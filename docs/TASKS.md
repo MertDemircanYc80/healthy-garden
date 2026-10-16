@@ -16,6 +16,8 @@ Roles and folder ownership are in `AGENTS.md`.
 ## Status (Oct 16)
 The full core loop runs **in the browser** (no backend needed): onboarding → tasks → collect
 coins → shop → plant → water/fertilize → skip a day → grow → real-tree certificate.
+Garden is a 3D Hay Day-style scene. Real data: Apple Health export import works now;
+iPhone Shortcuts sync works locally and needs Supabase for production (docs/DATA_SOURCES.md).
 Logic: `src/lib/game/engine.ts` (pure, tested by `npm run check`). Storage: localStorage via
 `src/components/GameProvider.tsx`. **Backend next step:** persist `GameState` in Supabase
 (task 2–5 + replace load()/save() in GameProvider) — screens don't need to change.
@@ -29,9 +31,9 @@ cut every stretch item.
 | # | Task | Role | Owner | Status |
 |---|---|---|---|---|
 | 1 | Repo scaffold, shared types, economy, mock adapter, API stubs | all | Mert | ✅ Done |
-| 2 | Create Supabase project, run `0001_init.sql`, share keys privately | backend | | Todo |
+| 2 | Create Supabase project, run migrations `0001`–`0003`, share keys privately | backend | | Todo |
 | 3 | Supabase client helper (`src/lib/supabase.ts`) | backend | | Todo |
-| 4 | `POST /api/sync` → upsert `daily_summaries` | backend | | Todo |
+| 4 | `/api/ingest` + `/api/summaries` (Shortcuts sync) | integration | Mert + Claude | ✅ Done (needs Supabase env + migration 0002) |
 | 5 | `GET /api/wallet` (balance from ledger + history) | backend | | Todo |
 | 6 | Vercel project linked to repo, share preview URL | integration | | Todo |
 | 7 | Wireframes for 5 core screens (30 min max) | design | | Todo |
@@ -56,11 +58,15 @@ cut every stretch item.
 
 | # | Task | Role | Owner | Status |
 |---|---|---|---|---|
-| 19 | File import adapter (Apple Health XML or CSV) | integration | | Todo |
+| 19 | Apple Health export.zip import (in-browser) | integration | Mert + Claude | ✅ Done |
 | 20 | Manual scroll-time input (fallback) | integration | | Todo (offline-hour logging already works) |
 | 21 | Real Impact screen + mocked redeem + certificate card | frontend + backend | Mert + Claude | ✅ Done |
 | 22 | Chrome extension (stretch) | integration | | Todo |
 | 23 | Open-Meteo "good day for a walk" banner (stretch) | frontend | | Todo |
+
+| 30 | Build the 3 iOS Shortcuts on a team iPhone (Data tab has steps), share iCloud links | integration | | Todo |
+| 31 | 3D Hay Day-style garden (procedural plants, 9 species) | frontend | Mert + Claude | ✅ Done |
+| 32 | 3D polish: planting particles, harvest/bloom celebration, camera fly-in | frontend | | Todo |
 
 ## Phase 4 — Polish & demo (hours 30–36)
 

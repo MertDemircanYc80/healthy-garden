@@ -8,6 +8,7 @@ const LINKS = [
   { href: "/tasks", label: "Tasks", icon: "✅" },
   { href: "/shop", label: "Shop", icon: "🛒" },
   { href: "/impact", label: "Impact", icon: "🌍" },
+  { href: "/data", label: "Data", icon: "📊" },
 ];
 
 export function BottomNav() {
@@ -21,7 +22,7 @@ export function BottomNav() {
             <li key={l.href}>
               <Link
                 href={l.href}
-                className={`flex flex-col items-center px-3 py-1 text-xs ${active ? "font-semibold text-leaf" : "text-muted"}`}
+                className={`flex flex-col items-center px-2 py-1 text-xs ${active ? "font-semibold text-leaf" : "text-muted"}`}
               >
                 <span className="text-xl" aria-hidden>
                   {l.icon}

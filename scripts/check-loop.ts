@@ -71,7 +71,7 @@ ok(today.health > 0 && today.health <= 1, `garden health meter in range (${today
 ok(today.earnedToday <= 200, "daily coin cap respected");
 
 const show = G.loadShowcase("2026-10-16");
-ok(show.plants.length === 7 && G.balanceOf(show) === 460, "showcase garden loads");
+ok(show.plants.length === 19 && G.balanceOf(show) === 460, "showcase garden loads (19 plants, 460 coins)");
 const r0 = G.redeemImpact(show);
 ok(!r0.ok, "tree locked below 500 coins");
 let sh = show;
@@ -80,6 +80,30 @@ sh = G.claimAll(sh).state;
 const r1 = G.redeemImpact(sh);
 ok(r1.ok && r1.state.impact.length === 1, `tree unlocks after crossing 500: ${r1.ok ? r1.message : r1.error}`);
 ok(!G.redeemImpact(r1.state).ok, "same milestone can't be redeemed twice");
+
+// Real data sources
+let r = G.createInitialState("2026-10-16");
+r = G.onboard(r, { name: "R", stepGoal: 8000, bedtimeTarget: "23:00", dataSource: "mock" }).state;
+ok(!G.setDataSource(r, "apple_health").ok, "can't switch to Apple Health before importing");
+const real = [
+  { date: "2026-10-15", steps: 9000, sleepMinutes: 450, bedtime: "23:05", wakeTime: "06:35", activeMinutes: 30, scrollMinutes: 0, longSessions: 0, source: "apple_health" as const },
+  { date: "2026-10-16", steps: 1200, sleepMinutes: 470, bedtime: "22:50", wakeTime: "06:40", activeMinutes: 0, scrollMinutes: 0, longSessions: 0, source: "apple_health" as const, runningMinutes: 25 },
+];
+const imp = G.importSummaries(r, real, "apple_health", "2026-10-16T10:00:00Z");
+ok(imp.ok && imp.state.profile.dataSource === "apple_health", "Apple Health import switches the source");
+r = imp.state;
+const rv = G.todayView(r);
+ok(rv.summary.steps === 1200 && rv.summary.runningMinutes === 25, "today uses imported numbers unchanged");
+ok(rv.tasks.find((t) => t.key === "first_steps")!.completed && rv.tasks.find((t) => t.key === "good_sleep")!.completed, "real data completes tasks");
+ok(!rv.tasks.find((t) => t.key === "doomscroll_down")!.completed, "no scroll source → doomscroll task not free");
+r = G.importSummaries(r, [{ ...real[1], source: "shortcut", scrollMinutes: 40, longSessions: 1, appUsage: { Instagram: 40 }, steps: 1500 }], "shortcut", "2026-10-16T11:00:00Z").state;
+const sv = G.todayView(r);
+ok(sv.summary.steps === 1500 && sv.summary.runningMinutes === 25 && sv.summary.scrollMinutes === 40, "Shortcuts sync merges with imported fields");
+ok(sv.tasks.find((t) => t.key === "doomscroll_down")!.completed, "doomscroll task works once scroll data exists (day-1 cap)");
+r = G.skipDay(r).state;
+ok(G.todayView(r).summary.steps === 0, "a day with no real data shows zeros, not fake numbers");
+r = G.clearImported(r).state;
+ok(r.profile.dataSource === "mock" && Object.keys(r.imported ?? {}).length === 0, "delete imported data returns to demo data");
 
 console.log(fails ? `\n${fails} check(s) failed` : "\nAll checks passed");
 process.exit(fails ? 1 : 0);

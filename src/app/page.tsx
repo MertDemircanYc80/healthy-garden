@@ -1,8 +1,9 @@
 "use client";
 
 // Home / Garden screen (plan §13.2 + §13.5 planting).
+import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useGame } from "@/components/GameProvider";
 import { PlantArt, STAGE_LABEL } from "@/components/Plant";
 import { Bar, Button, PageHeader, Sheet } from "@/components/ui";
@@ -11,6 +12,28 @@ import { fertilize, plant, plantAt, todayView, water, type GameState } from "@/l
 import type { GardenPlant } from "@/lib/types";
 
 type Selection = { x: number; y: number } | null;
+
+// three.js only runs in the browser.
+const Garden3D = dynamic(() => import("@/components/garden3d/Garden3D"), {
+  ssr: false,
+  loading: () => <div className="flex h-full items-center justify-center text-4xl"><span className="animate-pulse">🌱</span></div>,
+});
+
+function useWebGL() {
+  const [ok, setOk] = useState<boolean | null>(null);
+  useEffect(() => {
+    let supported = false;
+    try {
+      const c = document.createElement("canvas");
+      supported = !!(c.getContext("webgl2") || c.getContext("webgl"));
+    } catch {
+      supported = false;
+    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- feature detection needs the DOM
+    setOk(supported);
+  }, []);
+  return ok;
+}
 
 function nextHint(state: GameState) {
   const v = todayView(state);
@@ -27,6 +50,7 @@ function nextHint(state: GameState) {
 export default function GardenPage() {
   const { state, run } = useGame();
   const [sel, setSel] = useState<Selection>(null);
+  const webgl = useWebGL();
   const v = todayView(state);
   const hint = nextHint(state);
   const selected = sel ? plantAt(state, sel.x, sel.y) : undefined;
@@ -47,41 +71,28 @@ export default function GardenPage() {
     <div className="space-y-5">
       <PageHeader title={`Hi, ${state.profile.name}`} />
 
-      <section className="grid grid-cols-2 gap-3 rounded-3xl bg-card p-4 shadow-sm">
-        <div>
-          <p className="mb-1 text-xs font-medium text-muted">☀️ Sunlight today</p>
-          <Bar value={v.sunlight} tone="sun" />
-          <p className="mt-1 text-sm font-semibold">{Math.round(v.sunlight * 100)}%</p>
+      <section className="relative -mx-4 h-[58dvh] min-h-[360px] overflow-hidden sm:mx-0 sm:rounded-3xl">
+        {webgl === false ? (
+          <GardenGrid2D onSelect={(x, y) => setSel({ x, y })} />
+        ) : webgl ? (
+          <Garden3D
+            plants={state.plants}
+            sunlight={v.sunlight}
+            health={v.health}
+            selectedPlantId={selected?.id}
+            selectedPlot={sel && !selected ? sel : null}
+            onSelectPlant={(p) => setSel({ x: p.gridX, y: p.gridY })}
+            onSelectPlot={(x, y) => setSel({ x, y })}
+          />
+        ) : null}
+        <div className="pointer-events-none absolute inset-x-3 top-3 flex justify-between gap-2">
+          <Chip label="☀️ Sunlight" value={v.sunlight} tone="sun" />
+          <Chip label="🌿 Health" value={v.health} tone="leaf" />
         </div>
-        <div>
-          <p className="mb-1 text-xs font-medium text-muted">🌿 Garden health (7 days)</p>
-          <Bar value={v.health} />
-          <p className="mt-1 text-sm font-semibold">{Math.round(v.health * 100)}%</p>
-        </div>
-      </section>
-
-      <section
-        className="grid gap-2 rounded-3xl bg-[color-mix(in_oklab,var(--soil)_28%,var(--leaf-soft))] p-3"
-        style={{ gridTemplateColumns: `repeat(${GARDEN_GRID.cols}, minmax(0, 1fr))` }}
-        aria-label="Garden"
-      >
-        {Array.from({ length: GARDEN_GRID.rows }).flatMap((_, y) =>
-          Array.from({ length: GARDEN_GRID.cols }).map((__, x) => {
-            const p = plantAt(state, x, y);
-            return (
-              <button
-                key={`${x}-${y}`}
-                type="button"
-                onClick={() => setSel({ x, y })}
-                className="relative flex aspect-square items-end justify-center rounded-2xl bg-soil/35 pb-1.5 transition active:scale-95"
-                aria-label={p ? `${STAGE_LABEL[p.stage]} ${p.itemId.replace("_", " ")}` : "Empty spot"}
-              >
-                {p ? <PlantArt plant={p} /> : <span className="mb-3 text-lg text-foreground/20">+</span>}
-                {p?.wateredToday && <span className="absolute left-1 top-1 text-xs">💧</span>}
-                {p?.isDormant && <span className="absolute right-1 top-1 text-xs">💤</span>}
-              </button>
-            );
-          }),
+        {webgl && (
+          <p className="pointer-events-none absolute inset-x-0 bottom-2 text-center text-[11px] font-medium text-black/45">
+            Drag to look around · tap the soil to plant
+          </p>
         )}
       </section>
 
@@ -106,6 +117,48 @@ export default function GardenPage() {
         {sel && selected && <PlantDetails plant={selected} onDone={() => setSel(null)} />}
         {sel && !selected && <PlantPicker x={sel.x} y={sel.y} onDone={() => setSel(null)} />}
       </Sheet>
+    </div>
+  );
+}
+
+function Chip({ label, value, tone }: { label: string; value: number; tone: "sun" | "leaf" }) {
+  return (
+    <div className="w-[46%] rounded-2xl bg-white/85 px-3 py-2 shadow-sm backdrop-blur dark:bg-black/55">
+      <div className="flex justify-between text-[11px] font-semibold">
+        <span>{label}</span>
+        <span>{Math.round(value * 100)}%</span>
+      </div>
+      <div className="mt-1">
+        <Bar value={value} tone={tone} />
+      </div>
+    </div>
+  );
+}
+
+/** Fallback for devices without WebGL: the original grid. */
+function GardenGrid2D({ onSelect }: { onSelect: (x: number, y: number) => void }) {
+  const { state } = useGame();
+  return (
+    <div
+      className="grid h-full content-center gap-1.5 bg-[color-mix(in_oklab,var(--soil)_28%,var(--leaf-soft))] p-3 pt-20"
+      style={{ gridTemplateColumns: `repeat(${GARDEN_GRID.cols}, minmax(0, 1fr))` }}
+    >
+      {Array.from({ length: GARDEN_GRID.rows }).flatMap((_, y) =>
+        Array.from({ length: GARDEN_GRID.cols }).map((__, x) => {
+          const p = plantAt(state, x, y);
+          return (
+            <button
+              key={`${x}-${y}`}
+              type="button"
+              onClick={() => onSelect(x, y)}
+              className="relative flex aspect-square items-end justify-center rounded-xl bg-soil/35 pb-0.5"
+              aria-label={p ? `${STAGE_LABEL[p.stage]} ${p.itemId.replace("_", " ")}` : "Empty spot"}
+            >
+              {p ? <PlantArt plant={p} size={30} /> : <span className="mb-2 text-sm text-foreground/20">+</span>}
+            </button>
+          );
+        }),
+      )}
     </div>
   );
 }

@@ -12,9 +12,34 @@ export interface DailySummary {
   scrollMinutes: number; // total time on "feed" apps/sites (plan §8.2)
   longSessions: number; // feed sessions longer than 10 minutes
   source: DataSource;
+
+  // ---- Extended metrics (optional: each source fills what it has; see src/lib/data/) ----
+  walkingRunningKm?: number;
+  runningMinutes?: number; // from running workouts
+  workoutMinutes?: number; // all workouts
+  activeEnergyKcal?: number;
+  outdoorMinutes?: number; // Apple "Time in Daylight"
+  drivingMinutes?: number; // from driving start/end events (Shortcuts: Driving Focus / CarPlay)
+  appUsage?: Record<string, number>; // app name → minutes (feed apps the user selected)
+  nutrition?: Nutrition; // only when the user logs food into Apple Health (e.g. a food-logging app)
 }
 
-export type DataSource = "mock" | "file_import" | "aggregator" | "extension" | "manual";
+export interface Nutrition {
+  energyKcal?: number;
+  proteinG?: number;
+  carbsG?: number;
+  fatG?: number;
+  waterMl?: number;
+}
+
+export type DataSource =
+  | "mock"
+  | "file_import" // generic CSV
+  | "apple_health" // Apple Health export.zip uploaded in the app
+  | "shortcut" // iOS Shortcuts posting to /api/ingest
+  | "aggregator"
+  | "extension"
+  | "manual";
 
 export type TaskKey =
   | "first_steps"
@@ -42,8 +67,12 @@ export type ItemType = "flower" | "tree" | "tool" | "consumable";
 export type ShopItemId =
   | "daisy_seed"
   | "marigold_seed"
+  | "lavender_seed"
+  | "tulip_bulb"
   | "sunflower_seed"
+  | "rose_bush"
   | "fruit_sapling"
+  | "cherry_sapling"
   | "oak_sapling"
   | "watering_can"
   | "fertilizer";

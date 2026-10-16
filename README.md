@@ -27,11 +27,12 @@ The whole core loop, on a phone-sized screen, with no backend:
 - **Onboarding** (name, step goal, bedtime, data source) — or "load the demo garden"
 - **Tasks** — today's steps / sleep / scroll in one place, live progress, collect coins (idempotent, 200/day cap)
 - **Shop** — seeds, saplings, watering can, fertilizer
-- **Garden** — 4×4 grid, plant, water (or water all), fertilize; plants grow overnight, rest (never die) when skipped
+- **Garden** — a 3D Hay Day-style island (drag to rotate, pinch to zoom): tap the soil to plant, tap a plant to water/fertilize; 9 species (daisy, marigold, lavender, tulip, sunflower, rose, fruit tree, cherry blossom, oak) grow through 5 stages and rest (never die) when skipped
+- **Data** — import an Apple Health export (steps, walking/running, workouts, sleep, energy, daylight, food); iPhone Shortcuts sync for daily totals, feed-app time and driving (see `docs/DATA_SOURCES.md`)
 - **Real impact** — every 500 coins unlocks a (mocked) real tree + certificate
 - **🧪 Demo panel** — +1,000 steps, +1 h sleep, −30 min scroll, offline hour, skip to tomorrow, load demo garden, reset
 
-Data is saved in the browser (localStorage) until Supabase is wired. `npm run check` runs the core-loop tests.
+Game state is saved in the browser (localStorage). Shortcuts sync needs Supabase in production (`npm run dev` uses an in-memory store). `npm run check` runs the game-loop and data-pipeline tests.
 
 **Demo tip:** "Load demo garden" starts at 460 coins — complete one task live and the first real tree unlocks.
 
@@ -53,6 +54,7 @@ point to it.
 
 ## Credits
 
-_Add every third-party API, asset pack and dataset used here before submission._
+All 3D models are procedural (generated in code). Libraries: Next.js, React, three.js,
+@react-three/fiber, @react-three/drei, fflate, Supabase JS. _Add any other API, asset or dataset here before submission._
 
 **Not medical advice.** Healthy Garden is a hackathon prototype; tree-planting is mocked.

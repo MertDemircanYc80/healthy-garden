@@ -16,11 +16,22 @@ import type { DailySummary, GardenPlant, ShopItemId, TaskKey, TaskProgress } fro
 
 // ---------- State ----------
 
+export type ActiveSource = "mock" | "apple_health" | "shortcut";
+
 export interface Profile {
   name: string;
   stepGoal: number;
   bedtimeTarget: string; // "HH:MM"
-  dataSource: "mock" | "file_import";
+  /** Where today's numbers come from. Real sources fill `imported`. */
+  dataSource: ActiveSource;
+}
+
+export interface SyncInfo {
+  /** Personal token the iOS Shortcuts send as "Authorization: Bearer <token>". Never shared in URLs. */
+  token: string;
+  lastSyncAt?: string;
+  lastImportAt?: string;
+  importedRange?: { from: string; to: string };
 }
 
 export interface LedgerEntry {
@@ -63,6 +74,9 @@ export interface GameState {
   history: Record<string, number>;
   impact: ImpactRecord[];
   nextId: number;
+  /** Real data by day from Apple Health import and/or Shortcuts sync. */
+  imported?: Record<string, DailySummary>;
+  sync?: SyncInfo;
 }
 
 export type ActionResult = { state: GameState; ok: true; message: string } | { state: GameState; ok: false; error: string };
@@ -119,25 +133,57 @@ export function onboard(state: GameState, profile: Profile): ActionResult {
 
 const NO_ADJUST: DayAdjust = { steps: 0, sleepMinutes: 0, scrollMinutes: 0, offlineHours: 0 };
 
-/**
- * Today's data "so far". Past days use the full day from the data source;
- * the current day starts like a morning (last night's sleep is final, steps/scroll partial)
- * so the demo has room to show progress live.
- */
+export const emptySummary = (day: string, source: DailySummary["source"]): DailySummary => ({
+  date: day,
+  steps: 0,
+  sleepMinutes: 0,
+  bedtime: null,
+  wakeTime: null,
+  activeMinutes: 0,
+  scrollMinutes: 0,
+  longSessions: 0,
+  source,
+});
+
+/** Raw data for a day from the active source (before demo/manual adjustments). */
+function baseSummary(state: GameState, day: string): DailySummary {
+  if (state.profile.dataSource === "mock") {
+    // Demo data: the current day starts like a morning (sleep final, steps/scroll partial)
+    // so the demo has room to show progress live.
+    const m = mockSummary(day);
+    const isToday = day === state.day;
+    return {
+      ...m,
+      steps: Math.round(m.steps * (isToday ? 0.3 : 1)),
+      scrollMinutes: Math.round(m.scrollMinutes * (isToday ? 0.5 : 1)),
+    };
+  }
+  return state.imported?.[day] ?? emptySummary(day, state.profile.dataSource);
+}
+
+/** True when some source actually measured scrolling on this day. */
+export function hasScrollData(state: GameState, day: string): boolean {
+  if (state.profile.dataSource === "mock") return true;
+  const d = state.imported?.[day];
+  return !!d && (d.appUsage !== undefined || d.scrollMinutes > 0 || d.longSessions > 0);
+}
+
+/** A day's numbers = active source + demo/manual adjustments. */
 export function summaryFor(state: GameState, day: string): DailySummary {
-  const base = mockSummary(day); // TODO(integration): pick adapter by state.profile.dataSource
+  const base = baseSummary(state, day);
   const a = state.adjust[day] ?? NO_ADJUST;
-  const isToday = day === state.day;
   return {
     ...base,
-    steps: Math.max(0, Math.round(base.steps * (isToday ? 0.3 : 1)) + a.steps),
+    steps: Math.max(0, base.steps + a.steps),
     sleepMinutes: Math.max(0, base.sleepMinutes + a.sleepMinutes),
-    scrollMinutes: Math.max(0, Math.round(base.scrollMinutes * (isToday ? 0.5 : 1)) + a.scrollMinutes),
+    scrollMinutes: Math.max(0, base.scrollMinutes + a.scrollMinutes),
   };
 }
 
 export function scrollBaseline(state: GameState, day: string): number | null {
-  const prev = Array.from({ length: 7 }, (_, i) => summaryFor(state, addDays(day, -(i + 1))));
+  const prev = Array.from({ length: 7 }, (_, i) => addDays(day, -(i + 1)))
+    .filter((d) => hasScrollData(state, d))
+    .map((d) => summaryFor(state, d));
   if (prev.length === 0) return null;
   return prev.reduce((sum, d) => sum + d.scrollMinutes, 0) / prev.length;
 }
@@ -153,6 +199,7 @@ export function tasksFor(state: GameState, day: string): TaskView[] {
     scrollBaselineMinutes: scrollBaseline(state, day),
     bedtimeTarget: state.profile.bedtimeTarget,
     offlineHours: (state.adjust[day] ?? NO_ADJUST).offlineHours,
+    hasScrollData: hasScrollData(state, day) || (state.adjust[day]?.scrollMinutes ?? 0) !== 0,
   });
   const paid = state.awarded[day] ?? {};
   return tasks.map((t) => {
@@ -336,6 +383,47 @@ export function skipDay(state: GameState): ActionResult {
   return done(s, parts.join(" · "));
 }
 
+// ---------- Data sources ----------
+
+/** Merge real daily summaries (Apple Health import or Shortcuts sync) and switch to that source. */
+export function importSummaries(state: GameState, summaries: DailySummary[], source: Exclude<ActiveSource, "mock">, at: string): ActionResult {
+  if (!summaries.length) return nope(state, "No days with data were found in that file.");
+  const imported = { ...(state.imported ?? {}) };
+  for (const s of summaries) {
+    const prev = imported[s.date];
+    // Keep fields from other sources; the newest source wins where both have a value.
+    imported[s.date] = prev ? { ...prev, ...Object.fromEntries(Object.entries(s).filter(([, v]) => v !== undefined)), source } : { ...s, source };
+  }
+  const days = summaries.map((s) => s.date).sort();
+  const sync: SyncInfo = {
+    ...(state.sync ?? { token: "" }),
+    ...(source === "apple_health" ? { lastImportAt: at, importedRange: { from: days[0], to: days[days.length - 1] } } : { lastSyncAt: at }),
+  };
+  return done(
+    { ...state, imported, sync, profile: { ...state.profile, dataSource: source } },
+    `${summaries.length} day${summaries.length > 1 ? "s" : ""} of real data added 🌿`,
+  );
+}
+
+export function setDataSource(state: GameState, source: ActiveSource): ActionResult {
+  if (source !== "mock" && !Object.keys(state.imported ?? {}).length) {
+    return nope(state, "Import Apple Health data or run a Shortcut first.");
+  }
+  const label = { mock: "Demo data", apple_health: "Apple Health", shortcut: "iPhone Shortcuts" }[source];
+  return done({ ...state, profile: { ...state.profile, dataSource: source } }, `Using ${label}`);
+}
+
+export function setSyncToken(state: GameState, token: string): GameState {
+  return { ...state, sync: { ...(state.sync ?? {}), token } };
+}
+
+export function clearImported(state: GameState): ActionResult {
+  return done(
+    { ...state, imported: {}, sync: state.sync ? { token: state.sync.token } : undefined, profile: { ...state.profile, dataSource: "mock" } },
+    "Imported health data deleted from this device",
+  );
+}
+
 const PARTNER = "Tree-planting partner (prototype)";
 const SITES = [
   { location: "Santa Cruz Mountains, California", species: "Coast redwood" },
@@ -360,12 +448,24 @@ export function loadShowcase(today: string): GameState {
   s = onboard(s, { name: "Demo", stepGoal: 8000, bedtimeTarget: "23:00", dataSource: "mock" }).state;
   const garden: [ShopItemId, number, number, number, boolean][] = [
     ["oak_sapling", 0, 0, 8, false],
+    ["cherry_sapling", 7, 0, 8, false],
+    ["fruit_sapling", 3, 0, 7, false],
     ["sunflower_seed", 1, 0, 5, false],
-    ["daisy_seed", 2, 0, 3, false],
-    ["marigold_seed", 3, 0, 2, false],
-    ["fruit_sapling", 0, 1, 7, false],
-    ["daisy_seed", 1, 1, 1, true],
-    ["sunflower_seed", 3, 1, 3, false],
+    ["sunflower_seed", 2, 0, 5, false],
+    ["sunflower_seed", 5, 0, 3, false],
+    ["rose_bush", 6, 1, 6, false],
+    ["rose_bush", 4, 1, 4, false],
+    ["tulip_bulb", 1, 2, 4, false],
+    ["tulip_bulb", 2, 2, 4, false],
+    ["tulip_bulb", 3, 2, 3, false],
+    ["lavender_seed", 5, 2, 4, false],
+    ["lavender_seed", 6, 2, 4, false],
+    ["daisy_seed", 0, 3, 3, false],
+    ["daisy_seed", 1, 3, 3, false],
+    ["marigold_seed", 2, 3, 3, false],
+    ["marigold_seed", 4, 3, 2, false],
+    ["daisy_seed", 6, 3, 1, true],
+    ["tulip_bulb", 7, 3, 1, false],
   ];
   for (const [itemId, x, y, points, dormant] of garden) {
     const item = SHOP_ITEMS.find((i) => i.id === itemId)!;

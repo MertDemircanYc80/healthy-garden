@@ -1,6 +1,7 @@
 "use client";
 
 // Tasks screen (plan §13.3): today's data in one place + task progress + collect coins.
+import Link from "next/link";
 import { useGame } from "@/components/GameProvider";
 import { Bar, Button, PageHeader } from "@/components/ui";
 import { DAILY_COIN_CAP } from "@/lib/economy";
@@ -30,7 +31,12 @@ export default function TasksPage() {
         <Stat label="Sleep" value={`${Math.floor(summary.sleepMinutes / 60)}h ${summary.sleepMinutes % 60}m`} icon="😴" />
         <Stat label="Scrolling" value={`${summary.scrollMinutes} min`} icon="📱" />
       </section>
-      <p className="-mt-3 text-center text-xs text-muted">Source: demo data · daily totals only</p>
+      <p className="-mt-3 text-center text-xs text-muted">
+        Source: {{ mock: "demo data", apple_health: "Apple Health", shortcut: "iPhone Shortcuts" }[state.profile.dataSource]} ·{" "}
+        <Link href="/data" className="font-semibold text-leaf">
+          manage
+        </Link>
+      </p>
 
       <section className="flex items-center justify-between rounded-2xl bg-leaf-soft p-3">
         <div>

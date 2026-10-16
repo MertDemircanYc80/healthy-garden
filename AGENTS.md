@@ -57,41 +57,44 @@ never guilt-based.
 ```
 src/
   app/
-    page.tsx            Home / Garden screen
-    tasks/page.tsx      Tasks screen
-    shop/page.tsx       Shop screen
-    impact/page.tsx     Real Impact screen
-    api/**/route.ts     API endpoints (plan §12). Stubs return 501 until built.
+    page.tsx              Home: 3D garden (2D grid fallback without WebGL) + plant/plot sheets
+    tasks/page.tsx        Tasks screen
+    shop/page.tsx         Shop screen
+    impact/page.tsx       Real Impact screen
+    data/page.tsx         Data sources: Apple Health import, iPhone Shortcuts sync, privacy/delete
+    api/ingest/route.ts   POST health totals + app/driving events (Bearer sync token); DELETE all
+    api/summaries/route.ts GET synced data as DailySummary[]
+    api/**/route.ts       Other endpoints from plan §12 (stubs return 501)
   components/
-    GameProvider.tsx    Holds GameState, saves to localStorage; screens use useGame()
-    AppShell.tsx        Provider + onboarding gate + nav + demo panel
-    ui.tsx              Shared UI: PageHeader, Button, Bar, Sheet, Toasts
-    Plant.tsx           Plant art per stage (swap emoji for sprites here)
+    GameProvider.tsx      Holds GameState, saves to localStorage; screens use useGame()
+    AppShell.tsx          Provider + onboarding gate + nav + demo panel + auto-sync
+    garden3d/             three.js garden: Garden3D (canvas/camera/lights), Scenery, Plants, shared
+    ui.tsx                Shared UI: PageHeader, Button, Bar, Sheet, Toasts
+    Plant.tsx             2D emoji plant art (sheets, fallback grid)
   lib/
-    game/engine.ts      THE GAME: whole core loop as pure functions (state in → state out)
-    types.ts            Shared types — DailySummary is THE data contract
-    economy.ts          All game numbers (tasks, rewards, prices, caps)
-    tasks.ts            Task evaluator (pure functions)
-    garden.ts           Garden engine (pure functions)
-    today.ts            Builds today's summary + tasks for a user
-    api.ts              ok()/fail()/notImplemented() + DEMO_USER_ID
-  adapters/
-    types.ts            DataAdapter interface
-    mock.ts             Seeded 14-day demo data (REQUIRED, never remove)
-    index.ts            Adapter registry
-supabase/migrations/    SQL schema + seed (numbered, append-only)
-extension/              Chrome doomscroll tracker (stretch)
-docs/PLAN.md            Product plan (source of truth for scope)
-docs/TASKS.md           Task board / ownership
+    game/engine.ts        THE GAME: whole core loop as pure functions (state in → state out)
+    data/samples.ts       Raw data model (HealthSample, DeviceEvent, DailyMetrics)
+    data/aggregate.ts     Raw data → DailySummary (dedupe, sleep nights, sessions, driving)
+    data/appleHealth.ts   Streaming Apple Health export.xml parser (+ .worker.ts)
+    data/client.ts        Browser: import worker, sync fetch, token
+    server/               ingest validation/auth + storage (Supabase or dev memory)
+    types.ts              Shared types — DailySummary is THE data contract
+    economy.ts            All game numbers (tasks, rewards, prices, species, caps)
+    tasks.ts / garden.ts  Task evaluator / growth rules (pure)
+  adapters/mock.ts        Seeded demo data (REQUIRED, never remove)
+scripts/check-*.ts        `npm run check` — game loop + data pipeline tests
+supabase/migrations/      SQL schema + seed (numbered, append-only)
+docs/DATA_SOURCES.md      How real data gets in (read before touching data code)
+docs/PLAN.md / TASKS.md   Product plan / task board
 ```
 
 ## Ownership (avoid merge conflicts)
 
 | Role | Owns |
 |---|---|
-| Frontend / UI | `src/app/**/page.tsx`, `src/components/**`, `globals.css` |
+| Frontend / UI | `src/app/**/page.tsx`, `src/components/**` (incl. `garden3d/`), `globals.css` |
 | Backend / data | `src/app/api/**`, `src/lib/tasks.ts`, `src/lib/garden.ts`, `src/lib/today.ts`, `supabase/**` |
-| Integration | `src/adapters/**`, `extension/**`, `src/app/api/sync`, `src/app/api/demo` |
+| Integration | `src/lib/data/**`, `src/lib/server/**`, `src/app/api/ingest`, `src/app/api/summaries`, `src/app/data/**`, `extension/**` |
 | Pitch / design | `docs/**`, `public/**` (sprites, assets), README |
 
 Touching another role's files is fine for a one-line fix — mention it in the PR.
@@ -107,6 +110,13 @@ Touching another role's files is fine for a one-line fix — mention it in the P
   replacing load()/save() (and optionally running engine actions in API routes) — not
   rewriting screens.
 - The 🧪 Demo panel is the stage control for judging. Keep it working.
+- Real data: every source becomes `DailySummary` via `src/lib/data/aggregate.ts`, then
+  `importSummaries()` in the engine. Read `docs/DATA_SOURCES.md` first. Never send health data
+  or the sync token in URLs; keep Apple Health parsing in the browser.
+- 3D garden: plants are procedural (no downloaded models). New species = add to
+  `SHOP_ITEMS` + `ShopItemId`, a component in `garden3d/Plants.tsx`, and a `Species` case.
+  Share geometries/materials through `garden3d/shared.ts` (`GEO`, `mat()`) — don't create
+  materials inside render.
 
 ## Conventions
 

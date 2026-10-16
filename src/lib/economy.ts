@@ -48,14 +48,19 @@ export const TASKS_FOR_FULL_SUNLIGHT = 3;
 export const SHOP_ITEMS: ShopItem[] = [
   { id: "daisy_seed", name: "Daisy seed", type: "flower", price: 20, growthDays: 3, emoji: "🌼" },
   { id: "marigold_seed", name: "Marigold seed", type: "flower", price: 30, growthDays: 3, emoji: "🏵️" },
+  { id: "lavender_seed", name: "Lavender seed", type: "flower", price: 35, growthDays: 4, emoji: "🪻" },
+  { id: "tulip_bulb", name: "Tulip bulb", type: "flower", price: 40, growthDays: 4, emoji: "🌷" },
   { id: "sunflower_seed", name: "Sunflower seed", type: "flower", price: 50, growthDays: 5, emoji: "🌻" },
+  { id: "rose_bush", name: "Rose bush", type: "flower", price: 70, growthDays: 6, emoji: "🌹" },
   { id: "fruit_sapling", name: "Fruit sapling", type: "tree", price: 100, growthDays: 7, emoji: "🍎" },
+  { id: "cherry_sapling", name: "Cherry blossom sapling", type: "tree", price: 120, growthDays: 8, emoji: "🌸" },
   { id: "oak_sapling", name: "Oak sapling", type: "tree", price: 150, growthDays: 10, emoji: "🌳" },
   { id: "watering_can", name: "Watering can", type: "tool", price: 50, growthDays: null, emoji: "🚿" },
   { id: "fertilizer", name: "Fertilizer", type: "consumable", price: 20, growthDays: null, emoji: "🧪" },
 ];
 
-export const GARDEN_GRID = { cols: 4, rows: 4 } as const;
+/** Hidden planting plots in the 3D garden bed (plants snap to the nearest free plot). */
+export const GARDEN_GRID = { cols: 8, rows: 6 } as const;
 
 /** Real-impact milestone (plan §14): mocked tree planting. */
 export const IMPACT_MILESTONE_COINS = 500;

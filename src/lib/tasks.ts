@@ -10,6 +10,8 @@ export interface EvaluateContext {
   bedtimeTarget: string;
   /** Offline hours logged today (from extension or manual input). */
   offlineHours: number;
+  /** False when no source measures scrolling today — then "Doomscroll down" can't be earned for free. */
+  hasScrollData?: boolean;
 }
 
 const ratio = (value: number, goal: number) => Math.max(0, Math.min(1, value / goal));
@@ -69,6 +71,9 @@ export function evaluateTasks(summary: DailySummary, ctx: EvaluateContext): Task
         };
       }
       case "doomscroll_down": {
+        if (ctx.hasScrollData === false) {
+          return { ...task, progress: 0, completed: false, label: "Connect scroll tracking (Data tab) to unlock" };
+        }
         // Fairness rule: compare against the user's own baseline.
         const limit =
           ctx.scrollBaselineMinutes === null
