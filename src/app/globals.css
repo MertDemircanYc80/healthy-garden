@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+/* Rooted palette — calm, warm, nature (plan §13). Use these tokens, not raw hex. */
+:root {
+  --background: #f7f4ec;
+  --foreground: #1f2a1f;
+  --card: #ffffff;
+  --muted: #6b7565;
+  --leaf: #3f7d4e;
+  --leaf-soft: #dcebd9;
+  --sun: #e9b949;
+  --soil: #8a6a4b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #141a14;
+    --foreground: #e8ede4;
+    --card: #1d251d;
+    --muted: #9aa594;
+    --leaf: #7fc28e;
+    --leaf-soft: #253626;
+    --sun: #f0c868;
+    --soil: #b08d6c;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-leaf: var(--leaf);
+  --color-leaf-soft: var(--leaf-soft);
+  --color-sun: var(--sun);
+  --color-soil: var(--soil);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
