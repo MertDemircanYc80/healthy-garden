@@ -22,10 +22,18 @@ Open it in your browser's phone view (DevTools → device toolbar) — the app i
 
 ## What works right now
 
-- `/tasks` — today's tasks with progress bars, from seeded mock data
-- `/shop` — item list (buying not wired yet)
-- `GET /api/tasks/today`, `GET /api/shop`
-- Every other endpoint in `src/app/api/` is a stub returning **501** with its owner — claim it in `docs/TASKS.md`
+The whole core loop, on a phone-sized screen, with no backend:
+
+- **Onboarding** (name, step goal, bedtime, data source) — or "load the demo garden"
+- **Tasks** — today's steps / sleep / scroll in one place, live progress, collect coins (idempotent, 200/day cap)
+- **Shop** — seeds, saplings, watering can, fertilizer
+- **Garden** — 4×4 grid, plant, water (or water all), fertilize; plants grow overnight, rest (never die) when skipped
+- **Real impact** — every 500 coins unlocks a (mocked) real tree + certificate
+- **🧪 Demo panel** — +1,000 steps, +1 h sleep, −30 min scroll, offline hour, skip to tomorrow, load demo garden, reset
+
+Data is saved in the browser (localStorage) until Supabase is wired. `npm run check` runs the core-loop tests.
+
+**Demo tip:** "Load demo garden" starts at 460 coins — complete one task live and the first real tree unlocks.
 
 ## Stack
 

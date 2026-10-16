@@ -41,3 +41,31 @@ body {
   color: var(--foreground);
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
+
+/* ---- Small celebratory motion (plan §13: celebrate wins with small animations) ---- */
+@keyframes hg-pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); }
+}
+@keyframes hg-sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+@keyframes hg-toast {
+  0% { transform: translateY(12px); opacity: 0; }
+  12%, 85% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-6px); opacity: 0; }
+}
+@keyframes hg-sheet {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.hg-pop { animation: hg-pop 0.45s ease-out both; }
+.hg-sway { animation: hg-sway 3.5s ease-in-out infinite; transform-origin: 50% 100%; }
+.hg-toast { animation: hg-toast 2.6s ease-in-out both; }
+.hg-sheet { animation: hg-sheet 0.22s ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hg-pop, .hg-sway, .hg-toast, .hg-sheet { animation: none; }
+}

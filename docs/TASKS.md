@@ -13,6 +13,13 @@ Roles and folder ownership are in `AGENTS.md`.
 | Integration lead | _TBD_ |
 | Pitch / design lead | _TBD_ |
 
+## Status (Oct 16)
+The full core loop runs **in the browser** (no backend needed): onboarding → tasks → collect
+coins → shop → plant → water/fertilize → skip a day → grow → real-tree certificate.
+Logic: `src/lib/game/engine.ts` (pure, tested by `npm run check`). Storage: localStorage via
+`src/components/GameProvider.tsx`. **Backend next step:** persist `GameState` in Supabase
+(task 2–5 + replace load()/save() in GameProvider) — screens don't need to change.
+
 ## Checkpoint (hour 16)
 Complete a task → earn coins → buy a seed → plant it → see it grow. If not working,
 cut every stretch item.
@@ -38,20 +45,20 @@ cut every stretch item.
 | 10 | `POST /api/shop/buy` + inventory | backend | | Todo |
 | 11 | `GET /api/garden`, `plant`, `water`, `fertilize` | backend | | Todo |
 | 12 | Daily growth run (on page load) using `lib/garden.ts` | backend | | Todo |
-| 13 | Garden grid UI: render plants by stage, dormant = grey | frontend | | Todo |
-| 14 | Planting flow: pick seed → tap cell; tap plant → water/fertilize | frontend | | Todo |
-| 15 | Shop buy button + coin balance in header | frontend | | Todo |
-| 16 | Garden health meter + sunlight on home | frontend | | Todo |
-| 17 | `POST /api/demo/boost` + "skip a day" control | integration | | Todo |
-| 18 | Onboarding (name, step goal, bedtime, data source) | frontend | | Todo |
+| 13 | Garden grid UI: render plants by stage, dormant = grey | frontend | Mert + Claude | ✅ Done (local storage) |
+| 14 | Planting flow: pick seed → tap cell; tap plant → water/fertilize | frontend | Mert + Claude | ✅ Done (local storage) |
+| 15 | Shop buy button + coin balance in header | frontend | Mert + Claude | ✅ Done (local storage) |
+| 16 | Garden health meter + sunlight on home | frontend | Mert + Claude | ✅ Done (local storage) |
+| 17 | `POST /api/demo/boost` + "skip a day" control | integration | Mert + Claude | ✅ Done (local storage) |
+| 18 | Onboarding (name, step goal, bedtime, data source) | frontend | Mert + Claude | ✅ Done (local storage) |
 
 ## Phase 3 — Real data & impact (hours 22–30)
 
 | # | Task | Role | Owner | Status |
 |---|---|---|---|---|
 | 19 | File import adapter (Apple Health XML or CSV) | integration | | Todo |
-| 20 | Manual scroll-time input (fallback) | integration | | Todo |
-| 21 | Real Impact screen + mocked redeem + certificate card | frontend + backend | | Todo |
+| 20 | Manual scroll-time input (fallback) | integration | | Todo (offline-hour logging already works) |
+| 21 | Real Impact screen + mocked redeem + certificate card | frontend + backend | Mert + Claude | ✅ Done |
 | 22 | Chrome extension (stretch) | integration | | Todo |
 | 23 | Open-Meteo "good day for a walk" banner (stretch) | frontend | | Todo |
 
@@ -60,7 +67,7 @@ cut every stretch item.
 | # | Task | Role | Owner | Status |
 |---|---|---|---|---|
 | 24 | Growth / coin / planting animations | frontend | | Todo |
-| 25 | Seeded demo account with a good-looking garden | backend | | Todo |
+| 25 | Seeded demo account with a good-looking garden | backend | Mert + Claude | ✅ Done |
 | 26 | Test on a real phone + poor connection | all | | Todo |
 | 27 | Backup demo video | design | | Todo |
 | 28 | Slides + pitch, rehearse 2× with timer | design | | Todo |

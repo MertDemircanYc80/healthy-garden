@@ -59,3 +59,17 @@ export const GARDEN_GRID = { cols: 4, rows: 4 } as const;
 
 /** Real-impact milestone (plan §14): mocked tree planting. */
 export const IMPACT_MILESTONE_COINS = 500;
+
+/** Given once at onboarding so a new user can plant on day one. Tune freely. */
+export const WELCOME_GIFT: { itemId: ShopItem["id"]; quantity: number }[] = [
+  { itemId: "watering_can", quantity: 1 },
+  { itemId: "daisy_seed", quantity: 1 },
+];
+
+/** Demo-control step sizes (plan §17: live boost on stage). */
+export const DEMO_BOOST = {
+  steps: 1_000,
+  sleepMinutes: 60,
+  scrollMinutes: -30,
+  offlineHours: 1,
+} as const;

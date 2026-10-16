@@ -29,7 +29,7 @@ never guilt-based.
    Do not add real payments, native apps, medical advice, or new wearables.
 4. **Never commit secrets.** Keys go in `.env.local` (gitignored). Only `.env.example`
    is committed, with empty values.
-5. **Before every push:** `npm run lint && npm run build` must pass. Never push a red build to `main`.
+5. **Before every push:** `npm run lint && npm run check && npm run build` must pass. Never push a red build to `main`.
 6. **Small, frequent commits** on a feature branch; open a PR to `main` (see Git workflow).
 7. **Don't add dependencies casually.** Ask your human first; prefer what's already here.
    Approved if needed: `@supabase/supabase-js`, `recharts`.
@@ -47,8 +47,9 @@ never guilt-based.
 ⚠️ Next.js 16 differs from older versions you may know. Before using a Next API, check
 `node_modules/next/dist/docs/`. Known gotchas in this repo:
 - `export const dynamic = "force-dynamic"` is **not allowed** (cacheComponents is on).
-  For request-time data, call `await connection()` (from `next/server`) and render the
-  async component inside `<Suspense>`. See `src/app/tasks/page.tsx` for the pattern.
+  For request-time server data, call `await connection()` (from `next/server`) and render
+  the async component inside `<Suspense>`.
+- Previously visited routes stay mounted but hidden, so tests must target visible elements.
 - `params` / `searchParams` are Promises — `await` them.
 
 ## Project map
@@ -57,12 +58,17 @@ never guilt-based.
 src/
   app/
     page.tsx            Home / Garden screen
-    tasks/page.tsx      Tasks screen  ← reference pattern for data screens
+    tasks/page.tsx      Tasks screen
     shop/page.tsx       Shop screen
     impact/page.tsx     Real Impact screen
     api/**/route.ts     API endpoints (plan §12). Stubs return 501 until built.
-  components/           Shared UI (BottomNav, Placeholder)
+  components/
+    GameProvider.tsx    Holds GameState, saves to localStorage; screens use useGame()
+    AppShell.tsx        Provider + onboarding gate + nav + demo panel
+    ui.tsx              Shared UI: PageHeader, Button, Bar, Sheet, Toasts
+    Plant.tsx           Plant art per stage (swap emoji for sprites here)
   lib/
+    game/engine.ts      THE GAME: whole core loop as pure functions (state in → state out)
     types.ts            Shared types — DailySummary is THE data contract
     economy.ts          All game numbers (tasks, rewards, prices, caps)
     tasks.ts            Task evaluator (pure functions)
@@ -90,6 +96,18 @@ docs/TASKS.md           Task board / ownership
 
 Touching another role's files is fine for a one-line fix — mention it in the PR.
 
+## How the app works today (read before changing anything)
+
+- All game rules live in `src/lib/game/engine.ts`. Every action is
+  `(state, …args) => { ok, state, message } | { ok: false, state, error }`. Screens call
+  `run((s) => action(s, …))` from `useGame()`; the provider saves state and shows a toast.
+- New rule or feature → add a pure function to the engine + a check in `scripts/check-loop.ts`,
+  then call it from a screen. Run `npm run check`.
+- Persistence is localStorage (`GameProvider.tsx` load/save). Moving to Supabase means
+  replacing load()/save() (and optionally running engine actions in API routes) — not
+  rewriting screens.
+- The 🧪 Demo panel is the stage control for judging. Keep it working.
+
 ## Conventions
 
 - **TypeScript strict.** No `any` unless unavoidable (then comment why).
@@ -110,7 +128,7 @@ Touching another role's files is fine for a one-line fix — mention it in the P
 1. `git pull origin main` before starting anything.
 2. Branch: `git checkout -b <role>/<short-feature>` e.g. `backend/wallet-api`, `ui/garden-grid`.
 3. Commit often: `feat: …`, `fix: …`, `chore: …`, `docs: …`.
-4. Before pushing: `git pull --rebase origin main`, then `npm run lint && npm run build`.
+4. Before pushing: `git pull --rebase origin main`, then `npm run lint && npm run check && npm run build`.
 5. Push and open a PR into `main`. Keep PRs small (one feature). Merge quickly once the build is green.
 6. In `docs/TASKS.md`, move your task to "Done" in the same PR.
 

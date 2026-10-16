@@ -5,7 +5,7 @@
 <!-- Which item in docs/TASKS.md? -->
 
 ## Checklist
-- [ ] `npm run lint && npm run build` pass
+- [ ] `npm run lint && npm run check && npm run build` pass
 - [ ] Works on a phone-sized screen with the mock adapter
 - [ ] No changes to shared contracts (types.ts, economy.ts, adapters/types.ts, migrations) — or the team was told
 - [ ] No secrets / `.env.local` committed
