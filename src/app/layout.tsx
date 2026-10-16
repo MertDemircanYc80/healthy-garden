@@ -3,7 +3,7 @@ import { BottomNav } from "@/components/BottomNav";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Rooted",
+  title: "Healthy Garden",
   description: "Healthy habits grow a living garden.",
 };
 

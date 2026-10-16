@@ -1,4 +1,4 @@
-# Rooted doomscroll tracker (Chrome extension, Manifest V3)
+# Healthy Garden doomscroll tracker (Chrome extension, Manifest V3)
 
 **Owner:** integration lead · **Status:** not started (stretch, plan §8.2 Option A)
 

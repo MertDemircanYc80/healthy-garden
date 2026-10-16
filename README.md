@@ -1,8 +1,10 @@
-# 🌱 Rooted
+# 🌱 Healthy Garden
 
-> Forest rewards you for putting your phone down. Rooted rewards you for living well.
+> Forest rewards you for putting your phone down. Healthy Garden rewards you for living well.
+>
+> **Grow Yourself. Grow Your Garden. Grow a Better World.** 🌱
 
-Rooted turns healthy habits — walking, sleeping well, scrolling less — into a living
+Healthy Garden turns healthy habits — walking, sleeping well, scrolling less — into a living
 virtual garden, with milestones that link to real-world tree planting.
 Hackathon project · plan in [`docs/PLAN.md`](docs/PLAN.md) · task board in [`docs/TASKS.md`](docs/TASKS.md).
 
@@ -10,7 +12,7 @@ Hackathon project · plan in [`docs/PLAN.md`](docs/PLAN.md) · task board in [`d
 
 ```bash
 git clone <this-repo-url>
-cd rooted
+cd healthy-garden
 npm install
 cp .env.example .env.local   # fill in Supabase keys when available (app runs on mock data without them)
 npm run dev                  # http://localhost:3000
@@ -45,4 +47,4 @@ point to it.
 
 _Add every third-party API, asset pack and dataset used here before submission._
 
-**Not medical advice.** Rooted is a hackathon prototype; tree-planting is mocked.
+**Not medical advice.** Healthy Garden is a hackathon prototype; tree-planting is mocked.

@@ -7,7 +7,7 @@ export default function HomePage() {
   return (
     <div className="space-y-6">
       <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">🌱 Rooted</h1>
+        <h1 className="text-2xl font-semibold">🌱 Healthy Garden</h1>
         <span className="rounded-full bg-card px-3 py-1 text-sm font-semibold shadow-sm">0 🪙</span>
       </header>
 

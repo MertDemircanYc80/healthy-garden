@@ -1,4 +1,4 @@
--- Rooted: initial schema (plan §11).
+-- Healthy Garden: initial schema (plan §11).
 -- Run in Supabase: SQL Editor -> paste -> Run. Or: supabase db push.
 -- Change the schema with a NEW numbered migration file, never by editing this one.
 

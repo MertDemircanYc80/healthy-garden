@@ -1,4 +1,4 @@
-// Shared types for Rooted. Every module talks in these shapes.
+// Shared types for Healthy Garden. Every module talks in these shapes.
 // Changing a type here affects everyone — announce it in the team chat first.
 
 /** The ONE standard internal format every data adapter must produce (plan §8.1). */

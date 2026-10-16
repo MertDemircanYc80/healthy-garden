@@ -1,13 +1,13 @@
 # AGENTS.md — instructions for AI coding assistants
 
-You are helping a 3–4 person team build **Rooted** at a 1.5-day hackathon. Several
+You are helping a 3–4 person team build **Healthy Garden** at a 1.5-day hackathon. Several
 people (each with their own AI assistant) push to this repo at the same time. Your
 job is to ship working features fast **without breaking teammates' work**.
 
 Read this whole file before your first change. Then read `docs/PLAN.md` (the product
 plan) and `docs/TASKS.md` (who is doing what).
 
-## What Rooted is
+## What Healthy Garden is
 
 A phone-first web app: health data (steps, sleep) + doomscrolling time → daily tasks
 → coins → buy seeds/tools → a virtual garden grows. Plants never die (they go dormant).

@@ -1,9 +1,9 @@
-# Rooted — Product Plan (condensed)
+# Healthy Garden — Product Plan (condensed)
 
-Full original plan: [`Rooted_Plan_original.pdf`](./Rooted_Plan_original.pdf). This file is
+Full original plan (written under the earlier working title "Rooted"): [`Healthy_Garden_Plan_original.pdf`](./Healthy_Garden_Plan_original.pdf). This file is
 the working summary AI assistants and teammates should follow. Section numbers (§) match the PDF.
 
-> "Forest rewards you for putting your phone down. Rooted rewards you for living well."
+> "Forest rewards you for putting your phone down. Healthy Garden rewards you for living well."
 
 ## Problem (§2)
 Doomscrolling eats time, raises stress, cuts into sleep and movement. Health data is

@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Rooted palette — calm, warm, nature (plan §13). Use these tokens, not raw hex. */
+/* Healthy Garden palette — calm, warm, nature (plan §13). Use these tokens, not raw hex. */
 :root {
   --background: #f7f4ec;
   --foreground: #1f2a1f;
