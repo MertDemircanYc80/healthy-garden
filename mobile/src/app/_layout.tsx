@@ -3,6 +3,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { AppStateProvider } from "@/state/AppState";
+import { SoundsProvider } from "@/state/Sounds";
 import { HealthProvider } from "@/state/Health";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -18,9 +19,11 @@ export default function RootLayout() {
 
   return (
     <HealthProvider>
+      <SoundsProvider>
       <AppStateProvider>
         <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: "#16301F" } }} />
       </AppStateProvider>
+      </SoundsProvider>
     </HealthProvider>
   );
 }

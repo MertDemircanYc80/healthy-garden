@@ -2,6 +2,7 @@ import type { Goal, Metric } from "@/types";
 import type { HealthDayRow } from "./health/types";
 import type { SavedGarden } from "./savedGarden";
 import { goalProgress, onTrack } from "./format";
+import { updateSaplingReward, shiftDate, type SaplingReward } from "./saplingReward";
 import { rollGardenDay } from "./dailyCycle";
 
 export interface PersonalProgress {
@@ -89,6 +90,14 @@ export function reconcilePersonal(state: SavedGarden, days: HealthDayRow[], date
     if (!personalGoalsAt(progress,days,d).some(onTrack)) break;
     streak++;
   }
-  if (!changed && next === state && health === state.sim.health && streak === state.sim.streak) return state;
-  return {...next,personal:progress,sim:{...next.sim,health,streak,coins:next.sim.coins+earned}};
+  const results: SaplingReward["days"] = {};
+  // Include missing readings as unfinished assigned goals; exclude today's still-open limits.
+  for (let day = shiftDate(date, -30); day < date; day = shiftDate(day, 1)) {
+    if (day < progress.startedOn) continue;
+    const assigned = personalGoalsAt(progress, days, day);
+    if (assigned.length) results[day] = { completed: assigned.filter(onTrack).length, total: assigned.length };
+  }
+  const updated = !changed && next === state && health === state.sim.health && streak === state.sim.streak
+    ? state : {...next,personal:progress,sim:{...next.sim,health,streak,coins:next.sim.coins+earned}};
+  return updateSaplingReward(updated, date, results);
 }
