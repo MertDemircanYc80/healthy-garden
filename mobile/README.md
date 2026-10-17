@@ -59,7 +59,9 @@ to choose a flower or tree for that exact spot. The picker uses one owned item, 
 offers Buy & plant when none are owned. Buying and planting is one saved transaction;
 an occupied plot or failed save never spends gold. All 24 plots are accessible buttons. Watering consumes one can per thirsty plant; bulk watering stops at
 the number of cans available. Fertilizer adds half a growth stage and consumes one
-unit. Fully grown plants cannot be fertilized. Counts update and persist atomically
+unit, at most once per plant per garden day. The saved “Fertilized today” flag
+blocks repeated uses after reload and clears on Next day, just like watering.
+Older saves without the flag remain compatible. Fully grown plants cannot be fertilized. Counts update and persist atomically
 with each action, including rapid taps and storage errors.
 
 Progress uses AsyncStorage on iOS/Android and its localStorage backend on web, under

@@ -42,7 +42,7 @@ export function GardenSection({ selected, onClearSelection, onSelect, onChooseSp
   const p = selected ? plants.find((x) => x.id === selected.id) : undefined;
   if (p) {
     const canWater = !p.wateredToday && inventory.watering_can > 0;
-    const canFertilize = p.stage !== "blooming" && inventory.fertilizer > 0;
+    const canFertilize = !p.fertilizedToday && p.stage !== "blooming" && inventory.fertilizer > 0;
     return (
       <View>
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -80,10 +80,10 @@ export function GardenSection({ selected, onClearSelection, onSelect, onChooseSp
           <Text style={{ color: canWater ? C.pine : C.fern, fontWeight: "700", fontSize: T.body }}>{p.wateredToday ? "Watered today" : canWater ? "Water · uses 1 can" : "No watering cans left"}</Text>
         </Pressable>
         <Pressable accessibilityRole="button" disabled={busy || !canFertilize} onPress={() => { void act(() => fertilizePlant(p.id)); }} style={{ marginTop: 10, padding: 12, borderRadius: R.pill, alignItems: "center", backgroundColor: canFertilize ? C.moss : C.pineLine }}>
-          <Text style={{ color: canFertilize ? C.pine : C.fern, fontWeight: "700" }}>{p.stage === "blooming" ? "Fully grown" : canFertilize ? "Fertilize · uses 1" : "No fertilizer left"}</Text>
+          <Text style={{ color: canFertilize ? C.pine : C.fern, fontWeight: "700" }}>{p.fertilizedToday ? "Fertilized today" : p.stage === "blooming" ? "Fully grown" : canFertilize ? "Fertilize · uses 1" : "No fertilizer left"}</Text>
         </Pressable>
         {supplies}
-        <Text style={u.muted}>One fertilizer adds half a growth stage.</Text>
+        <Text style={u.muted}>One fertilizer adds half a growth stage. Once per plant per day.</Text>
         {feedback}
       </View>
     );

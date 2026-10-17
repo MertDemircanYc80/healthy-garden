@@ -144,8 +144,8 @@ export function nextDay(s: DemoState): DemoState {
 
   const grown: string[] = [];
   const plants = s.plants.map((p) => {
-    if (!p.wateredToday) return { ...p, resting: true };
-    if (p.stage === "blooming") return { ...p, wateredToday: false, resting: false };
+    if (!p.wateredToday) return { ...p, fertilizedToday: false, resting: true };
+    if (p.stage === "blooming") return { ...p, wateredToday: false, fertilizedToday: false, resting: false };
     let growth = p.growth + 0.35 + 0.65 * sunlight;
     let stage: Stage = p.stage;
     if (growth >= 1) {
@@ -153,7 +153,7 @@ export function nextDay(s: DemoState): DemoState {
       growth = stage === "blooming" ? 1 : growth - 1;
       grown.push(NAMES[p.species]);
     }
-    return { ...p, stage, growth, wateredToday: false, resting: false };
+    return { ...p, stage, growth, wateredToday: false, fertilizedToday: false, resting: false };
   });
 
   const nextOffset = s.offset + 1;

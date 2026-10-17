@@ -28,7 +28,7 @@ export function decodeGarden(raw: string): SavedGarden {
     const plantsValid = Array.isArray(s.plants) && s.plants.every(p => record(p) &&
       typeof p.id === "string" && species.includes(String(p.species)) && stages.includes(String(p.stage)) &&
       count(p.col) && p.col < 6 && count(p.row) && p.row < 4 && fraction(p.growth) &&
-      typeof p.wateredToday === "boolean" && typeof p.resting === "boolean" && (p.variant === undefined || count(p.variant)));
+      typeof p.wateredToday === "boolean" && (p.fertilizedToday === undefined || typeof p.fertilizedToday === "boolean") && typeof p.resting === "boolean" && (p.variant === undefined || count(p.variant)));
     const alertsValid = Array.isArray(s.alerts) && s.alerts.every(a => record(a) &&
       ["id", "title", "body", "time"].every(k => typeof a[k] === "string") &&
       ["nudge", "heads_up", "celebrate"].includes(String(a.level)) && typeof a.read === "boolean");

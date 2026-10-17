@@ -23,6 +23,8 @@ export interface Plant {
   stage: Stage;
   growth: number; // 0..1 toward the next stage
   wateredToday: boolean;
+  /** Optional for older saves; cleared when the garden advances to the next day. */
+  fertilizedToday?: boolean;
   resting: boolean; // skipped days → resting, never dead
   variant?: number; // colour variant for tulips/roses
 }

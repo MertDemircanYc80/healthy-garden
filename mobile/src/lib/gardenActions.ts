@@ -20,7 +20,7 @@ export function plantItem(state: SavedGarden, item: ItemId, requestedPlot?: Gard
   const spot = requestedPlot ?? GARDEN_PLOTS.find(s => !state.sim.plants.some(p => p.col === s.col && p.row === s.row));
   if (!spot) throw new GardenActionError("Your garden is full.");
   if (state.sim.plants.some(p => p.col === spot.col && p.row === spot.row)) throw new GardenActionError("That plot is already planted. Choose an empty plot.");
-  const plant: Plant = { id: `plot-${spot.col}-${spot.row}`, ...spot, species, stage: "seed", growth: 0, wateredToday: false, resting: false };
+  const plant: Plant = { id: `plot-${spot.col}-${spot.row}`, ...spot, species, stage: "seed", growth: 0, wateredToday: false, fertilizedToday: false, resting: false };
   return { ...state, inventory: { ...state.inventory, [item]: state.inventory[item] - 1 }, sim: { ...state.sim, plants: [...state.sim.plants, plant] } };
 }
 
@@ -52,14 +52,15 @@ export function waterPlants(state: SavedGarden, id?: string): SavedGarden {
   };
 }
 
-/** One fertilizer advances half a growth stage; fully grown plants consume nothing. */
+/** One fertilizer per plant per garden day; fully grown plants consume nothing. */
 export function fertilizePlant(state: SavedGarden, id: string): SavedGarden {
   const plant = state.sim.plants.find(p => p.id === id);
   if (!plant) throw new GardenActionError("This plant is no longer in the garden.");
   if (plant.stage === "blooming") throw new GardenActionError("This plant is fully grown.");
+  if (plant.fertilizedToday) throw new GardenActionError("This plant was already fertilized today.");
   if (state.inventory.fertilizer < 1) throw new GardenActionError("No fertilizer left. Visit the Market.");
   const progress = plant.growth + 0.5;
   const stage = progress >= 1 ? STAGES[STAGES.indexOf(plant.stage) + 1] : plant.stage;
   const growth = stage === "blooming" ? 1 : progress >= 1 ? progress - 1 : progress;
-  return { ...state, inventory: { ...state.inventory, fertilizer: state.inventory.fertilizer - 1 }, sim: { ...state.sim, plants: state.sim.plants.map(p => p.id === id ? { ...p, stage, growth } : p) } };
+  return { ...state, inventory: { ...state.inventory, fertilizer: state.inventory.fertilizer - 1 }, sim: { ...state.sim, plants: state.sim.plants.map(p => p.id === id ? { ...p, stage, growth, fertilizedToday: true } : p) } };
 }

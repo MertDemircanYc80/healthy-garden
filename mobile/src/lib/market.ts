@@ -3,7 +3,7 @@ export const MARKET_ITEMS = [
   { id: "lavender", name: "Lavender", icon: "🪻", price: 35, category: "Plants", description: "Soft purple blooms and a moment of calm." },
   { id: "sunflower", name: "Sunflower", icon: "🌻", price: 50, category: "Plants", description: "A bright bloom that follows the sun." },
   { id: "tree", name: "Apple tree", icon: "🌳", price: 100, category: "Plants", description: "A small tree with room to grow." },
-  { id: "fertilizer", name: "Fertilizer", icon: "🌱", price: 20, category: "Tools & supplies", description: "One use: boost one plant’s growth." },
+  { id: "fertilizer", name: "Fertilizer", icon: "🌱", price: 20, category: "Tools & supplies", description: "Boost one plant’s growth. Once per plant per day." },
   { id: "watering_can", name: "Watering can", icon: "🚿", price: 50, category: "Tools & supplies", description: "One use: water one plant." },
 ] as const;
 
