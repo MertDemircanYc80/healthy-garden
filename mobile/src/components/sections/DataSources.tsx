@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { Card, Chip, styles as u } from "@/components/ui";
 import { isBackendConfigured } from "@/lib/supabase";
+import { useApp } from "@/state/AppState";
 import { useHealth } from "@/state/Health";
 import { C, F, R, T } from "@/theme";
 
@@ -17,12 +18,15 @@ function ago(iso: string | null) {
 
 export function DataSources() {
   const h = useHealth();
-  const t = h.today;
+  const { demo } = useApp();
+  const sample = !h.connected;
+  // Until Apple Health is connected, show the demo persona's day so every number has a source.
+  const t = sample ? demo.day ?? null : h.today;
 
   let status: string;
   let action: { label: string; onPress: () => void } | null = null;
-  if (h.availability === "expo_go") status = "Needs the Healthy Garden test build. Expo Go can't read Apple Health.";
-  else if (h.availability === "not_ios") status = "Apple Health is only on iPhone.";
+  if (h.availability === "expo_go") status = "Showing sample data. Apple Health needs the Healthy Garden test build — Expo Go can't read it.";
+  else if (h.availability === "not_ios") status = "Showing sample data. Apple Health is only on iPhone.";
   else if (h.availability === "no_healthkit") status = "Apple Health isn't available on this device.";
   else if (!h.connected) {
     status = "Steps, sleep, workouts, daylight and meals update by themselves once connected.";
@@ -42,7 +46,7 @@ export function DataSources() {
 
   return (
     <Card>
-      <Text style={u.h}>Apple Health</Text>
+      <Text style={u.h}>{sample ? `Sample day, ${demo.dateLabel}` : "Apple Health"}</Text>
       <Text style={[u.muted, { marginTop: 4 }]}>{status}</Text>
       {stats.length > 0 && (
         <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 12, gap: 8 }}>

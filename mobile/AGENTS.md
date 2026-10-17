@@ -14,9 +14,11 @@ team agrees — Expo Go on everyone's phone would stop opening the app.
 - Everything else lives in the bottom island. Collapsed it shows a peek; expanded it covers at
   most ~60% of the screen so the back of the garden stays visible.
 - No login screen. Each install will sign in anonymously to Supabase (later).
-- Screens read data only through `useApp()` (`src/state/AppState.tsx`). Right now it serves
-  demo data from `src/data/demo.ts`; later it loads Supabase tables with the same shapes
-  (`src/types.ts` mirrors `supabase/migrations/*_app_schema.sql`).
+- Screens read data only through `useApp()` (`src/state/AppState.tsx`). Right now it runs the
+  demo week (`src/demo/simulation.ts`): sample persona data in `src/data/demo-health.json` and the
+  coach's output in `src/data/demo-coach.json`. Later it loads Supabase tables with the same
+  shapes (`src/types.ts` mirrors `supabase/migrations/*_app_schema.sql`). Don't edit the two
+  JSON files by hand — regenerate them (docs/SUBMISSION.md).
 - Design tokens are in `src/theme.ts` (pine island, moss accent, sun yellow for rewards,
   Fraunces for display text, system font for body). Don't hard-code new colours.
 - Copy: sentence case, plain words, encouraging, never shaming. Health content always says

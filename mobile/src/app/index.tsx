@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Platform, Pressable, Text, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { GardenScene, phaseFor } from "@/components/garden/GardenScene";
+import { DemoSheet } from "@/components/DemoSheet";
 import { CoinIcon } from "@/components/Icons";
 import { Island, type TabKey } from "@/components/island/Island";
 import { AlertsSection } from "@/components/sections/AlertsSection";
@@ -24,7 +25,8 @@ export default function Home() {
   const params = useLocalSearchParams<{ hour?: string; tab?: string; open?: string }>();
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const { today, plants, alerts } = useApp();
+  const { today, plants, alerts, demo } = useApp();
+  const [demoOpen, setDemoOpen] = useState(false);
 
   const [tab, setTab] = useState<TabKey>(TABS.includes(params.tab as TabKey) ? (params.tab as TabKey) : "garden");
   const [expanded, setExpanded] = useState(params.open === "1");
@@ -35,7 +37,7 @@ export default function Home() {
 
   const bottom = Math.max(insets.bottom, 10) + (Platform.OS === "web" ? 6 : 0);
   const collapsedHeight = 282;
-  const headerH = insets.top + 74;
+  const headerH = insets.top + 102;
   // Expanded, the island still leaves the sky and the back of the garden in view.
   const expandedHeight = Math.max(collapsedHeight + 80, Math.min(height - headerH - bottom - 8, height * 0.6));
   const unread = alerts.filter((a) => !a.read).length;
@@ -86,6 +88,26 @@ export default function Home() {
           <Text style={{ fontFamily: F.displayItalic, fontSize: T.body, color: night ? "rgba(231,240,226,0.8)" : "rgba(22,48,31,0.7)", marginTop: 2 }}>
             your garden is {today.health >= 0.75 ? "thriving" : today.health >= 0.5 ? "growing" : "resting"}
           </Text>
+          <Pressable
+            onPress={() => setDemoOpen(true)}
+            accessibilityRole="button"
+            accessibilityLabel={`Sample data, ${demo.dateLabel}. Open demo controls`}
+            style={({ pressed }) => ({
+              alignSelf: "flex-start",
+              marginTop: 8,
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 6,
+              backgroundColor: night ? "rgba(22,48,31,0.6)" : "rgba(255,255,255,0.6)",
+              borderRadius: R.pill,
+              paddingHorizontal: 10,
+              paddingVertical: 4,
+              opacity: pressed ? 0.7 : 1,
+            })}
+          >
+            <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: C.sun }} />
+            <Text style={{ fontSize: T.tiny, fontWeight: "700", color: night ? C.mist : C.pine }}>Sample data, {demo.dateLabel}</Text>
+          </Pressable>
         </View>
         <Pressable
           onPress={() => onTab("garden")}
@@ -125,6 +147,8 @@ export default function Home() {
         {tab === "report" && <ReportSection />}
         {tab === "alerts" && <AlertsSection />}
       </Island>
+
+      <DemoSheet open={demoOpen} onClose={() => setDemoOpen(false)} />
     </View>
   );
 }

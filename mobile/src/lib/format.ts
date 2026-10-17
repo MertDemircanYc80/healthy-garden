@@ -11,6 +11,7 @@ export function clockFromHours(h: number) {
 
 export function goalValue(g: Goal, v: number) {
   if (g.metric === "bedtime") return clockFromHours(v);
+  if (g.metric === "sleep_minutes") return `${Math.floor(v / 60)}h ${Math.round(v % 60)}m`;
   if (g.unit === "steps") return v.toLocaleString("en-US");
   return `${v} ${g.unit}`;
 }

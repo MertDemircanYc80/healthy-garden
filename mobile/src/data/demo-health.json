@@ -1,0 +1,1115 @@
+{
+ "today": "2026-10-16",
+ "days": [
+  {
+   "date": "2026-09-17",
+   "offset": -29,
+   "steps": 6847,
+   "walking_running_km": 5.07,
+   "active_energy_kcal": 420,
+   "active_minutes": 21,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 433,
+   "bedtime": "23:09",
+   "wake_time": "06:29",
+   "daylight_minutes": 9,
+   "screen_minutes": 274,
+   "feed_minutes": 108,
+   "long_sessions": 2,
+   "driving_minutes": 7,
+   "app_usage": {
+    "Instagram": 56,
+    "TikTok": 36,
+    "YouTube": 16
+   },
+   "nutrition": {
+    "energyKcal": 1991,
+    "proteinG": 75,
+    "carbsG": 235,
+    "fatG": 80,
+    "waterMl": 1820
+   }
+  },
+  {
+   "date": "2026-09-18",
+   "offset": -28,
+   "steps": 4586,
+   "walking_running_km": 3.4,
+   "active_energy_kcal": 341,
+   "active_minutes": 17,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 344,
+   "bedtime": "00:14",
+   "wake_time": "06:09",
+   "daylight_minutes": 18,
+   "screen_minutes": 242,
+   "feed_minutes": 95,
+   "long_sessions": 2,
+   "driving_minutes": 18,
+   "app_usage": {
+    "Instagram": 49,
+    "TikTok": 31,
+    "YouTube": 14
+   },
+   "nutrition": {
+    "energyKcal": 1852,
+    "proteinG": 84,
+    "carbsG": 248,
+    "fatG": 76,
+    "waterMl": 1235
+   }
+  },
+  {
+   "date": "2026-09-19",
+   "offset": -27,
+   "steps": 9509,
+   "walking_running_km": 7.04,
+   "active_energy_kcal": 783,
+   "active_minutes": 47,
+   "running_minutes": 30,
+   "workout_minutes": 35,
+   "sleep_minutes": 421,
+   "bedtime": "22:53",
+   "wake_time": "06:02",
+   "daylight_minutes": 42,
+   "screen_minutes": 214,
+   "feed_minutes": 98,
+   "long_sessions": 2,
+   "driving_minutes": 12,
+   "app_usage": {
+    "Instagram": 51,
+    "TikTok": 32,
+    "YouTube": 15
+   },
+   "nutrition": {
+    "energyKcal": 1889,
+    "proteinG": 56,
+    "carbsG": 214,
+    "fatG": 67,
+    "waterMl": 1295
+   }
+  },
+  {
+   "date": "2026-09-20",
+   "offset": -26,
+   "steps": 3061,
+   "walking_running_km": 2.27,
+   "active_energy_kcal": 287,
+   "active_minutes": 21,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 333,
+   "bedtime": "23:50",
+   "wake_time": "05:37",
+   "daylight_minutes": 12,
+   "screen_minutes": 211,
+   "feed_minutes": 61,
+   "long_sessions": 1,
+   "driving_minutes": 12,
+   "app_usage": {
+    "Instagram": 32,
+    "TikTok": 20,
+    "YouTube": 9
+   },
+   "nutrition": {
+    "energyKcal": 1877,
+    "proteinG": 79,
+    "carbsG": 251,
+    "fatG": 83,
+    "waterMl": 1565
+   }
+  },
+  {
+   "date": "2026-09-21",
+   "offset": -25,
+   "steps": 8061,
+   "walking_running_km": 5.97,
+   "active_energy_kcal": 462,
+   "active_minutes": 20,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 433,
+   "bedtime": "23:06",
+   "wake_time": "06:30",
+   "daylight_minutes": 23,
+   "screen_minutes": 220,
+   "feed_minutes": 83,
+   "long_sessions": 2,
+   "driving_minutes": 36,
+   "app_usage": {
+    "Instagram": 43,
+    "TikTok": 27,
+    "YouTube": 12
+   },
+   "nutrition": {
+    "energyKcal": 1889,
+    "proteinG": 87,
+    "carbsG": 288,
+    "fatG": 74,
+    "waterMl": 1470
+   }
+  },
+  {
+   "date": "2026-09-22",
+   "offset": -24,
+   "steps": 9192,
+   "walking_running_km": 6.81,
+   "active_energy_kcal": 727,
+   "active_minutes": 43,
+   "running_minutes": 25,
+   "workout_minutes": 30,
+   "sleep_minutes": 354,
+   "bedtime": "00:37",
+   "wake_time": "06:37",
+   "daylight_minutes": 31,
+   "screen_minutes": 240,
+   "feed_minutes": 92,
+   "long_sessions": 2,
+   "driving_minutes": 9,
+   "app_usage": {
+    "Instagram": 48,
+    "TikTok": 30,
+    "YouTube": 14
+   },
+   "nutrition": {
+    "energyKcal": 2001,
+    "proteinG": 51,
+    "carbsG": 267,
+    "fatG": 80,
+    "waterMl": 1325
+   }
+  },
+  {
+   "date": "2026-09-23",
+   "offset": -23,
+   "steps": 7086,
+   "walking_running_km": 5.25,
+   "active_energy_kcal": 428,
+   "active_minutes": 20,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 467,
+   "bedtime": "22:51",
+   "wake_time": "06:45",
+   "daylight_minutes": 18,
+   "screen_minutes": 200,
+   "feed_minutes": 82,
+   "long_sessions": 2,
+   "driving_minutes": 7,
+   "app_usage": {
+    "Instagram": 43,
+    "TikTok": 27,
+    "YouTube": 12
+   },
+   "nutrition": {
+    "energyKcal": 2111,
+    "proteinG": 97,
+    "carbsG": 230,
+    "fatG": 81,
+    "waterMl": 1640
+   }
+  },
+  {
+   "date": "2026-09-24",
+   "offset": -22,
+   "steps": 4175,
+   "walking_running_km": 3.09,
+   "active_energy_kcal": 326,
+   "active_minutes": 19,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 367,
+   "bedtime": "00:24",
+   "wake_time": "06:41",
+   "daylight_minutes": 11,
+   "screen_minutes": 268,
+   "feed_minutes": 128,
+   "long_sessions": 3,
+   "driving_minutes": 21,
+   "app_usage": {
+    "Instagram": 67,
+    "TikTok": 42,
+    "YouTube": 19
+   },
+   "nutrition": {
+    "energyKcal": 2075,
+    "proteinG": 86,
+    "carbsG": 247,
+    "fatG": 80,
+    "waterMl": 1735
+   }
+  },
+  {
+   "date": "2026-09-25",
+   "offset": -21,
+   "steps": 4652,
+   "walking_running_km": 3.45,
+   "active_energy_kcal": 343,
+   "active_minutes": 16,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 349,
+   "bedtime": "00:31",
+   "wake_time": "06:28",
+   "daylight_minutes": 6,
+   "screen_minutes": 230,
+   "feed_minutes": 96,
+   "long_sessions": 2,
+   "driving_minutes": 7,
+   "app_usage": {
+    "Instagram": 50,
+    "TikTok": 32,
+    "YouTube": 14
+   },
+   "nutrition": {
+    "energyKcal": 2180,
+    "proteinG": 84,
+    "carbsG": 211,
+    "fatG": 63,
+    "waterMl": 1475
+   }
+  },
+  {
+   "date": "2026-09-26",
+   "offset": -20,
+   "steps": 7725,
+   "walking_running_km": 5.72,
+   "active_energy_kcal": 675,
+   "active_minutes": 38,
+   "running_minutes": 25,
+   "workout_minutes": 30,
+   "sleep_minutes": 347,
+   "bedtime": "23:50",
+   "wake_time": "05:50",
+   "daylight_minutes": 42,
+   "screen_minutes": 243,
+   "feed_minutes": 96,
+   "long_sessions": 2,
+   "driving_minutes": 9,
+   "app_usage": {
+    "Instagram": 50,
+    "TikTok": 32,
+    "YouTube": 14
+   },
+   "nutrition": {
+    "energyKcal": 2194,
+    "proteinG": 53,
+    "carbsG": 258,
+    "fatG": 67,
+    "waterMl": 1220
+   }
+  },
+  {
+   "date": "2026-09-27",
+   "offset": -19,
+   "steps": 1800,
+   "walking_running_km": 1.33,
+   "active_energy_kcal": 243,
+   "active_minutes": 20,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 375,
+   "bedtime": "00:38",
+   "wake_time": "07:04",
+   "daylight_minutes": 19,
+   "screen_minutes": 208,
+   "feed_minutes": 60,
+   "long_sessions": 1,
+   "driving_minutes": 7,
+   "app_usage": {
+    "Instagram": 31,
+    "TikTok": 20,
+    "YouTube": 9
+   },
+   "nutrition": {
+    "energyKcal": 2153,
+    "proteinG": 87,
+    "carbsG": 290,
+    "fatG": 72,
+    "waterMl": 1710
+   }
+  },
+  {
+   "date": "2026-09-28",
+   "offset": -18,
+   "steps": 7492,
+   "walking_running_km": 5.55,
+   "active_energy_kcal": 442,
+   "active_minutes": 14,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 440,
+   "bedtime": "22:52",
+   "wake_time": "06:22",
+   "daylight_minutes": 8,
+   "screen_minutes": 244,
+   "feed_minutes": 74,
+   "long_sessions": 2,
+   "driving_minutes": 27,
+   "app_usage": {
+    "Instagram": 38,
+    "TikTok": 24,
+    "YouTube": 11
+   },
+   "nutrition": {
+    "energyKcal": 2344,
+    "proteinG": 93,
+    "carbsG": 261,
+    "fatG": 73,
+    "waterMl": 1450
+   }
+  },
+  {
+   "date": "2026-09-29",
+   "offset": -17,
+   "steps": 10986,
+   "walking_running_km": 8.14,
+   "active_energy_kcal": 835,
+   "active_minutes": 47,
+   "running_minutes": 30,
+   "workout_minutes": 35,
+   "sleep_minutes": 450,
+   "bedtime": "22:48",
+   "wake_time": "06:27",
+   "daylight_minutes": 40,
+   "screen_minutes": 261,
+   "feed_minutes": 97,
+   "long_sessions": 2,
+   "driving_minutes": 26,
+   "app_usage": {
+    "Instagram": 50,
+    "TikTok": 32,
+    "YouTube": 15
+   },
+   "nutrition": {
+    "energyKcal": 1980,
+    "proteinG": 56,
+    "carbsG": 232,
+    "fatG": 72,
+    "waterMl": 1770
+   }
+  },
+  {
+   "date": "2026-09-30",
+   "offset": -16,
+   "steps": 4997,
+   "walking_running_km": 3.7,
+   "active_energy_kcal": 355,
+   "active_minutes": 19,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 372,
+   "bedtime": "00:19",
+   "wake_time": "06:46",
+   "daylight_minutes": 13,
+   "screen_minutes": 206,
+   "feed_minutes": 62,
+   "long_sessions": 1,
+   "driving_minutes": 14,
+   "app_usage": {
+    "Instagram": 32,
+    "TikTok": 20,
+    "YouTube": 9
+   },
+   "nutrition": {
+    "energyKcal": 2068,
+    "proteinG": 96,
+    "carbsG": 243,
+    "fatG": 77,
+    "waterMl": 1535
+   }
+  },
+  {
+   "date": "2026-10-01",
+   "offset": -15,
+   "steps": 6183,
+   "walking_running_km": 4.58,
+   "active_energy_kcal": 396,
+   "active_minutes": 15,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 467,
+   "bedtime": "23:11",
+   "wake_time": "07:06",
+   "daylight_minutes": 16,
+   "screen_minutes": 247,
+   "feed_minutes": 108,
+   "long_sessions": 2,
+   "driving_minutes": 8,
+   "app_usage": {
+    "Instagram": 56,
+    "TikTok": 36,
+    "YouTube": 16
+   },
+   "nutrition": {
+    "energyKcal": 2111,
+    "proteinG": 97,
+    "carbsG": 233,
+    "fatG": 76,
+    "waterMl": 1705
+   }
+  },
+  {
+   "date": "2026-10-02",
+   "offset": -14,
+   "steps": 5911,
+   "walking_running_km": 4.38,
+   "active_energy_kcal": 387,
+   "active_minutes": 13,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 344,
+   "bedtime": "00:10",
+   "wake_time": "06:03",
+   "daylight_minutes": 16,
+   "screen_minutes": 304,
+   "feed_minutes": 137,
+   "long_sessions": 3,
+   "driving_minutes": 37,
+   "app_usage": {
+    "Instagram": 71,
+    "TikTok": 45,
+    "YouTube": 21
+   },
+   "nutrition": {
+    "energyKcal": 2019,
+    "proteinG": 95,
+    "carbsG": 242,
+    "fatG": 75,
+    "waterMl": 1120
+   }
+  },
+  {
+   "date": "2026-10-03",
+   "offset": -13,
+   "steps": 8840,
+   "walking_running_km": 6.55,
+   "active_energy_kcal": 714,
+   "active_minutes": 44,
+   "running_minutes": 25,
+   "workout_minutes": 30,
+   "sleep_minutes": 429,
+   "bedtime": "23:04",
+   "wake_time": "06:24",
+   "daylight_minutes": 32,
+   "screen_minutes": 253,
+   "feed_minutes": 106,
+   "long_sessions": 2,
+   "driving_minutes": 34,
+   "app_usage": {
+    "Instagram": 55,
+    "TikTok": 35,
+    "YouTube": 16
+   },
+   "nutrition": {
+    "energyKcal": 2276,
+    "proteinG": 58,
+    "carbsG": 273,
+    "fatG": 63,
+    "waterMl": 1555
+   }
+  },
+  {
+   "date": "2026-10-04",
+   "offset": -12,
+   "steps": 3988,
+   "walking_running_km": 2.95,
+   "active_energy_kcal": 320,
+   "active_minutes": 21,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 421,
+   "bedtime": "22:41",
+   "wake_time": "05:48",
+   "daylight_minutes": 11,
+   "screen_minutes": 193,
+   "feed_minutes": 59,
+   "long_sessions": 1,
+   "driving_minutes": 13,
+   "app_usage": {
+    "Instagram": 31,
+    "TikTok": 19,
+    "YouTube": 9
+   },
+   "nutrition": {
+    "energyKcal": 2132,
+    "proteinG": 84,
+    "carbsG": 225,
+    "fatG": 63,
+    "waterMl": 1570
+   }
+  },
+  {
+   "date": "2026-10-05",
+   "offset": -11,
+   "steps": 6224,
+   "walking_running_km": 4.61,
+   "active_energy_kcal": 398,
+   "active_minutes": 16,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 420,
+   "bedtime": "23:08",
+   "wake_time": "06:15",
+   "daylight_minutes": 9,
+   "screen_minutes": 214,
+   "feed_minutes": 90,
+   "long_sessions": 2,
+   "driving_minutes": 35,
+   "app_usage": {
+    "Instagram": 47,
+    "TikTok": 30,
+    "YouTube": 14
+   },
+   "nutrition": {
+    "energyKcal": 1894,
+    "proteinG": 82,
+    "carbsG": 281,
+    "fatG": 60,
+    "waterMl": 1750
+   }
+  },
+  {
+   "date": "2026-10-06",
+   "offset": -10,
+   "steps": 11041,
+   "walking_running_km": 8.18,
+   "active_energy_kcal": 881,
+   "active_minutes": 55,
+   "running_minutes": 35,
+   "workout_minutes": 40,
+   "sleep_minutes": 457,
+   "bedtime": "22:50",
+   "wake_time": "06:41",
+   "daylight_minutes": 41,
+   "screen_minutes": 200,
+   "feed_minutes": 60,
+   "long_sessions": 1,
+   "driving_minutes": 9,
+   "app_usage": {
+    "Instagram": 31,
+    "TikTok": 20,
+    "YouTube": 9
+   },
+   "nutrition": {
+    "energyKcal": 2230,
+    "proteinG": 57,
+    "carbsG": 278,
+    "fatG": 73,
+    "waterMl": 1395
+   }
+  },
+  {
+   "date": "2026-10-07",
+   "offset": -9,
+   "steps": 6974,
+   "walking_running_km": 5.17,
+   "active_energy_kcal": 424,
+   "active_minutes": 21,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 431,
+   "bedtime": "23:01",
+   "wake_time": "06:22",
+   "daylight_minutes": 9,
+   "screen_minutes": 184,
+   "feed_minutes": 68,
+   "long_sessions": 1,
+   "driving_minutes": 12,
+   "app_usage": {
+    "Instagram": 35,
+    "TikTok": 22,
+    "YouTube": 10
+   },
+   "nutrition": {
+    "energyKcal": 2244,
+    "proteinG": 85,
+    "carbsG": 280,
+    "fatG": 83,
+    "waterMl": 1395
+   }
+  },
+  {
+   "date": "2026-10-08",
+   "offset": -8,
+   "steps": 4948,
+   "walking_running_km": 3.67,
+   "active_energy_kcal": 353,
+   "active_minutes": 21,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 335,
+   "bedtime": "23:56",
+   "wake_time": "05:40",
+   "daylight_minutes": 18,
+   "screen_minutes": 255,
+   "feed_minutes": 130,
+   "long_sessions": 3,
+   "driving_minutes": 23,
+   "app_usage": {
+    "Instagram": 68,
+    "TikTok": 43,
+    "YouTube": 20
+   },
+   "nutrition": {
+    "energyKcal": 1922,
+    "proteinG": 98,
+    "carbsG": 279,
+    "fatG": 84,
+    "waterMl": 1500
+   }
+  },
+  {
+   "date": "2026-10-09",
+   "offset": -7,
+   "steps": 4583,
+   "walking_running_km": 3.39,
+   "active_energy_kcal": 340,
+   "active_minutes": 16,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 350,
+   "bedtime": "23:38",
+   "wake_time": "05:39",
+   "daylight_minutes": 16,
+   "screen_minutes": 229,
+   "feed_minutes": 95,
+   "long_sessions": 2,
+   "driving_minutes": 12,
+   "app_usage": {
+    "Instagram": 49,
+    "TikTok": 31,
+    "YouTube": 14
+   },
+   "nutrition": {
+    "energyKcal": 1980,
+    "proteinG": 89,
+    "carbsG": 242,
+    "fatG": 82,
+    "waterMl": 1585
+   }
+  },
+  {
+   "date": "2026-10-10",
+   "offset": -6,
+   "steps": 8660,
+   "walking_running_km": 6.41,
+   "active_energy_kcal": 798,
+   "active_minutes": 52,
+   "running_minutes": 35,
+   "workout_minutes": 40,
+   "sleep_minutes": 464,
+   "bedtime": "22:38",
+   "wake_time": "06:36",
+   "daylight_minutes": 28,
+   "screen_minutes": 267,
+   "feed_minutes": 124,
+   "long_sessions": 3,
+   "driving_minutes": 12,
+   "app_usage": {
+    "Instagram": 64,
+    "TikTok": 41,
+    "YouTube": 19
+   },
+   "nutrition": {
+    "energyKcal": 2181,
+    "proteinG": 56,
+    "carbsG": 280,
+    "fatG": 66,
+    "waterMl": 1135
+   }
+  },
+  {
+   "date": "2026-10-11",
+   "offset": -5,
+   "steps": 2155,
+   "walking_running_km": 1.6,
+   "active_energy_kcal": 255,
+   "active_minutes": 12,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 373,
+   "bedtime": "00:06",
+   "wake_time": "06:32",
+   "daylight_minutes": 12,
+   "screen_minutes": 235,
+   "feed_minutes": 76,
+   "long_sessions": 2,
+   "driving_minutes": 34,
+   "app_usage": {
+    "Instagram": 40,
+    "TikTok": 25,
+    "YouTube": 11
+   },
+   "nutrition": {
+    "energyKcal": 2243,
+    "proteinG": 93,
+    "carbsG": 267,
+    "fatG": 71,
+    "waterMl": 1480
+   }
+  },
+  {
+   "date": "2026-10-12",
+   "offset": -4,
+   "steps": 7196,
+   "walking_running_km": 5.33,
+   "active_energy_kcal": 432,
+   "active_minutes": 12,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 450,
+   "bedtime": "22:58",
+   "wake_time": "06:39",
+   "daylight_minutes": 6,
+   "screen_minutes": 258,
+   "feed_minutes": 103,
+   "long_sessions": 2,
+   "driving_minutes": 10,
+   "app_usage": {
+    "Instagram": 54,
+    "TikTok": 34,
+    "YouTube": 15
+   },
+   "nutrition": {
+    "energyKcal": 2153,
+    "proteinG": 92,
+    "carbsG": 253,
+    "fatG": 64,
+    "waterMl": 1460
+   }
+  },
+  {
+   "date": "2026-10-13",
+   "offset": -3,
+   "steps": 8761,
+   "walking_running_km": 6.49,
+   "active_energy_kcal": 712,
+   "active_minutes": 38,
+   "running_minutes": 25,
+   "workout_minutes": 30,
+   "sleep_minutes": 352,
+   "bedtime": "00:07",
+   "wake_time": "06:09",
+   "daylight_minutes": 37,
+   "screen_minutes": 221,
+   "feed_minutes": 76,
+   "long_sessions": 2,
+   "driving_minutes": 37,
+   "app_usage": {
+    "Instagram": 40,
+    "TikTok": 25,
+    "YouTube": 11
+   },
+   "nutrition": {
+    "energyKcal": 2231,
+    "proteinG": 61,
+    "carbsG": 236,
+    "fatG": 82,
+    "waterMl": 1315
+   }
+  },
+  {
+   "date": "2026-10-14",
+   "offset": -2,
+   "steps": 3844,
+   "walking_running_km": 2.85,
+   "active_energy_kcal": 315,
+   "active_minutes": 17,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 384,
+   "bedtime": "23:47",
+   "wake_time": "06:25",
+   "daylight_minutes": 14,
+   "screen_minutes": 217,
+   "feed_minutes": 96,
+   "long_sessions": 2,
+   "driving_minutes": 10,
+   "app_usage": {
+    "Instagram": 50,
+    "TikTok": 32,
+    "YouTube": 14
+   },
+   "nutrition": {
+    "energyKcal": 2254,
+    "proteinG": 84,
+    "carbsG": 218,
+    "fatG": 61,
+    "waterMl": 1570
+   }
+  },
+  {
+   "date": "2026-10-15",
+   "offset": -1,
+   "steps": 6523,
+   "walking_running_km": 4.83,
+   "active_energy_kcal": 408,
+   "active_minutes": 20,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 438,
+   "bedtime": "22:49",
+   "wake_time": "06:18",
+   "daylight_minutes": 9,
+   "screen_minutes": 294,
+   "feed_minutes": 138,
+   "long_sessions": 3,
+   "driving_minutes": 12,
+   "app_usage": {
+    "Instagram": 72,
+    "TikTok": 46,
+    "YouTube": 21
+   },
+   "nutrition": {
+    "energyKcal": 1873,
+    "proteinG": 83,
+    "carbsG": 211,
+    "fatG": 83,
+    "waterMl": 1425
+   }
+  },
+  {
+   "date": "2026-10-16",
+   "offset": 0,
+   "steps": 3120,
+   "walking_running_km": 2.31,
+   "active_energy_kcal": 260,
+   "active_minutes": 14,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 357,
+   "bedtime": "23:45",
+   "wake_time": "05:54",
+   "daylight_minutes": 9,
+   "screen_minutes": 112,
+   "feed_minutes": 38,
+   "long_sessions": 1,
+   "driving_minutes": 0,
+   "app_usage": {
+    "Instagram": 22,
+    "TikTok": 11,
+    "YouTube": 5
+   },
+   "nutrition": {
+    "energyKcal": 620,
+    "proteinG": 31,
+    "carbsG": 74,
+    "fatG": 21,
+    "waterMl": 600
+   }
+  },
+  {
+   "date": "2026-10-17",
+   "offset": 1,
+   "steps": 8822,
+   "walking_running_km": 6.53,
+   "active_energy_kcal": 714,
+   "active_minutes": 54,
+   "running_minutes": 25,
+   "workout_minutes": 30,
+   "sleep_minutes": 458,
+   "bedtime": "23:02",
+   "wake_time": "06:52",
+   "daylight_minutes": 46,
+   "screen_minutes": 191,
+   "feed_minutes": 79,
+   "long_sessions": 2,
+   "driving_minutes": 14,
+   "app_usage": {
+    "Instagram": 41,
+    "TikTok": 26,
+    "YouTube": 12
+   },
+   "nutrition": {
+    "energyKcal": 1940,
+    "proteinG": 87,
+    "carbsG": 282,
+    "fatG": 73,
+    "waterMl": 1495
+   }
+  },
+  {
+   "date": "2026-10-18",
+   "offset": 2,
+   "steps": 5000,
+   "walking_running_km": 3.7,
+   "active_energy_kcal": 355,
+   "active_minutes": 22,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 427,
+   "bedtime": "23:01",
+   "wake_time": "06:16",
+   "daylight_minutes": 26,
+   "screen_minutes": 164,
+   "feed_minutes": 54,
+   "long_sessions": 1,
+   "driving_minutes": 33,
+   "app_usage": {
+    "Instagram": 28,
+    "TikTok": 18,
+    "YouTube": 8
+   },
+   "nutrition": {
+    "energyKcal": 2093,
+    "proteinG": 71,
+    "carbsG": 252,
+    "fatG": 70,
+    "waterMl": 1860
+   }
+  },
+  {
+   "date": "2026-10-19",
+   "offset": 3,
+   "steps": 8958,
+   "walking_running_km": 6.64,
+   "active_energy_kcal": 494,
+   "active_minutes": 21,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 444,
+   "bedtime": "23:04",
+   "wake_time": "06:42",
+   "daylight_minutes": 23,
+   "screen_minutes": 174,
+   "feed_minutes": 36,
+   "long_sessions": 1,
+   "driving_minutes": 22,
+   "app_usage": {
+    "Instagram": 19,
+    "TikTok": 12,
+    "YouTube": 5
+   },
+   "nutrition": {
+    "energyKcal": 1879,
+    "proteinG": 83,
+    "carbsG": 270,
+    "fatG": 76,
+    "waterMl": 1770
+   }
+  },
+  {
+   "date": "2026-10-20",
+   "offset": 4,
+   "steps": 12254,
+   "walking_running_km": 9.08,
+   "active_energy_kcal": 924,
+   "active_minutes": 54,
+   "running_minutes": 35,
+   "workout_minutes": 40,
+   "sleep_minutes": 431,
+   "bedtime": "22:54",
+   "wake_time": "06:16",
+   "daylight_minutes": 42,
+   "screen_minutes": 202,
+   "feed_minutes": 56,
+   "long_sessions": 1,
+   "driving_minutes": 38,
+   "app_usage": {
+    "Instagram": 29,
+    "TikTok": 18,
+    "YouTube": 8
+   },
+   "nutrition": {
+    "energyKcal": 2249,
+    "proteinG": 78,
+    "carbsG": 284,
+    "fatG": 64,
+    "waterMl": 2095
+   }
+  },
+  {
+   "date": "2026-10-21",
+   "offset": 5,
+   "steps": 9001,
+   "walking_running_km": 6.67,
+   "active_energy_kcal": 495,
+   "active_minutes": 23,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 456,
+   "bedtime": "22:37",
+   "wake_time": "06:23",
+   "daylight_minutes": 15,
+   "screen_minutes": 188,
+   "feed_minutes": 55,
+   "long_sessions": 1,
+   "driving_minutes": 39,
+   "app_usage": {
+    "Instagram": 29,
+    "TikTok": 18,
+    "YouTube": 8
+   },
+   "nutrition": {
+    "energyKcal": 2328,
+    "proteinG": 83,
+    "carbsG": 273,
+    "fatG": 68,
+    "waterMl": 2070
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "offset": 6,
+   "steps": 8991,
+   "walking_running_km": 6.66,
+   "active_energy_kcal": 495,
+   "active_minutes": 26,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 465,
+   "bedtime": "23:06",
+   "wake_time": "07:05",
+   "daylight_minutes": 28,
+   "screen_minutes": 237,
+   "feed_minutes": 81,
+   "long_sessions": 2,
+   "driving_minutes": 31,
+   "app_usage": {
+    "Instagram": 42,
+    "TikTok": 27,
+    "YouTube": 12
+   },
+   "nutrition": {
+    "energyKcal": 2192,
+    "proteinG": 70,
+    "carbsG": 270,
+    "fatG": 80,
+    "waterMl": 1640
+   }
+  },
+  {
+   "date": "2026-10-23",
+   "offset": 7,
+   "steps": 8334,
+   "walking_running_km": 6.17,
+   "active_energy_kcal": 472,
+   "active_minutes": 21,
+   "running_minutes": 0,
+   "workout_minutes": 0,
+   "sleep_minutes": 429,
+   "bedtime": "22:37",
+   "wake_time": "05:55",
+   "daylight_minutes": 32,
+   "screen_minutes": 192,
+   "feed_minutes": 61,
+   "long_sessions": 1,
+   "driving_minutes": 23,
+   "app_usage": {
+    "Instagram": 32,
+    "TikTok": 20,
+    "YouTube": 9
+   },
+   "nutrition": {
+    "energyKcal": 1978,
+    "proteinG": 81,
+    "carbsG": 243,
+    "fatG": 81,
+    "waterMl": 2030
+   }
+  }
+ ]
+}

@@ -3,6 +3,7 @@
 import type { LlmCall } from "./claude.ts";
 import { addDays, computeFeatures, value, weekStart, type MetricKey } from "./features.ts";
 import { SYSTEM_PROMPT, buildUserMessage } from "./prompt.ts";
+import { ruleBasedCoach } from "./fallback.ts";
 import { reportMetrics, reportPeriod, weeklyScore } from "./report.ts";
 import { sanitize, starterGoals } from "./schema.ts";
 import type { AlertRow, AnalysisResult, GoalRow, HealthDay, InsightRow, ReportRow } from "./types.ts";
@@ -80,26 +81,27 @@ export async function runAnalysis(opts: {
   const goalTargets = Object.fromEntries(existing.map((g) => [g.metric, g.target]));
 
   try {
-    // Not enough data (or no API key): deterministic starter plan, no AI cost.
+    // Not enough data, or no API key: deterministic plan with no AI cost.
     if (f.daysWithAnyData < 3 || !opts.llm) {
       const goals = wantGoals ? starterGoals(f, ws) : [];
+      const coach =
+        f.daysWithAnyData < 3
+          ? {
+              summary: "Your garden is just getting started. After a few days of data your coach will have personal suggestions.",
+              insights: [{ kind: "suggestion", title: "Give your coach a few days", body: "Keep your phone with you and wear your watch if you have one. Personal suggestions start after about three days.", evidence: null, action: null, metric: null }] as InsightRow[],
+              alerts: [] as AlertRow[],
+            }
+          : ruleBasedCoach(f);
       const report: ReportRow = {
         ...reportPeriod(today),
         score,
         score_change: change,
-        summary:
-          f.daysWithAnyData < 3
-            ? "Your garden is just getting started. After a few days of data your coach will have personal suggestions."
-            : "Here's your week at a glance.",
-        metrics: reportMetrics(f, {}, goalTargets),
+        summary: coach.summary,
+        metrics: reportMetrics(f, {}, { ...goalTargets, ...Object.fromEntries(goals.map((g) => [g.metric, g.target])) }),
       };
-      const insights: InsightRow[] =
-        f.daysWithAnyData < 3
-          ? [{ kind: "suggestion", title: "Give your coach a few days", body: "Keep your phone with you and wear your watch if you have one. Personal suggestions start after about three days.", evidence: null, action: null, metric: null }]
-          : [];
-      await store.save(userId, today, { newGoals: goals, insights, report, alerts: [], model: null });
+      await store.save(userId, today, { newGoals: goals, insights: coach.insights, report, alerts: coach.alerts, model: null });
       await store.logRun(userId, "ok", f.daysWithAnyData);
-      return { status: "starter", result: { goals, insights, report, alerts: [] } };
+      return { status: "starter", result: { goals, insights: coach.insights, report, alerts: coach.alerts } };
     }
 
     const ctx = { wantGoals, currentGoals, recentInsightTitles: await store.recentInsightTitles(userId, addDays(today, -7)), timezone: tz };

@@ -200,7 +200,12 @@ Deno.test("no API key or little data: starter plan without calling Claude", asyn
   const noKey = memoryStore(dataset());
   const r2 = await runAnalysis({ userId: "u1", store: noKey.store, llm: null, now: NOW });
   assertEquals(r2.status, "starter");
-  assertEquals(noKey.saved[0].newGoals.length, 3);
+  assertEquals(noKey.saved[0].newGoals.map((g) => g.metric), ["steps", "sleep_minutes", "feed_minutes", "bedtime"]);
+  // rule-based coach still writes real, fact-based suggestions
+  const titles = noKey.saved[0].insights.map((i) => i.title);
+  assert(titles.includes("Late nights cost you sleep"), titles.join(" | "));
+  assert(/6 h 5 min/.test(noKey.saved[0].insights[0].body));
+  assert(noKey.saved[0].report.summary.startsWith("This week you averaged"));
 });
 
 Deno.test("Claude failure is logged, nothing saved", async () => {
