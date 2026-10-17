@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path, Rect } from "react-native-svg";
+import { SaplingRewardCard } from "@/components/SaplingRewardCard";
 import { CoinIcon } from "@/components/Icons";
 import { MARKET_ITEMS, STARTING_COINS, type ItemId } from "@/lib/market";
 import { useApp } from "@/state/AppState";
@@ -62,6 +63,7 @@ export default function Market() {
 
     <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: Math.max(insets.bottom, 16) + 24 }}>
       <View style={styles.content}>
+        <SaplingRewardCard />
         {(["Plants", "Tools & supplies"] as const).map(category => <View key={category} style={{ marginBottom: 24 }}>
           <Text accessibilityRole="header" style={styles.sectionTitle}>{category}</Text>
           <View style={styles.grid}>{MARKET_ITEMS.filter(item => item.category === category).map(item => {
@@ -90,7 +92,7 @@ export default function Market() {
 
         <View style={styles.reset}>
           <Text style={styles.itemName}>A fresh start</Text>
-          <Text style={[styles.muted, { marginTop: 6 }]}>For testing: empty the garden and inventory, clear this garden’s progress, and restore {STARTING_COINS} coins. Your health data and account stay untouched.</Text>
+          <Text style={[styles.muted, { marginTop: 6 }]}>For testing: empty the garden and inventory, clear this garden’s progress, and restore {STARTING_COINS} coins. Your health data, account and sapling reward progress/claim stay untouched.</Text>
           {!confirmReset ? <Pressable accessibilityRole="button" disabled={busy} onPress={() => setConfirmReset(true)} style={styles.resetButton}><Text style={{ color: C.berry, fontWeight: "600" }}>Reset saved garden</Text></Pressable> : <>
             <Text style={[styles.notice, { marginTop: 12 }]}>Clear this device’s saved garden and purchases?</Text>
             <View style={{ flexDirection: "row", gap: 16 }}>

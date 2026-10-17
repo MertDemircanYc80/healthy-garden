@@ -1,3 +1,4 @@
+import { validSaplingReward, type SaplingReward } from "./saplingReward";
 import type { PersonalProgress } from "./personalGoals";
 import { coachAlerts, MAX_OFFSET, type DemoState } from "@/demo/simulation";
 import { emptyInventory, MARKET_ITEMS, STARTING_COINS, type Inventory } from "./market";
@@ -7,6 +8,7 @@ export interface SavedGarden {
   version: 1;
   calendarDate?: string;
   personal?: PersonalProgress;
+  saplingReward?: SaplingReward;
   sim: DemoState & { health: number };
   inventory: Inventory;
 }
@@ -33,6 +35,7 @@ export function decodeGarden(raw: string): SavedGarden {
         if (!record(plan) || typeof plan.startsOn !== "string" || !Array.isArray(plan.goals) || !plan.goals.every(g => record(g) && typeof g.id === "string" && ["steps","active_minutes","feed_minutes","daylight_minutes"].includes(String(g.metric)) && typeof g.target === "number" && Number.isFinite(g.target) && g.target >= 0 && count(g.reward) && g.reward <= 100 && ["at_least","at_most"].includes(String(g.direction)))) throw new Error("Saved goals could not be read.");
       }
     }
+    if (v.saplingReward !== undefined && !validSaplingReward(v.saplingReward)) throw new Error("Saved sapling reward could not be read.");
     const s = v.sim;
     const inventory = v.inventory;
     const plantsValid = Array.isArray(s.plants) && s.plants.every(p => record(p) &&
@@ -87,7 +90,8 @@ export function createGardenStore(storage: Storage, key = GARDEN_STORAGE_KEY, in
     },
     reset() {
       return enqueue(async () => {
-        const next = initialize();
+        const previous = await load().catch(() => null);
+        const next = { ...initialize(), ...(previous?.saplingReward ? { saplingReward: previous.saplingReward } : {}) };
         await storage.setItem(key, JSON.stringify(next));
         return publish(next);
       });

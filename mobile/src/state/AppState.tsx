@@ -15,6 +15,7 @@ import { useHealth } from "@/state/Health";
 import { personalGoalsAt, reconcilePersonal } from "@/lib/personalGoals";
 import { useGardenSounds } from "@/state/Sounds";
 import type { GardenSound } from "@/lib/gardenSounds";
+import { saplingStatus, claimSaplingReward, updateSaplingReward } from "@/lib/saplingReward";
 import { C } from "@/theme";
 import type { Alert, Goal, Insight, Plant, Report, Today } from "@/types";
 
@@ -41,6 +42,8 @@ interface AppState {
   alerts: Alert[];
   demo: DemoControls;
   inventory: Inventory;
+  sapling: ReturnType<typeof saplingStatus>;
+  claimSapling: () => Promise<ActionResult>;
   buyItem: (id: ItemId) => Promise<{ ok: boolean; message: string }>;
   resetData: () => Promise<boolean>;
   waterPlant: (id: string) => Promise<ActionResult>;
@@ -107,8 +110,20 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
   }, [store, mode, health.days, health.ready]);
 
   const clearPersonalGoals = useCallback(async () => {
-    await stores.personal.update(s => ({ ...s, personal: { startedOn: localDay(new Date()), weeks: {}, rewarded: s.personal?.rewarded ?? [] }, sim: { ...s.sim, health: 0, streak: 0, alerts: [] } }));
+    await stores.personal.update(s => ({ ...s, ...(s.saplingReward ? { saplingReward: { ...s.saplingReward, days: {} } } : {}), personal: { startedOn: localDay(new Date()), weeks: {}, rewarded: s.personal?.rewarded ?? [] }, sim: { ...s.sim, health: 0, streak: 0, alerts: [] } }));
   }, [stores]);
+
+  const claimSapling = useCallback(async (): Promise<ActionResult> => {
+    if (isDemo) return { ok: false, message: "Use your personal garden to earn this reward." };
+    try {
+      await stores.personal.update(s => claimSaplingReward(health.ready ? reconcilePersonal(s, health.days, localDay(new Date())) : s, localDay(new Date())));
+      return { ok: true, message: "Your placeholder discount is claimed. No real purchase or redemption was made." };
+    } catch (error) {
+      const message = error instanceof Error && ["The sapling reward is still locked.", "This sapling discount has already been claimed."].includes(error.message)
+        ? error.message : "Couldn’t save your claim. Please try again.";
+      return { ok: false, message };
+    }
+  }, [isDemo, stores, health.ready, health.days]);
 
   const setSim = useCallback((change: (s: SavedGarden["sim"]) => SavedGarden["sim"]) => {
     void store.update(state => ({ ...state, sim: change(state.sim) }))
@@ -147,7 +162,12 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
 
   const gardenAction = useCallback(async (change: (state: SavedGarden) => SavedGarden, message: string, sound: GardenSound): Promise<ActionResult> => {
     try {
-      await store.update(state => change(isDemo ? state : health.ready ? reconcilePersonal(state, health.days, localDay(new Date())) : rollGardenDay(state, localDay(new Date()))));
+      await store.update(state => {
+        const date = localDay(new Date());
+        const next = change(isDemo ? state : health.ready ? reconcilePersonal(state, health.days, date) : rollGardenDay(state, date));
+        // Planting can satisfy the final reward condition in this same saved action.
+        return isDemo ? next : updateSaplingReward(next, date, {});
+      });
       setSaveError(false);
       sounds.play(sound);
       return { ok: true, message };
@@ -182,6 +202,8 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       isDemo, switchMode, clearPersonalGoals,
       today: { sunlight, health: sim.health, coins: sim.coins, streak: sim.streak },
       inventory,
+      sapling: saplingStatus(saved ?? START, localDate),
+      claimSapling,
       buyItem,
       resetData,
       plants: sim.plants,
@@ -205,7 +227,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       dismissInsight,
       markAlertsRead,
     };
-  }, [clearPersonalGoals, health.days.length, isDemo, switchMode, localDate, sim, inventory, buyItem, resetData, goals, insights, goNext, reset, waterPlant, waterAll, plantOwnedItem, plantInPlot, fertilizePlant, dismissInsight, markAlertsRead]);
+  }, [saved, claimSapling, clearPersonalGoals, health.days.length, isDemo, switchMode, localDate, sim, inventory, buyItem, resetData, goals, insights, goNext, reset, waterPlant, waterAll, plantOwnedItem, plantInPlot, fertilizePlant, dismissInsight, markAlertsRead]);
 
   if (!saved) return (
     <View style={{ flex: 1, backgroundColor: C.pine, padding: 28, justifyContent: "center", gap: 18 }}>

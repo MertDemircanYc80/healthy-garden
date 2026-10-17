@@ -136,3 +136,9 @@ Excluded: account backup/recovery, activity history, care-status redesign, GitHu
 | # | Task | Role | Owner | Status |
 |---|---|---|---|---|
 | S1 | Gentle sine-based, low-pass-filtered garden sounds, serialized playback and persistent mute | frontend | Codex (user requested) | ✅ Done |
+
+## Sapling reward
+
+| # | Task | Role | Owner | Status |
+|---|---|---|---|---|
+| R1 | Market sapling discount milestone, persisted progress and one-time placeholder claim | frontend | Codex (user requested) | ✅ Done |

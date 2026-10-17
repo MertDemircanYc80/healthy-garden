@@ -104,7 +104,7 @@ silently replaced. Failed writes leave the previous balance and inventory intact
 
 For testing, open Market → **Reset saved garden** → **Confirm reset**. This restores
 1,000 coins, empties the garden and inventory, and resets garden demo progress, while leaving health and
-account data untouched. The demo controls have the same confirmed reset.
+account data and sapling reward progress/claim untouched. The demo controls have the same confirmed reset.
 
 Run `npm run check` for purchase, persistence, concurrent mutation, failed storage, and
 reset tests. Web hosting must serve `index.html` for client routes such as `/market`;
@@ -175,3 +175,30 @@ To test: plant in an empty plot, buy a watering can/fertilizer and care for the 
 Try rapid successful actions on different plants, then mute and refresh. The speaker should
 stay muted and plant care should still work. Unmute to restore effects. `npm run check`
 covers serialization, mute persistence, cancellation and storage/audio failure handling.
+
+
+## Real Sapling Discount (placeholder)
+
+The Market has a special 20%-off reward card. It unlocks after **30 local calendar days**
+since personal-goal tracking started, with **at least 80% of assigned goals completed**
+over the last 30 completed days, **garden health of at least 80%**, and at least one planted
+item. Health uses the existing garden-health score shown by the app. Today's goals enter
+the completion percentage after midnight; missing readings count as incomplete. Sample
+mode never earns this reward. Existing saved personal start dates are honored.
+
+The locked card shows days, completed/assigned goal counts, and garden health. Unlocking
+is permanent. The unlocked card shows the deliberately fake code `DEMO-SAPLING-20` and a
+Claim button. A successful claim is saved before the UI changes to Claimed; repeated taps
+cannot create another claim. Failed saves leave the button available to retry.
+
+Progress, unlock date, and claim date are saved with the garden in **AsyncStorage**
+(`healthgarden:game:v1`), backed by **localStorage on web**. Garden resets preserve this
+record. Deleting personal health data clears aggregate goal counts while retaining an
+already earned discount and its claim receipt. Clearing browser/app storage removes the
+record; this is a device-local prototype, not server-enforced redemption or cross-device
+sync. There is no real discount, partner, payment, or new Supabase setup.
+
+`npm run check` includes deterministic reward tests for the 30-day/80% boundaries, health,
+empty gardens, missing/sample readings, reloads, rapid repeated claims, failed writes,
+old saves, and garden resets. These fixtures test a month of progress without changing
+your system clock or live garden.
