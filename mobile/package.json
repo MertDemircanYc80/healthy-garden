@@ -26,6 +26,7 @@
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "~4.26.0",
     "react-native-svg": "15.15.4",
+    "react-native-url-polyfill": "^4.0.0",
     "react-native-web": "~0.21.4"
   },
   "devDependencies": {
@@ -39,7 +40,8 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "export:web": "expo export -p web",
-    "check": "npx --yes tsx scripts/check-health.ts"
+    "check": "npx --yes tsx scripts/check-health.ts",
+    "check:supabase": "node --experimental-strip-types scripts/check-supabase.mts"
   },
   "private": true
 }

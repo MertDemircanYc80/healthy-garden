@@ -27,6 +27,7 @@ Roles and folder ownership are in `AGENTS.md`.
 | M8 | Shop + planting in the island (port from web prototype engine) | frontend | | Todo |
 | M9 | Development build on a team iPhone (EAS or Xcode) so Apple Health works | integration | | Todo |
 | M10 | Coins: pay goal rewards into `coin_events`, update garden coins/streak | backend | | Todo |
+| M11 | Configure the Expo Supabase client from local env, add a public-key connection check | integration | Codex (user requested) | ✅ Done — dashboard auth/schema setup remains M2 |
 
 ## Web prototype board (frozen — kept for reference)
 

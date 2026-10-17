@@ -1,24 +1,19 @@
 // Supabase client for the app. Values come from mobile/.env.local:
 //   EXPO_PUBLIC_SUPABASE_URL, EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 // Without them the app keeps running on demo data and on-device health data.
+import "react-native-url-polyfill/auto";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { Platform } from "react-native";
+import { createSupabaseClient } from "./supabase-client";
 
-const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const key = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-
-export const supabase: SupabaseClient | null =
-  url && key
-    ? createClient(url, key, {
-        auth: {
-          storage: AsyncStorage,
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: Platform.OS === "web",
-        },
-      })
-    : null;
+export const supabase = createSupabaseClient({
+  auth: {
+    ...(Platform.OS !== "web" ? { storage: AsyncStorage } : {}),
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: Platform.OS === "web",
+  },
+});
 
 export const isBackendConfigured = () => supabase !== null;
 
