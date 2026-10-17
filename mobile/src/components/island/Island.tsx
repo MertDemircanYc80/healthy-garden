@@ -25,6 +25,9 @@ interface Props {
   collapsedHeight: number;
   expandedHeight: number;
   bottom: number;
+  fullscreen?: boolean;
+  safeBottom?: number;
+  contentKey?: number;
   badges?: Partial<Record<TabKey, number>>;
   onTab: (t: TabKey) => void;
   onToggle: () => void;
@@ -35,20 +38,24 @@ function tap() {
   if (Platform.OS !== "web") Haptics.selectionAsync().catch(() => {});
 }
 
-export function Island({ tab, expanded, collapsedHeight, expandedHeight, bottom, badges, onTab, onToggle, children }: Props) {
+export function Island({ tab, expanded, collapsedHeight, expandedHeight, bottom, fullscreen, safeBottom = 0, contentKey, badges, onTab, onToggle, children }: Props) {
   const h = useRef(new Animated.Value(expanded ? expandedHeight : collapsedHeight)).current;
   const scroll = useRef<ScrollView>(null);
 
   useEffect(() => {
-    Animated.spring(h, { toValue: expanded ? expandedHeight : collapsedHeight, useNativeDriver: false, damping: 22, stiffness: 220, mass: 0.9 }).start();
-  }, [expanded, collapsedHeight, expandedHeight, h]);
+    const animation = fullscreen
+      ? Animated.timing(h, { toValue: expandedHeight, duration: 240, useNativeDriver: false })
+      : Animated.spring(h, { toValue: expanded ? expandedHeight : collapsedHeight, useNativeDriver: false, damping: 29, stiffness: 220, mass: 0.9 });
+    animation.start();
+    return () => animation.stop();
+  }, [expanded, collapsedHeight, expandedHeight, fullscreen, h]);
 
   useEffect(() => {
     scroll.current?.scrollTo({ y: 0, animated: false });
-  }, [tab]);
+  }, [tab, contentKey]);
 
   return (
-    <Animated.View style={[styles.island, { height: h, bottom }]}>
+    <Animated.View style={[styles.island, { height: h, bottom }, fullscreen && { left: 0, right: 0, bottom: 0, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }]}>
       <Pressable
         onPress={() => {
           tap();
@@ -68,7 +75,7 @@ export function Island({ tab, expanded, collapsedHeight, expandedHeight, bottom,
         {children}
       </ScrollView>
 
-      <View style={styles.tabBar} accessibilityRole="tablist">
+      <View style={[styles.tabBar, fullscreen && { height: TAB_BAR_H + safeBottom, paddingBottom: safeBottom }]} accessibilityRole="tablist">
         {TABS.map(({ key, label, Icon }) => {
           const active = key === tab;
           const badge = badges?.[key] ?? 0;

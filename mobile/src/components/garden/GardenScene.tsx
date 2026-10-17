@@ -40,12 +40,13 @@ interface Props {
   health: number;
   hour: number;
   selectedId?: string | null;
+  wateredId?: string | null;
   onPlantPress?: (p: Plant) => void;
   onEmptyPlotPress?: (plot: GardenPlot) => void;
   selectedPlot?: GardenPlot | null;
 }
 
-export function GardenScene({ plants, width, height, bottomCover, topCover, health, hour, selectedId, onPlantPress, onEmptyPlotPress, selectedPlot }: Props) {
+export function GardenScene({ plants, width, height, bottomCover, topCover, health, hour, selectedId, wateredId, onPlantPress, onEmptyPlotPress, selectedPlot }: Props) {
   const phase = phaseFor(hour);
   const sky = SKY[phase];
   const k = VB_W / width; // screen px → viewBox units
@@ -57,7 +58,7 @@ export function GardenScene({ plants, width, height, bottomCover, topCover, heal
   const treeRoom = 80;
   const frontRoom = 26;
   const available = VB_H - (topCover + bottomCover) * k;
-  const scale = Math.min(1.25, available / (bedH + treeRoom + frontRoom), (VB_W - 44) / bedW);
+  const scale = Math.min(1.25, available / (bedH + treeRoom + frontRoom), (VB_W - 26) / bedW);
   const top = topCover * k + treeRoom * scale + Math.max(0, (available - (bedH + treeRoom + frontRoom) * scale) * 0.7);
   const cx = VB_W / 2 - ((BED.cols - BED.rows) * TILE_W * scale) / 4;
   const horizon = top - 22 * scale;
@@ -179,8 +180,8 @@ export function GardenScene({ plants, width, height, bottomCover, topCover, heal
         const active = selectedPlot?.col === plot.col && selectedPlot.row === plot.row;
         const [x, y] = iso(plot.col + 0.5, plot.row + 0.5);
         return <G key={`empty-${plot.col}-${plot.row}`}>
-          <Polygon points={pts(iso(plot.col + 0.08, plot.row + 0.08), iso(plot.col + 0.92, plot.row + 0.08), iso(plot.col + 0.92, plot.row + 0.92), iso(plot.col + 0.08, plot.row + 0.92))} fill={active ? C.sun : C.moss} fillOpacity={active ? 0.4 : 0.18} stroke={active ? C.sun : C.moss} strokeWidth={1.2 * scale} strokeDasharray={active ? undefined : `${3 * scale},${2 * scale}`} />
-          <Path d={`M ${x - 4 * scale} ${y} H ${x + 4 * scale} M ${x} ${y - 4 * scale} V ${y + 4 * scale}`} stroke={active ? C.sun : C.mist} strokeWidth={1.5 * scale} strokeLinecap="round" />
+          <Polygon points={pts(iso(plot.col + 0.08, plot.row + 0.08), iso(plot.col + 0.92, plot.row + 0.08), iso(plot.col + 0.92, plot.row + 0.92), iso(plot.col + 0.08, plot.row + 0.92))} fill={active ? C.sun : C.moss} fillOpacity={active ? 0.4 : 0.06} stroke={active ? C.sun : C.soilDark} strokeWidth={1.2 * scale} strokeDasharray={active ? undefined : `${3 * scale},${2 * scale}`} />
+          <Path d={`M ${x - 4 * scale} ${y} H ${x + 4 * scale} M ${x} ${y - 4 * scale} V ${y + 4 * scale}`} stroke={active ? C.sun : C.wood} strokeWidth={1.5 * scale} strokeLinecap="round" />
         </G>;
       })}
 
@@ -190,6 +191,7 @@ export function GardenScene({ plants, width, height, bottomCover, topCover, heal
         return (
           <G key={p.id} transform={`translate(${x} ${y}) scale(${scale})`}>
             <PlantArt plant={p} selected={p.id === selectedId} />
+            {p.id === wateredId && <G>{[-12,-6,0,6,12].map((x,i)=><Path key={x} d={`M ${x} ${-24-(i%2)*8} q -4 6 0 7 q 4 -1 0 -7`} fill={C.sky} />)}</G>}
           </G>
         );
       })}
@@ -240,13 +242,13 @@ export function GardenScene({ plants, width, height, bottomCover, topCover, heal
       {GARDEN_PLOTS.map(plot => {
         const plant = plants.find(p => p.col === plot.col && p.row === plot.row);
         const [x, y] = iso(plot.col + 0.5, plot.row + 0.5);
-        const targetW = TILE_W * scale / k * 0.5;
-        const targetH = TILE_H * scale / k * 0.9;
+        const targetW = plant ? Math.max(44, TILE_W * scale / k * 0.6) : TILE_W * scale / k * 0.5;
+        const targetH = plant ? 54 : TILE_H * scale / k * 0.9;
         return <Pressable key={`plot-${plot.col}-${plot.row}`} accessibilityRole="button"
           accessibilityLabel={plant ? `Care for plant in plot ${plotNumber(plot)}` : `Plant in empty plot ${plotNumber(plot)}`}
           accessibilityState={{ selected: selectedPlot?.col === plot.col && selectedPlot.row === plot.row }}
           onPress={() => plant ? onPlantPress?.(plant) : onEmptyPlotPress?.(plot)}
-          style={{ position: "absolute", left: x / k - targetW / 2, top: y / k - targetH / 2, width: targetW, height: targetH }} />;
+          style={{ position: "absolute", left: x / k - targetW / 2, top: y / k - (plant ? targetH - 12 : targetH / 2), width: targetW, height: targetH, zIndex: plant ? 10 + plot.col + plot.row : 0 }} />;
       })}
     </View>
     </View>

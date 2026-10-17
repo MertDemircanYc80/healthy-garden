@@ -18,15 +18,15 @@ function ago(iso: string | null) {
 
 export function DataSources() {
   const h = useHealth();
-  const { demo } = useApp();
-  const sample = !h.connected;
-  // Until Apple Health is connected, show the demo persona's day so every number has a source.
+  const { demo, dataMode } = useApp();
+  const sample = dataMode === "sample";
+  // Sample data appears only after the presenter explicitly loads the replay.
   const t = sample ? demo.day ?? null : h.today;
 
   let status: string;
   let action: { label: string; onPress: () => void } | null = null;
-  if (h.availability === "expo_go") status = "Showing sample data. Apple Health needs the Healthy Garden test build — Expo Go can't read it.";
-  else if (h.availability === "not_ios") status = "Showing sample data. Apple Health is only on iPhone.";
+  if (h.availability === "expo_go") status = "Apple Health needs the Healthy Garden test build — Expo Go can't read it.";
+  else if (h.availability === "not_ios") status = "Apple Health is only available in a native iPhone build.";
   else if (h.availability === "no_healthkit") status = "Apple Health isn't available on this device.";
   else if (!h.connected) {
     status = "Steps, sleep, workouts, daylight and meals update by themselves once connected.";
@@ -66,7 +66,7 @@ export function DataSources() {
       {h.error && <Text style={[u.muted, { color: C.berry, marginTop: 8 }]}>{h.error}</Text>}
 
       <View style={{ height: 1, backgroundColor: C.pineLine, marginVertical: 14 }} />
-      <ScreenTimeInput current={t?.feed_minutes ?? null} onSave={h.logScreenTime} />
+      {sample ? <Text style={u.muted}>Screen time in this replay is fictional. Real per-app access is not connected.</Text> : <ScreenTimeInput current={t?.feed_minutes ?? null} onSave={h.logScreenTime} />}
     </Card>
   );
 }

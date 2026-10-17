@@ -26,10 +26,11 @@ async function main() {
   assert.throws(() => purchase(19, inventory, "flower"), /Not enough money/);
   console.log("✓ exact funds succeed, insufficient funds fail, input state is unchanged");
 
-  const storage = memoryStorage();
+  const funded = initialGarden(); funded.sim.coins = 1000;
+  const storage = memoryStorage(JSON.stringify(funded));
   const store = createGardenStore(storage);
   assert.equal((await store.load()).sim.coins, 1000);
-  assert.equal(storage.raw(), null, "startup must not overwrite storage");
+  assert.equal(JSON.parse(storage.raw()!).sim.coins, 1000, "startup must not overwrite storage");
   const seen: number[] = [];
   const unsubscribe = store.subscribe(s => seen.push(s.sim.coins));
   await store.update(buy);
@@ -109,8 +110,8 @@ async function main() {
   assert.throws(() => fertilizePlant(blooming, blooming.sim.plants[0].id), /fully grown/);
   const almostGrown = { ...blooming, sim: { ...blooming.sim, plants: [{ ...blooming.sim.plants[0], stage: "mature" as const, growth: 0.75, fertilizedToday: false }] } };
   assert.equal(fertilizePlant(almostGrown, almostGrown.sim.plants[0].id).sim.plants[0].stage, "blooming");
-  let full = initialGarden(); full.inventory.tree = 25;
-  for (let i = 0; i < 24; i++) full = plantItem(full, "tree");
+  let full = initialGarden(); full.inventory.tree = 36;
+  for (let i = 0; i < 35; i++) full = plantItem(full, "tree");
   assert.throws(() => plantItem(full, "tree"), /full/);
   assert.equal(full.inventory.tree, 1);
   console.log("✓ empty defaults, planting, limited watering, fertilizer, and full gardens enforce owned quantities");
@@ -142,22 +143,22 @@ async function main() {
   assert.equal((await createGardenStore(plantingStorage).load()).inventory.tree, 0);
   console.log("✓ concurrent use cannot overspend; failed writes preserve supplies and reload restores used counts");
   const chosen = { col: 4, row: 2 };
-  const placed = placePlant(initialGarden(), "tree", chosen, true);
+  const placed = placePlant(funded, "tree", chosen, true);
   assert.equal(placed.sim.coins, 900);
   assert.equal(placed.inventory.tree, 0);
   assert.equal(placed.sim.plants[0].col, 4);
   assert.equal(placed.sim.plants[0].row, 2);
   assert.throws(() => placePlant(placed, "flower", chosen, true), /already planted/);
   assert.equal(placed.sim.coins, 900, "occupied plots never spend gold");
-  const ownedPlant = initialGarden(); ownedPlant.inventory.flower = 1;
+  const ownedPlant = { ...initialGarden(), sim: { ...initialGarden().sim, coins: 1000 } }; ownedPlant.inventory.flower = 1;
   assert.equal(placePlant(ownedPlant, "flower", chosen, true).sim.coins, 1000, "prefer owned stock over purchasing");
   assert.throws(() => placePlant(initialGarden(), "flower", chosen, false), /None left/);
-  for (const invalidPlot of [{ col: -1, row: 0 }, { col: 6, row: 0 }, { col: 0, row: 4 }, { col: 0.5, row: 1 }]) {
-    assert.throws(() => placePlant(initialGarden(), "flower", invalidPlot, true), /valid garden plot/);
+  for (const invalidPlot of [{ col: -1, row: 0 }, { col: 7, row: 0 }, { col: 0, row: 5 }, { col: 0.5, row: 1 }]) {
+    assert.throws(() => placePlant(funded, "flower", invalidPlot, true), /valid garden plot/);
   }
   const poor = initialGarden(); poor.sim.coins = 19;
   assert.throws(() => placePlant(poor, "flower", chosen, true), /Not enough money/);
-  const placementStorage = memoryStorage();
+  const placementStorage = memoryStorage(JSON.stringify(funded));
   const placementStore = createGardenStore(placementStorage);
   placementStorage.failWrites(true);
   await assert.rejects(placementStore.update(s => placePlant(s, "tree", chosen, true)), /Disk full/);

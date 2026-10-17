@@ -1,0 +1,315 @@
+{
+  "provenance": "AI-authored by Codex for the fixed PMData + fictional scenario in this repository. Cached replay output, not a live model request. Only days up to each through index were used. Optional live gateway replaces these packets.",
+  "plans": [
+    {
+      "through": 6,
+      "source": "prepared_ai",
+      "summary": "Movement is already a strength: 12,053 steps a day. Sleep averages 5h 51m, while the fictional screen-time scenario averages 3h 16m in feeds. Protect a little more rest, shorten the scroll, and make room for daylight.",
+      "goals": [
+        {
+          "id": "week-6-steps",
+          "title": "Keep moving",
+          "metric": "steps",
+          "target": 12000,
+          "unit": "steps",
+          "direction": "at_least",
+          "reason": "Your last 7 days average 12,053 steps. Keep an achievable daily movement habit.",
+          "reward": 25
+        },
+        {
+          "id": "week-6-sleep_minutes",
+          "title": "Make room for rest",
+          "metric": "sleep_minutes",
+          "target": 380,
+          "unit": "min",
+          "direction": "at_least",
+          "reason": "You averaged 351 minutes of sleep. Try a small improvement with a consistent wind-down.",
+          "reward": 25
+        },
+        {
+          "id": "week-6-feed_minutes",
+          "title": "A little less scrolling",
+          "metric": "feed_minutes",
+          "target": 150,
+          "unit": "min",
+          "direction": "at_most",
+          "reason": "The demo feed average is 196 minutes. Set aside one short block without feeds.",
+          "reward": 25
+        },
+        {
+          "id": "week-6-daylight_minutes",
+          "title": "Step into daylight",
+          "metric": "daylight_minutes",
+          "target": 25,
+          "unit": "min",
+          "direction": "at_least",
+          "reason": "The demo daylight average is 13 minutes. A short outdoor break can fit around your day.",
+          "reward": 25
+        }
+      ],
+      "insights": [
+        {
+          "id": "pattern-6",
+          "kind": "pattern",
+          "title": "Your week, in perspective",
+          "body": "Movement is already a strength: 12,053 steps a day. Sleep averages 5h 51m, while the fictional screen-time scenario averages 3h 16m in feeds. Protect a little more rest, shorten the scroll, and make room for daylight.",
+          "evidence": "2019-11-02 to 2019-11-08 \u00b7 7 completed days"
+        },
+        {
+          "id": "next-6",
+          "kind": "suggestion",
+          "title": "One small evening change",
+          "body": "Choose a short feed-free wind-down before bed. Keep the target comfortable and repeatable. These are lifestyle suggestions, not medical advice."
+        }
+      ]
+    },
+    {
+      "through": 13,
+      "source": "prepared_ai",
+      "summary": "Your second week is mixed, and that matters. Feed time falls to 2h 34m and daylight nearly doubles, but sleep still averages 5h 44m. Keep the movement routine; put the next small change into your evening.",
+      "goals": [
+        {
+          "id": "week-13-steps",
+          "title": "Keep moving",
+          "metric": "steps",
+          "target": 12000,
+          "unit": "steps",
+          "direction": "at_least",
+          "reason": "Your last 7 days average 15,124 steps. Keep an achievable daily movement habit.",
+          "reward": 25
+        },
+        {
+          "id": "week-13-sleep_minutes",
+          "title": "Make room for rest",
+          "metric": "sleep_minutes",
+          "target": 380,
+          "unit": "min",
+          "direction": "at_least",
+          "reason": "You averaged 344 minutes of sleep. Try a small improvement with a consistent wind-down.",
+          "reward": 25
+        },
+        {
+          "id": "week-13-feed_minutes",
+          "title": "A little less scrolling",
+          "metric": "feed_minutes",
+          "target": 135,
+          "unit": "min",
+          "direction": "at_most",
+          "reason": "The demo feed average is 154 minutes. Set aside one short block without feeds.",
+          "reward": 25
+        },
+        {
+          "id": "week-13-daylight_minutes",
+          "title": "Step into daylight",
+          "metric": "daylight_minutes",
+          "target": 30,
+          "unit": "min",
+          "direction": "at_least",
+          "reason": "The demo daylight average is 24 minutes. A short outdoor break can fit around your day.",
+          "reward": 25
+        }
+      ],
+      "insights": [
+        {
+          "id": "pattern-13",
+          "kind": "pattern",
+          "title": "Your week, in perspective",
+          "body": "Your second week is mixed, and that matters. Feed time falls to 2h 34m and daylight nearly doubles, but sleep still averages 5h 44m. Keep the movement routine; put the next small change into your evening.",
+          "evidence": "2019-11-09 to 2019-11-15 \u00b7 7 completed days"
+        },
+        {
+          "id": "next-13",
+          "kind": "suggestion",
+          "title": "One small evening change",
+          "body": "Choose a short feed-free wind-down before bed. Keep the target comfortable and repeatable. These are lifestyle suggestions, not medical advice."
+        }
+      ]
+    },
+    {
+      "through": 20,
+      "source": "prepared_ai",
+      "summary": "A quieter week for movement, with 11,914 daily steps. Feed time reaches 2h on average and daylight rises to 36 minutes. Sleep remains the difficult habit at 5h 35m; try a modest, repeatable wind-down rather than a bigger challenge.",
+      "goals": [
+        {
+          "id": "week-20-steps",
+          "title": "Keep moving",
+          "metric": "steps",
+          "target": 12000,
+          "unit": "steps",
+          "direction": "at_least",
+          "reason": "Your last 7 days average 11,914 steps. Keep an achievable daily movement habit.",
+          "reward": 25
+        },
+        {
+          "id": "week-20-sleep_minutes",
+          "title": "Make room for rest",
+          "metric": "sleep_minutes",
+          "target": 380,
+          "unit": "min",
+          "direction": "at_least",
+          "reason": "You averaged 335 minutes of sleep. Try a small improvement with a consistent wind-down.",
+          "reward": 25
+        },
+        {
+          "id": "week-20-feed_minutes",
+          "title": "A little less scrolling",
+          "metric": "feed_minutes",
+          "target": 120,
+          "unit": "min",
+          "direction": "at_most",
+          "reason": "The demo feed average is 120 minutes. Set aside one short block without feeds.",
+          "reward": 25
+        },
+        {
+          "id": "week-20-daylight_minutes",
+          "title": "Step into daylight",
+          "metric": "daylight_minutes",
+          "target": 40,
+          "unit": "min",
+          "direction": "at_least",
+          "reason": "The demo daylight average is 36 minutes. A short outdoor break can fit around your day.",
+          "reward": 25
+        }
+      ],
+      "insights": [
+        {
+          "id": "pattern-20",
+          "kind": "pattern",
+          "title": "Your week, in perspective",
+          "body": "A quieter week for movement, with 11,914 daily steps. Feed time reaches 2h on average and daylight rises to 36 minutes. Sleep remains the difficult habit at 5h 35m; try a modest, repeatable wind-down rather than a bigger challenge.",
+          "evidence": "2019-11-16 to 2019-11-22 \u00b7 7 completed days"
+        },
+        {
+          "id": "next-20",
+          "kind": "suggestion",
+          "title": "One small evening change",
+          "body": "Choose a short feed-free wind-down before bed. Keep the target comfortable and repeatable. These are lifestyle suggestions, not medical advice."
+        }
+      ]
+    },
+    {
+      "through": 27,
+      "source": "prepared_ai",
+      "summary": "By week four, daylight averages 42 minutes and feed time 1h 44m. Sleep is still inconsistent at 5h 49m. Keep the habits that fit, and carry a gentle sleep goal into the next week.",
+      "goals": [
+        {
+          "id": "week-27-steps",
+          "title": "Keep moving",
+          "metric": "steps",
+          "target": 12000,
+          "unit": "steps",
+          "direction": "at_least",
+          "reason": "Your last 7 days average 15,776 steps. Keep an achievable daily movement habit.",
+          "reward": 25
+        },
+        {
+          "id": "week-27-sleep_minutes",
+          "title": "Make room for rest",
+          "metric": "sleep_minutes",
+          "target": 380,
+          "unit": "min",
+          "direction": "at_least",
+          "reason": "You averaged 349 minutes of sleep. Try a small improvement with a consistent wind-down.",
+          "reward": 25
+        },
+        {
+          "id": "week-27-feed_minutes",
+          "title": "A little less scrolling",
+          "metric": "feed_minutes",
+          "target": 105,
+          "unit": "min",
+          "direction": "at_most",
+          "reason": "The demo feed average is 104 minutes. Set aside one short block without feeds.",
+          "reward": 25
+        },
+        {
+          "id": "week-27-daylight_minutes",
+          "title": "Step into daylight",
+          "metric": "daylight_minutes",
+          "target": 45,
+          "unit": "min",
+          "direction": "at_least",
+          "reason": "The demo daylight average is 42 minutes. A short outdoor break can fit around your day.",
+          "reward": 25
+        }
+      ],
+      "insights": [
+        {
+          "id": "pattern-27",
+          "kind": "pattern",
+          "title": "Your week, in perspective",
+          "body": "By week four, daylight averages 42 minutes and feed time 1h 44m. Sleep is still inconsistent at 5h 49m. Keep the habits that fit, and carry a gentle sleep goal into the next week.",
+          "evidence": "2019-11-23 to 2019-11-29 \u00b7 7 completed days"
+        },
+        {
+          "id": "next-27",
+          "kind": "suggestion",
+          "title": "One small evening change",
+          "body": "Choose a short feed-free wind-down before bed. Keep the target comfortable and repeatable. These are lifestyle suggestions, not medical advice."
+        }
+      ]
+    },
+    {
+      "through": 29,
+      "source": "prepared_ai",
+      "summary": "Thirty days are in. Feed time in the illustrative scenario is lower, outdoor time is higher, and several goals were missed as well as met. The wearable record still shows uneven sleep. Your garden reflects consistent care, not a perfect month.",
+      "goals": [
+        {
+          "id": "week-29-steps",
+          "title": "Keep moving",
+          "metric": "steps",
+          "target": 12000,
+          "unit": "steps",
+          "direction": "at_least",
+          "reason": "Your last 7 days average 13,961 steps. Keep an achievable daily movement habit.",
+          "reward": 25
+        },
+        {
+          "id": "week-29-sleep_minutes",
+          "title": "Make room for rest",
+          "metric": "sleep_minutes",
+          "target": 380,
+          "unit": "min",
+          "direction": "at_least",
+          "reason": "You averaged 351 minutes of sleep. Try a small improvement with a consistent wind-down.",
+          "reward": 25
+        },
+        {
+          "id": "week-29-feed_minutes",
+          "title": "A little less scrolling",
+          "metric": "feed_minutes",
+          "target": 105,
+          "unit": "min",
+          "direction": "at_most",
+          "reason": "The demo feed average is 101 minutes. Set aside one short block without feeds.",
+          "reward": 25
+        },
+        {
+          "id": "week-29-daylight_minutes",
+          "title": "Step into daylight",
+          "metric": "daylight_minutes",
+          "target": 45,
+          "unit": "min",
+          "direction": "at_least",
+          "reason": "The demo daylight average is 44 minutes. A short outdoor break can fit around your day.",
+          "reward": 25
+        }
+      ],
+      "insights": [
+        {
+          "id": "pattern-29",
+          "kind": "pattern",
+          "title": "Your week, in perspective",
+          "body": "Thirty days are in. Feed time in the illustrative scenario is lower, outdoor time is higher, and several goals were missed as well as met. The wearable record still shows uneven sleep. Your garden reflects consistent care, not a perfect month.",
+          "evidence": "2019-11-25 to 2019-12-01 \u00b7 7 completed days"
+        },
+        {
+          "id": "next-29",
+          "kind": "suggestion",
+          "title": "One small evening change",
+          "body": "Choose a short feed-free wind-down before bed. Keep the target comfortable and repeatable. These are lifestyle suggestions, not medical advice."
+        }
+      ]
+    }
+  ]
+}

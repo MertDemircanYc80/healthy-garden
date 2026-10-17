@@ -1,6 +1,7 @@
 // Island → Alerts: timely nudges, heads-ups and wins.
 import { Pressable, Text, View } from "react-native";
 import { Card, SectionTitle, styles as u } from "@/components/ui";
+import { EmptyState } from "@/components/EmptyState";
 import { useApp } from "@/state/AppState";
 import { C, T } from "@/theme";
 import type { AlertLevel } from "@/types";
@@ -9,6 +10,7 @@ const LEVEL: Record<AlertLevel, string> = { nudge: C.berry, heads_up: C.sky, cel
 
 export function AlertsSection() {
   const { alerts, markAlertsRead } = useApp();
+  if (!alerts.length) return <EmptyState title="A quiet moment" body="New updates will appear here." />;
   const unread = alerts.filter((a) => !a.read).length;
   return (
     <View>
