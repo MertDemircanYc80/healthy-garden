@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ensureUser, requestAnalysis, supabase } from "@/lib/supabase";
 import { localDay } from "./days";
 import { readDays } from "./healthkit";
+import { validateHealthRow } from "./validation";
 import type { HealthDayRow } from "./types";
 
 const LAST_SYNC_KEY = "healthgarden:lastHealthSync";
@@ -45,7 +46,8 @@ async function upload(rows: HealthDayRow[], columns: (keyof HealthDayRow)[]) {
   if (!userId) return;
   // Every row carries exactly the same keys: a bulk upsert updates only these columns, and
   // the source that owns them is the truth (no data that day → null).
-  const payload = rows.map((r) => {
+  const payload = rows.map((input) => {
+    const r = validateHealthRow(input);
     const out: Record<string, unknown> = { user_id: userId, date: r.date, source: r.source ?? "healthkit" };
     for (const k of columns) out[k] = r[k] ?? null;
     return out;
@@ -94,8 +96,9 @@ export async function lastSync(): Promise<string | null> {
  */
 export async function logScreenTime(input: { feedMinutes?: number; screenMinutes?: number }, day = localDay(new Date())) {
   const row: HealthDayRow = { date: day, source: "manual" };
-  if (input.feedMinutes !== undefined) row.feed_minutes = Math.max(0, Math.round(input.feedMinutes));
-  if (input.screenMinutes !== undefined) row.screen_minutes = Math.max(0, Math.round(input.screenMinutes));
+  if (input.feedMinutes !== undefined) row.feed_minutes = input.feedMinutes;
+  if (input.screenMinutes !== undefined) row.screen_minutes = input.screenMinutes;
+  validateHealthRow(row);
   await cache([row]);
   const cols = (["feed_minutes", "screen_minutes"] as const).filter((k) => row[k] !== undefined);
   await upload([row], [...cols]);

@@ -133,3 +133,14 @@ For the AI assistant:
 - Coins: a `settle` step that pays `reward_coins` into `coin_events` (unique `ref` = no double pay)
   when a day's goal is met, and updates `gardens.coins` / `streak`.
 - Before a public launch: CAPTCHA on anonymous sign-ins, Sign in with Apple via manual linking.
+
+### Approved improvements: health access checks
+
+Apply `supabase/migrations/20261017010000_health_access.sql` after the app schema.
+It preserves ownership RLS, limits client-writable columns, protects record identities,
+restricts edits of coach-generated goals, and validates new health totals.
+Run `supabase/tests/health_access.sql` using the SQL editor in a development project:
+it creates two synthetic users inside a transaction and rolls all fixtures back.
+It checks cross-user reads/inserts/updates/deletes, anonymous access, ownership changes,
+and malformed totals. The migration and SQL checks have not yet been run on the hosted
+project; mobile validation tests do not substitute for these database tests.
