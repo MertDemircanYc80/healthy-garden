@@ -1,41 +1,80 @@
-// Island → Goals: weekly goals the coach set from this user's own data.
 import { Text, View } from "react-native";
 import { CoinIcon } from "@/components/Icons";
+import { EmptyState } from "@/components/EmptyState";
 import { Bar, Card, SectionTitle, styles as u } from "@/components/ui";
 import { useApp } from "@/state/AppState";
-import { C, T } from "@/theme";
+import { C } from "@/theme";
 import { goalProgress, goalValue, onTrack } from "@/lib/format";
-
 export function GoalsSection() {
-  const { goals } = useApp();
+  const { goals, journey } = useApp();
+  if (!goals.length)
+    return (
+      <EmptyState body="Personal goals will arrive after your first week of data." />
+    );
+  const started = journey.phase !== "baseline";
+  const complete = journey.phase === "complete";
   return (
     <View>
-      <SectionTitle title="Your goals this week" hint="Set by your coach from your own data. They adjust every Monday." />
+      <SectionTitle
+        title="Small steps, each day"
+        hint={
+          started
+            ? complete
+              ? "Day complete · rewards added to your garden"
+              : "Today through 14:00 · rewards arrive at day’s end"
+            : "Your first plan · begins on day 8"
+        }
+      />
       {goals.map((g) => {
-        const ok = onTrack(g);
+        const ok = started && onTrack(g);
         return (
           <Card key={g.id}>
-            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 12,
+              }}
+            >
               <Text style={[u.h, { flex: 1 }]}>{g.title}</Text>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                <CoinIcon size={14} />
-                <Text style={{ color: C.sun, fontWeight: "700", fontSize: T.small }}>+{g.reward}</Text>
+              <View
+                style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
+              >
+                <CoinIcon size={13} />
+                <Text style={{ color: C.sun, fontWeight: "600" }}>
+                  {g.reward}
+                </Text>
               </View>
             </View>
-            <View style={{ marginTop: 12 }}>
-              <Bar value={goalProgress(g)} color={ok ? C.moss : C.sun} />
+            <Text style={[u.num, { marginTop: 12 }]}>
+              {started ? goalValue(g, g.current) : "—"}
+              <Text style={u.muted}> / {goalValue(g, g.target)}</Text>
+            </Text>
+            <View style={{ marginTop: 10 }}>
+              <Bar
+                value={started ? goalProgress(g) : 0}
+                color={ok ? C.moss : C.sky}
+              />
             </View>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 6 }}>
-              <Text style={u.muted}>
-                Today {goalValue(g, g.current)}, {g.direction === "at_least" ? "goal" : "limit"} {goalValue(g, g.target)}
-              </Text>
-              <View style={{ flexDirection: "row", gap: 3, alignItems: "center" }} accessibilityLabel={`${g.daysHit} of ${g.daysTotal} days this week`}>
-                {Array.from({ length: g.daysTotal }, (_, i) => (
-                  <View key={i} style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: i < g.daysHit ? C.moss : C.pineLine }} />
-                ))}
-              </View>
-            </View>
-            <Text style={[u.body, { color: C.fern, marginTop: 10, fontSize: T.small, lineHeight: 19 }]}>{g.reason}</Text>
+            <Text style={[u.muted, { marginTop: 8 }]}>
+              {!started
+                ? "Starts tomorrow"
+                : g.direction === "at_most"
+                  ? complete
+                    ? ok
+                      ? "Within your daily limit"
+                      : "Over today’s limit · a fresh start tomorrow"
+                    : ok
+                      ? "Within limit so far · confirmed at day’s end"
+                      : "Over your limit so far · a fresh start tomorrow"
+                  : ok
+                    ? complete
+                      ? "Completed"
+                      : "Target reached so far"
+                    : "A little room to grow"}
+            </Text>
+            <Text style={[u.muted, { marginTop: 8 }]}>{g.reason}</Text>
           </Card>
         );
       })}

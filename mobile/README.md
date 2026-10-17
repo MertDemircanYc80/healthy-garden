@@ -1,80 +1,41 @@
-# Healthy Garden — mobile
+# Healthy Garden · jury preview
 
-Expo (React Native) app. One screen: a fixed garden on top, a floating "island" at the bottom
-with Garden, Goals, Coach, Report and Alerts.
-
-## Run it on your phone (Expo Go)
+This branch (`demo/jury-month`) starts with an empty 7 × 5 garden, no sample records, no goals/coach/alerts, and 0 gold. It uses Expo SDK 57; do not upgrade the SDK to try this preview.
 
 ```bash
-cd mobile
-npm install
-npx expo start          # scan the QR code with the iPhone camera (Expo Go installed)
+npm ci
+npm start -- --clear
 ```
 
-Phone and laptop on different networks? Use `npx expo start --tunnel`.
+`npm start` explicitly selects **Expo Go**. Scan the new QR, keep the terminal running, and use the same network and Expo account on the phone and computer. If your network blocks local access, use `npx expo start --go --tunnel --clear`.
 
-Expo Go is enough for the UI. **Apple Health (HealthKit) needs a development build** — Expo Go
-can't load the HealthKit module (the app detects Expo Go and simply shows "needs the test build").
+Tap **30-day demo** under the garden title to load the first week. Analyze it, then open day 8, complete days, earn gold, buy plants/refills and grow the garden. Choose **Water**, then tap a plant directly in the illustration. Water refills cost 5 gold; a daisy costs 20 gold. One refill waters one plant, once per day. Fertilizer remains limited to one use per plant per day.
 
-Development build, two options:
-- **Mac + Xcode, cable:** `npx expo run:ios --device` (free Apple ID may be limited; a paid Apple
-  Developer account always works).
-- **EAS (cloud):** `npx eas-cli build --profile development --platform ios` — needs a paid Apple
-  Developer account; install from the link EAS gives you. Then `npx expo start --dev-client`.
+Report opens full-screen. Tap any metric for 7/30-day history and the previous week. The 14:00 demo snapshot is explicitly partial; sleep has already ended. No goal payout occurs before day completion. Missing data stays empty.
 
-What syncs: steps, walking + running distance, active energy, exercise minutes, running and other
-workouts, sleep (main night only, naps ignored), time in daylight, and meals/protein/water if a
-food app writes them to Apple Health. Screen time can't be read on iOS — users type today's
-feed-app minutes in Report → Feed apps today. Data is cached on the phone and uploaded to
-Supabase `health_days` when `mobile/.env.local` has the Supabase URL + publishable key.
+This is a hybrid replay: 30 days of public PMData wearable readings plus clearly marked fictional screen, daylight and nutrition data. Prepared AI analysis works without a key; an optional local live-AI gateway is available. Read the [data provenance](../datasets/README.md) before recording or presenting it.
 
-Tests for the pure health helpers: `npm run check`.
+**Full instructions, safe teammate commands, live AI setup and a 2:45 video script:** [docs/JURY_DEMO.md](../docs/JURY_DEMO.md).
 
-## Check it in a browser
+## Saved progress
+
+This preview uses `healthgarden:jury:v1`. It does not overwrite the original `healthgarden:game:v1` garden. Purchases, supplies, plants, goals, analysis checkpoints and daily reward receipts are saved as one serialized snapshot. A failed save leaves the prior state intact. Returning to the empty state requires confirmation. Actual health/account data is not deleted by a demo reset.
+
+The original seeded demo modules are retained as a regression fallback and are not used as startup app data on this branch.
+
+## Real data
+
+Expo Go cannot read HealthKit. A Healthy Garden native development build is needed for Apple Health. The existing reader supports steps, sleep, workouts, activity, daylight and dietary energy. Compatible food apps can write nutrition to Apple Health; no direct MyFitnessPal API is claimed. Per-app Screen Time integration is not implemented. Manual feed minutes remain under Report → Data sources & connections.
+
+## Checks
 
 ```bash
-npm run export:web && npx serve -s dist   # open at phone size; ?hour=21 shows night
+npm run typecheck
+npm run check
+npx expo-doctor
+npm run export:web
 ```
 
-## Structure
+`npm run check` covers the health pipeline, original demo fallback, purchases and supply limits, full 30-day replay, daily payout idempotency, storage failures/reload, final-day rewards and an authenticated live-coach gateway with a mocked provider. No real provider call is made by tests.
 
-```
-src/app/index.tsx            main garden + island
-src/app/market.tsx           Market and inventory
-src/components/garden/       fixed SVG garden (scene + plants)
-src/components/island/       the bottom island + tab bar
-src/components/sections/     Garden, Goals, Coach, Report, Alerts
-src/state/AppState.tsx       data for every section (demo now, Supabase later)
-src/data/demo.ts             demo content in the same shape the AI will write
-src/types.ts                 shared shapes (mirror the Supabase tables)
-src/theme.ts                 colours, fonts, sizes
-```
-
-## Market and saved progress
-
-Tap the money badge in the top-right header to open the Market. Plants and supplies have Buy
-buttons; unaffordable purchases are disabled. Purchases update the shared balance and
-inventory immediately after a successful save. Tap any highlighted + plot in the garden
-to choose a flower or tree for that exact spot. The picker uses one owned item, or
-offers Buy & plant when none are owned. Buying and planting is one saved transaction;
-an occupied plot or failed save never spends gold. All 24 plots are accessible buttons. Watering consumes one can per thirsty plant; bulk watering stops at
-the number of cans available. Fertilizer adds half a growth stage and consumes one
-unit, at most once per plant per garden day. The saved “Fertilized today” flag
-blocks repeated uses after reload and clears on Next day, just like watering.
-Older saves without the flag remain compatible. Fully grown plants cannot be fertilized. Counts update and persist atomically
-with each action, including rapid taps and storage errors.
-
-Progress uses AsyncStorage on iOS/Android and its localStorage backend on web, under
-`healthgarden:game:v1`. Money, inventory, and garden demo progress are saved together
-on this device; they do not sync through Supabase or across devices. Startup restores
-the saved snapshot before showing the app. Only a missing save uses the initial 1,000
-coins, an empty garden, and empty inventory. Existing saves are preserved. Unreadable saves show retry/reset options rather than being
-silently replaced. Failed writes leave the previous balance and inventory intact.
-
-For testing, open Market → **Reset saved garden** → **Confirm reset**. This restores
-1,000 coins, empties the garden and inventory, and resets garden demo progress, while leaving health and
-account data untouched. The demo controls have the same confirmed reset.
-
-Run `npm run check` for purchase, persistence, concurrent mutation, failed storage, and
-reset tests. Web hosting must serve `index.html` for client routes such as `/market`;
-`serve -s dist` provides this fallback locally.
+For web previews, serve `dist/` with an SPA fallback for `/market`. The garden screenshot parameters `?hour=10&tab=report&open=1` still work.

@@ -1,0 +1,664 @@
+{
+  "sources": {
+    "wearable": {
+      "title": "PMData \u2014 Simula Research Laboratory",
+      "url": "https://datasets.simula.no/pmdata/",
+      "download": "https://datasets.simula.no/downloads/pmdata.zip",
+      "license": "CC BY-NC 4.0",
+      "participant": "p01",
+      "period": "2019-11-02 through 2019-12-01",
+      "authors": "Vajira Thambawita et al. (2020)",
+      "fields": [
+        "steps",
+        "sleep_minutes",
+        "bedtime",
+        "sedentary_minutes",
+        "active_minutes"
+      ],
+      "method": "Minute step counts summed per source date; longest sleep session assigned to dateOfSleep; active minutes = moderately + very active. Fitbit sedentary minutes are an activity classification, not measured sitting time."
+    },
+    "scenario": {
+      "title": "Healthy Garden fictional companion scenario",
+      "fields": [
+        "daylight_minutes",
+        "feed_minutes",
+        "screen_minutes",
+        "app_usage",
+        "nutrition"
+      ],
+      "method": "Deterministic fictional demo values; not measured from PMData participants. 14:00 snapshots scale cumulative totals to 55%; sleep is kept complete. No observed intervention or claim of causal improvement."
+    }
+  },
+  "days": [
+    {
+      "date": "2019-11-02",
+      "steps": 13118,
+      "sleep_minutes": 378,
+      "bedtime": "00:09",
+      "sedentary_minutes": 709,
+      "active_minutes": 99,
+      "daylight_minutes": 12,
+      "feed_minutes": 190,
+      "screen_minutes": 255,
+      "app_usage": {
+        "Instagram": 91,
+        "TikTok": 65,
+        "YouTube": 34
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2150
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-03",
+      "steps": 14312,
+      "sleep_minutes": 378,
+      "bedtime": "00:32",
+      "sedentary_minutes": 648,
+      "active_minutes": 108,
+      "daylight_minutes": 8,
+      "feed_minutes": 205,
+      "screen_minutes": 282,
+      "app_usage": {
+        "Instagram": 98,
+        "TikTok": 70,
+        "YouTube": 37
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2235
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-04",
+      "steps": 10970,
+      "sleep_minutes": 361,
+      "bedtime": "23:55",
+      "sedentary_minutes": 760,
+      "active_minutes": 51,
+      "daylight_minutes": 18,
+      "feed_minutes": 180,
+      "screen_minutes": 269,
+      "app_usage": {
+        "Instagram": 86,
+        "TikTok": 61,
+        "YouTube": 33
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2320
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-05",
+      "steps": 16186,
+      "sleep_minutes": 326,
+      "bedtime": "00:22",
+      "sedentary_minutes": 737,
+      "active_minutes": 78,
+      "daylight_minutes": 10,
+      "feed_minutes": 220,
+      "screen_minutes": 321,
+      "app_usage": {
+        "Instagram": 106,
+        "TikTok": 75,
+        "YouTube": 39
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2405
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-06",
+      "steps": 8189,
+      "sleep_minutes": 341,
+      "bedtime": "00:25",
+      "sedentary_minutes": 849,
+      "active_minutes": 21,
+      "daylight_minutes": 15,
+      "feed_minutes": 175,
+      "screen_minutes": 240,
+      "app_usage": {
+        "Instagram": 84,
+        "TikTok": 60,
+        "YouTube": 31
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2490
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-07",
+      "steps": 8710,
+      "sleep_minutes": 312,
+      "bedtime": "23:45",
+      "sedentary_minutes": 866,
+      "active_minutes": 26,
+      "daylight_minutes": 6,
+      "feed_minutes": 195,
+      "screen_minutes": 272,
+      "app_usage": {
+        "Instagram": 94,
+        "TikTok": 66,
+        "YouTube": 35
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2575
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-08",
+      "steps": 12888,
+      "sleep_minutes": 360,
+      "bedtime": "23:48",
+      "sedentary_minutes": 744,
+      "active_minutes": 92,
+      "daylight_minutes": 20,
+      "feed_minutes": 210,
+      "screen_minutes": 299,
+      "app_usage": {
+        "Instagram": 101,
+        "TikTok": 71,
+        "YouTube": 38
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2660
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-09",
+      "steps": 16450,
+      "sleep_minutes": 344,
+      "bedtime": "00:31",
+      "sedentary_minutes": 653,
+      "active_minutes": 91,
+      "daylight_minutes": 22,
+      "feed_minutes": 160,
+      "screen_minutes": 261,
+      "app_usage": {
+        "Instagram": 77,
+        "TikTok": 54,
+        "YouTube": 29
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2120
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-10",
+      "steps": 17843,
+      "sleep_minutes": 382,
+      "bedtime": "00:15",
+      "sedentary_minutes": 629,
+      "active_minutes": 126,
+      "daylight_minutes": 28,
+      "feed_minutes": 150,
+      "screen_minutes": 215,
+      "app_usage": {
+        "Instagram": 72,
+        "TikTok": 51,
+        "YouTube": 27
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2205
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-11",
+      "steps": 12519,
+      "sleep_minutes": 318,
+      "bedtime": "00:09",
+      "sedentary_minutes": 811,
+      "active_minutes": 53,
+      "daylight_minutes": 14,
+      "feed_minutes": 185,
+      "screen_minutes": 262,
+      "app_usage": {
+        "Instagram": 89,
+        "TikTok": 63,
+        "YouTube": 33
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2290
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-12",
+      "steps": 10392,
+      "sleep_minutes": 378,
+      "bedtime": "23:19",
+      "sedentary_minutes": 744,
+      "active_minutes": 52,
+      "daylight_minutes": 30,
+      "feed_minutes": 140,
+      "screen_minutes": 229,
+      "app_usage": {
+        "Instagram": 67,
+        "TikTok": 48,
+        "YouTube": 25
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2375
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-13",
+      "steps": 11185,
+      "sleep_minutes": 320,
+      "bedtime": "00:28",
+      "sedentary_minutes": 825,
+      "active_minutes": 57,
+      "daylight_minutes": 35,
+      "feed_minutes": 125,
+      "screen_minutes": 226,
+      "app_usage": {
+        "Instagram": 60,
+        "TikTok": 42,
+        "YouTube": 23
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2460
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-14",
+      "steps": 19220,
+      "sleep_minutes": 325,
+      "bedtime": "00:22",
+      "sedentary_minutes": 691,
+      "active_minutes": 174,
+      "daylight_minutes": 25,
+      "feed_minutes": 145,
+      "screen_minutes": 210,
+      "app_usage": {
+        "Instagram": 70,
+        "TikTok": 49,
+        "YouTube": 26
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2545
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-15",
+      "steps": 18259,
+      "sleep_minutes": 342,
+      "bedtime": "00:14",
+      "sedentary_minutes": 660,
+      "active_minutes": 130,
+      "daylight_minutes": 16,
+      "feed_minutes": 170,
+      "screen_minutes": 247,
+      "app_usage": {
+        "Instagram": 82,
+        "TikTok": 58,
+        "YouTube": 30
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2630
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-16",
+      "steps": 15305,
+      "sleep_minutes": 317,
+      "bedtime": "00:47",
+      "sedentary_minutes": 668,
+      "active_minutes": 111,
+      "daylight_minutes": 38,
+      "feed_minutes": 120,
+      "screen_minutes": 209,
+      "app_usage": {
+        "Instagram": 58,
+        "TikTok": 41,
+        "YouTube": 21
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2090
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-17",
+      "steps": 11916,
+      "sleep_minutes": 337,
+      "bedtime": "00:30",
+      "sedentary_minutes": 752,
+      "active_minutes": 63,
+      "daylight_minutes": 40,
+      "feed_minutes": 110,
+      "screen_minutes": 211,
+      "app_usage": {
+        "Instagram": 53,
+        "TikTok": 37,
+        "YouTube": 20
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2175
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-18",
+      "steps": 8241,
+      "sleep_minutes": 330,
+      "bedtime": "00:23",
+      "sedentary_minutes": 878,
+      "active_minutes": 59,
+      "daylight_minutes": 20,
+      "feed_minutes": 155,
+      "screen_minutes": 220,
+      "app_usage": {
+        "Instagram": 74,
+        "TikTok": 53,
+        "YouTube": 28
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2260
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-19",
+      "steps": 7134,
+      "sleep_minutes": 318,
+      "bedtime": "00:17",
+      "sedentary_minutes": 903,
+      "active_minutes": 31,
+      "daylight_minutes": 42,
+      "feed_minutes": 105,
+      "screen_minutes": 182,
+      "app_usage": {
+        "Instagram": 50,
+        "TikTok": 36,
+        "YouTube": 19
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2345
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-20",
+      "steps": 10116,
+      "sleep_minutes": 383,
+      "bedtime": "23:28",
+      "sedentary_minutes": 743,
+      "active_minutes": 75,
+      "daylight_minutes": 45,
+      "feed_minutes": 100,
+      "screen_minutes": 189,
+      "app_usage": {
+        "Instagram": 48,
+        "TikTok": 34,
+        "YouTube": 18
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2430
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-21",
+      "steps": 19747,
+      "sleep_minutes": 327,
+      "bedtime": "00:04",
+      "sedentary_minutes": 680,
+      "active_minutes": 192,
+      "daylight_minutes": 26,
+      "feed_minutes": 135,
+      "screen_minutes": 236,
+      "app_usage": {
+        "Instagram": 65,
+        "TikTok": 46,
+        "YouTube": 24
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2515
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-22",
+      "steps": 10938,
+      "sleep_minutes": 333,
+      "bedtime": "00:18",
+      "sedentary_minutes": 797,
+      "active_minutes": 84,
+      "daylight_minutes": 40,
+      "feed_minutes": 115,
+      "screen_minutes": 180,
+      "app_usage": {
+        "Instagram": 55,
+        "TikTok": 39,
+        "YouTube": 21
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2600
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-23",
+      "steps": 20704,
+      "sleep_minutes": 356,
+      "bedtime": "23:58",
+      "sedentary_minutes": 639,
+      "active_minutes": 165,
+      "daylight_minutes": 44,
+      "feed_minutes": 100,
+      "screen_minutes": 177,
+      "app_usage": {
+        "Instagram": 48,
+        "TikTok": 34,
+        "YouTube": 18
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2060
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-24",
+      "steps": 16517,
+      "sleep_minutes": 421,
+      "bedtime": "00:45",
+      "sedentary_minutes": 565,
+      "active_minutes": 124,
+      "daylight_minutes": 48,
+      "feed_minutes": 95,
+      "screen_minutes": 184,
+      "app_usage": {
+        "Instagram": 46,
+        "TikTok": 32,
+        "YouTube": 17
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2145
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-25",
+      "steps": 12481,
+      "sleep_minutes": 332,
+      "bedtime": "00:31",
+      "sedentary_minutes": 767,
+      "active_minutes": 55,
+      "daylight_minutes": 22,
+      "feed_minutes": 140,
+      "screen_minutes": 241,
+      "app_usage": {
+        "Instagram": 67,
+        "TikTok": 48,
+        "YouTube": 25
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2230
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-26",
+      "steps": 16428,
+      "sleep_minutes": 318,
+      "bedtime": "23:49",
+      "sedentary_minutes": 750,
+      "active_minutes": 117,
+      "daylight_minutes": 50,
+      "feed_minutes": 90,
+      "screen_minutes": 155,
+      "app_usage": {
+        "Instagram": 43,
+        "TikTok": 31,
+        "YouTube": 16
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2315
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-27",
+      "steps": 10556,
+      "sleep_minutes": 365,
+      "bedtime": "23:34",
+      "sedentary_minutes": 769,
+      "active_minutes": 43,
+      "daylight_minutes": 52,
+      "feed_minutes": 85,
+      "screen_minutes": 162,
+      "app_usage": {
+        "Instagram": 41,
+        "TikTok": 29,
+        "YouTube": 15
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2400
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-28",
+      "steps": 17535,
+      "sleep_minutes": 341,
+      "bedtime": "23:57",
+      "sedentary_minutes": 670,
+      "active_minutes": 140,
+      "daylight_minutes": 30,
+      "feed_minutes": 120,
+      "screen_minutes": 209,
+      "app_usage": {
+        "Instagram": 58,
+        "TikTok": 41,
+        "YouTube": 21
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2485
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-29",
+      "steps": 16209,
+      "sleep_minutes": 309,
+      "bedtime": "00:12",
+      "sedentary_minutes": 709,
+      "active_minutes": 115,
+      "daylight_minutes": 48,
+      "feed_minutes": 95,
+      "screen_minutes": 196,
+      "app_usage": {
+        "Instagram": 46,
+        "TikTok": 32,
+        "YouTube": 17
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2570
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-11-30",
+      "steps": 10782,
+      "sleep_minutes": 402,
+      "bedtime": "00:31",
+      "sedentary_minutes": 671,
+      "active_minutes": 68,
+      "daylight_minutes": 55,
+      "feed_minutes": 80,
+      "screen_minutes": 145,
+      "app_usage": {
+        "Instagram": 38,
+        "TikTok": 27,
+        "YouTube": 15
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2030
+      },
+      "source": "demo"
+    },
+    {
+      "date": "2019-12-01",
+      "steps": 13736,
+      "sleep_minutes": 387,
+      "bedtime": "00:03",
+      "sedentary_minutes": 630,
+      "active_minutes": 87,
+      "daylight_minutes": 50,
+      "feed_minutes": 100,
+      "screen_minutes": 177,
+      "app_usage": {
+        "Instagram": 48,
+        "TikTok": 34,
+        "YouTube": 18
+      },
+      "calories_burned": null,
+      "nutrition": {
+        "energyKcal": 2115
+      },
+      "source": "demo"
+    }
+  ]
+}

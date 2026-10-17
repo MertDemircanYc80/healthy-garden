@@ -113,3 +113,5 @@ cut every stretch item.
 | M16 | Highlight selectable empty plots, plant picker with buy-and-plant, and 1,000 starting gold | frontend | Codex (user requested) | ✅ Done |
 
 | M17 | Persist and enforce one fertilizer use per plant per day | frontend | Codex (user requested) | ✅ Done |
+
+| M18 | Jury demo: empty default, larger interactive garden, full-screen daily reports, sourced 30-day replay, adaptive coach and goal rewards | frontend + integration | Mert + Codex (user requested) | ✅ Done — preview on `demo/jury-month`; validation and teammate setup in `docs/JURY_DEMO.md` |

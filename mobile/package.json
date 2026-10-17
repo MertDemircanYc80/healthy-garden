@@ -33,14 +33,15 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "start": "expo start --go",
+    "android": "expo start --go --android",
+    "ios": "expo start --go --ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "export:web": "expo export -p web",
-    "check": "npx --yes tsx scripts/check-health.ts && npx --yes tsx scripts/check-demo.ts && npx --yes tsx scripts/check-market.ts",
-    "demo:data": "npx --yes tsx scripts/make-demo-data.ts"
+    "check": "npx --yes tsx scripts/check-health.ts && npx --yes tsx scripts/check-demo.ts && npx --yes tsx scripts/check-market.ts && npx --yes tsx scripts/check-journey.ts && node scripts/check-coach.mjs",
+    "demo:data": "npx --yes tsx scripts/make-demo-data.ts",
+    "coach": "node --env-file-if-exists=.env.coach.local scripts/coach-server.mjs"
   },
   "private": true
 }

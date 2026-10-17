@@ -1,22 +1,52 @@
-import { coachAlerts, MAX_OFFSET, type DemoState } from "@/demo/simulation";
-import { emptyInventory, MARKET_ITEMS, STARTING_COINS, type Inventory } from "./market";
+import type { DemoState } from "@/demo/simulation";
+import { emptyJourney, validatePlan, type Journey } from "@/demo/journey";
+import { GARDEN_SIZE } from "./gardenPlots";
+import {
+  emptyInventory,
+  MARKET_ITEMS,
+  STARTING_COINS,
+  type Inventory,
+} from "./market";
 
-export const GARDEN_STORAGE_KEY = "healthgarden:game:v1";
+// Separate storage: switching back to main restores the original garden untouched.
+export const GARDEN_STORAGE_KEY = "healthgarden:jury:v1";
 export interface SavedGarden {
   version: 1;
   sim: DemoState & { health: number };
   inventory: Inventory;
+  journey: Journey;
 }
 export const initialGarden = (): SavedGarden => ({
   version: 1,
-  sim: { offset: 0, coins: STARTING_COINS, streak: 4, plants: [], alerts: coachAlerts(), health: 0.72 },
+  sim: {
+    offset: 0,
+    coins: STARTING_COINS,
+    streak: 0,
+    plants: [],
+    alerts: [],
+    health: 0,
+  },
   inventory: emptyInventory(),
+  journey: emptyJourney(),
 });
 
-const record = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
-const count = (v: unknown): v is number => typeof v === "number" && Number.isSafeInteger(v) && v >= 0;
-const fraction = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v) && v >= 0 && v <= 1;
-const species = ["daisy", "marigold", "lavender", "tulip", "sunflower", "rose", "fruit_tree", "cherry_tree", "oak"];
+const record = (v: unknown): v is Record<string, unknown> =>
+  typeof v === "object" && v !== null && !Array.isArray(v);
+const count = (v: unknown): v is number =>
+  typeof v === "number" && Number.isSafeInteger(v) && v >= 0;
+const fraction = (v: unknown): v is number =>
+  typeof v === "number" && Number.isFinite(v) && v >= 0 && v <= 1;
+const species = [
+  "daisy",
+  "marigold",
+  "lavender",
+  "tulip",
+  "sunflower",
+  "rose",
+  "fruit_tree",
+  "cherry_tree",
+  "oak",
+];
 const stages = ["seed", "sprout", "young", "mature", "blooming"];
 
 /** Never silently overwrite an unreadable save with starting money. */
@@ -25,22 +55,92 @@ export function decodeGarden(raw: string): SavedGarden {
   if (record(v) && v.version === 1 && record(v.sim) && record(v.inventory)) {
     const s = v.sim;
     const inventory = v.inventory;
-    const plantsValid = Array.isArray(s.plants) && s.plants.every(p => record(p) &&
-      typeof p.id === "string" && species.includes(String(p.species)) && stages.includes(String(p.stage)) &&
-      count(p.col) && p.col < 6 && count(p.row) && p.row < 4 && fraction(p.growth) &&
-      typeof p.wateredToday === "boolean" && (p.fertilizedToday === undefined || typeof p.fertilizedToday === "boolean") && typeof p.resting === "boolean" && (p.variant === undefined || count(p.variant)));
-    const alertsValid = Array.isArray(s.alerts) && s.alerts.every(a => record(a) &&
-      ["id", "title", "body", "time"].every(k => typeof a[k] === "string") &&
-      ["nudge", "heads_up", "celebrate"].includes(String(a.level)) && typeof a.read === "boolean");
-    if (count(s.coins) && count(s.offset) && s.offset <= MAX_OFFSET && count(s.streak) && fraction(s.health) &&
-        plantsValid && alertsValid && MARKET_ITEMS.every(item => count(inventory[item.id]))) {
+    const plantsValid =
+      Array.isArray(s.plants) &&
+      s.plants.every(
+        (p) =>
+          record(p) &&
+          typeof p.id === "string" &&
+          species.includes(String(p.species)) &&
+          stages.includes(String(p.stage)) &&
+          count(p.col) &&
+          p.col < GARDEN_SIZE.cols &&
+          count(p.row) &&
+          p.row < GARDEN_SIZE.rows &&
+          fraction(p.growth) &&
+          typeof p.wateredToday === "boolean" &&
+          (p.fertilizedToday === undefined ||
+            typeof p.fertilizedToday === "boolean") &&
+          typeof p.resting === "boolean" &&
+          (p.variant === undefined || count(p.variant)),
+      );
+    const alertsValid =
+      Array.isArray(s.alerts) &&
+      s.alerts.every(
+        (a) =>
+          record(a) &&
+          ["id", "title", "body", "time"].every(
+            (k) => typeof a[k] === "string",
+          ) &&
+          ["nudge", "heads_up", "celebrate"].includes(String(a.level)) &&
+          typeof a.read === "boolean",
+      );
+    const j = v.journey;
+    const journeyValid =
+      record(j) &&
+      Number.isInteger(j.index) &&
+      Number(j.index) >= -1 &&
+      Number(j.index) <= 29 &&
+      ["empty", "baseline", "midday", "complete"].includes(String(j.phase)) &&
+      Array.isArray(j.plans) &&
+      j.plans.every((p) => {
+        try {
+          return (
+            record(p) &&
+            count(p.through) &&
+            Number(p.through) <= Number(j.index) &&
+            !!validatePlan(p, Number(p.through))
+          );
+        } catch {
+          return false;
+        }
+      }) &&
+      Array.isArray(j.settled) &&
+      j.settled.every(
+        (d) => typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d),
+      ) &&
+      new Set(j.settled).size === j.settled.length &&
+      Array.isArray(j.ledger) &&
+      j.ledger.every(
+        (e) =>
+          record(e) &&
+          typeof e.id === "string" &&
+          typeof e.date === "string" &&
+          count(e.amount) &&
+          count(e.goalsHit) &&
+          count(e.goalsTotal),
+      );
+    if (
+      count(s.coins) &&
+      count(s.offset) &&
+      s.offset <= 29 &&
+      count(s.streak) &&
+      fraction(s.health) &&
+      journeyValid &&
+      plantsValid &&
+      alertsValid &&
+      MARKET_ITEMS.every((item) => count(inventory[item.id]))
+    ) {
       return v as unknown as SavedGarden;
     }
   }
   throw new Error("Saved garden data could not be read.");
 }
 
-interface Storage { getItem(key: string): Promise<string | null>; setItem(key: string, value: string): Promise<void> }
+interface Storage {
+  getItem(key: string): Promise<string | null>;
+  setItem(key: string, value: string): Promise<void>;
+}
 
 /** Serialize all mutations and publish only after saving the complete snapshot succeeds. */
 export function createGardenStore(storage: Storage) {
@@ -50,12 +150,19 @@ export function createGardenStore(storage: Storage) {
   const listeners = new Set<(state: SavedGarden) => void>();
   const publish = (next: SavedGarden) => {
     current = next;
-    listeners.forEach(listener => listener(next));
+    listeners.forEach((listener) => listener(next));
     return next;
   };
   const load = (): Promise<SavedGarden> => {
     if (current) return Promise.resolve(current);
-    loading ??= storage.getItem(GARDEN_STORAGE_KEY).then(raw => publish(raw === null ? initialGarden() : decodeGarden(raw))).finally(() => { loading = null; });
+    loading ??= storage
+      .getItem(GARDEN_STORAGE_KEY)
+      .then((raw) =>
+        publish(raw === null ? initialGarden() : decodeGarden(raw)),
+      )
+      .finally(() => {
+        loading = null;
+      });
     return loading;
   };
   const enqueue = (operation: () => Promise<SavedGarden>) => {
@@ -65,7 +172,12 @@ export function createGardenStore(storage: Storage) {
   };
   return {
     load,
-    subscribe(listener: (state: SavedGarden) => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },
+    subscribe(listener: (state: SavedGarden) => void) {
+      listeners.add(listener);
+      return () => {
+        listeners.delete(listener);
+      };
+    },
     update(change: (state: SavedGarden) => SavedGarden) {
       return enqueue(async () => {
         const previous = await load();

@@ -1,3 +1,5 @@
+> **Jury preview branch:** See [the 30-day demo guide](docs/JURY_DEMO.md) for the empty-first UI, real-data provenance, video script and safe teammate setup. `main` keeps the original version.
+
 # 🌱 Healthy Garden
 
 > **Grow Yourself. Grow Your Garden. Grow a Better World.**
