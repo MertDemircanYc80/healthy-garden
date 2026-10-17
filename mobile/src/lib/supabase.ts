@@ -1,6 +1,6 @@
 // Supabase client for the app. Values come from mobile/.env.local:
 //   EXPO_PUBLIC_SUPABASE_URL, EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY
-// Without them the app keeps running on demo data and on-device health data.
+// Without them the app keeps running with on-device data and optional sample mode.
 import "react-native-url-polyfill/auto";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
@@ -8,7 +8,7 @@ import { createSupabaseClient } from "./supabase-client";
 
 export const supabase = createSupabaseClient({
   auth: {
-    ...(Platform.OS !== "web" ? { storage: AsyncStorage } : {}),
+    storage: AsyncStorage,
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: Platform.OS === "web",
@@ -32,5 +32,7 @@ export async function requestAnalysis(force = false): Promise<string> {
   if (!supabase) return "offline";
   const { data, error } = await supabase.functions.invoke("analyze", { body: { force } });
   if (error) throw new Error("Your coach couldn't update right now.");
-  return (data as { status?: string })?.status ?? "ok";
+  const status = (data as { status?: string })?.status;
+  if (status === "error") throw new Error("Your coach could not update right now.");
+  return status ?? "ok";
 }

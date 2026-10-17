@@ -32,46 +32,46 @@ Tests for the pure health helpers: `npm run check`.
 
 ## Supabase connection
 
-The app uses `@supabase/supabase-js` with a public key. Copy `.env.example` to `.env.local`
-inside `mobile/` and fill in `EXPO_PUBLIC_SUPABASE_URL` and
-`EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Both files use Expo's public environment variables;
-only the empty example is committed. Never put a secret/service-role key in this app.
+The app and readiness check share `src/lib/supabase-client.ts`. Copy `.env.example` to
+`mobile/.env.local` and fill in `EXPO_PUBLIC_SUPABASE_URL` and
+`EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Use only a publishable/anon key; never a
+secret/service-role key. Environment files are ignored; the empty example is committed.
+The factory trims whitespace and rejects partial configuration. When both values are
+absent, the personal garden and local health data remain available without cloud syncing.
+The app adds the native URL polyfill and retains its existing AsyncStorage auth sessions.
 
-With Node.js 22.18 or newer, run from `mobile/`:
+From `mobile/`, using Node.js 22.18 or newer:
 
 ```bash
-npm run check:supabase
+npm run check:connection
 npm run typecheck
 npm run check
 ```
 
-The connection check loads `mobile/.env.local` (or accepts variables supplied by CI) and
-uses the same client factory as the app to make a read-only Storage request. It fails with
-a nonzero exit code for missing configuration, a rejected key, or an unreachable endpoint.
-It does not create users, need a bucket/table, or verify anonymous sign-in or database writes.
+`check:connection` verifies public-key access to the Auth API, anonymous sign-in settings,
+and denial of signed-out access to `health_days`. It uses bounded network requests and
+exits unsuccessfully for missing/invalid configuration or incomplete backend setup.
+It does not create accounts or write data, and does not prove authenticated uploads or
+cross-user isolation. `check:supabase` is a compatibility alias for the same check.
+`npm run check` includes offline client-configuration tests.
 
-`src/lib/supabase-client.ts` reads the environment and creates the client;
-`src/lib/supabase.ts` adds native URL support and persistent session storage. When both
-variables are absent, the app retains its demo mode. Expo Go/device behavior still needs
-device testing; the command above checks connectivity from Node.js.
-
-Before health uploads can work, enable **Authentication → Sign In / Providers → Anonymous
-Sign-Ins** and apply `supabase/migrations/20261016120000_app_schema.sql` in the project's SQL
-Editor if the app schema is absent. This creates the app tables, RLS policies, and new-user
-trigger. Do not apply the archived `supabase/web-prototype/` migrations or rerun the initial
-schema over existing app tables. See [the backend setup guide](../docs/SUPABASE_SETUP.md).
-The section screens still use demo data; this connection setup does not implement task M3.
+For a new backend, follow [the Supabase setup guide](../docs/SUPABASE_SETUP.md), including
+its health access and privacy migrations. Do not rerun the initial schema over existing
+app tables or apply the archived web-prototype migrations. Personal goals and garden
+progress stay local; health totals sync when enabled. Native-device validation remains
+separate from these Node.js checks.
 
 ## Check it in a browser
 
 ```bash
-npm run export:web && npx serve dist   # open at phone size; ?hour=21 shows night
+npm run export:web && npx serve -s dist   # open at phone size; ?hour=21 shows night
 ```
 
 ## Structure
 
 ```
-src/app/index.tsx            the one screen: garden + island
+src/app/index.tsx            main garden + island
+src/app/market.tsx           Market and inventory
 src/components/garden/       fixed SVG garden (scene + plants)
 src/components/island/       the bottom island + tab bar
 src/components/sections/     Garden, Goals, Coach, Report, Alerts
@@ -80,3 +80,72 @@ src/data/demo.ts             demo content in the same shape the AI will write
 src/types.ts                 shared shapes (mirror the Supabase tables)
 src/theme.ts                 colours, fonts, sizes
 ```
+
+## Market and saved progress
+
+Tap the money badge in the top-right header to open the Market. Plants and supplies have Buy
+buttons; unaffordable purchases are disabled. Purchases update the shared balance and
+inventory immediately after a successful save. Tap any highlighted + plot in the garden
+to choose a flower or tree for that exact spot. The picker uses one owned item, or
+offers Buy & plant when none are owned. Buying and planting is one saved transaction;
+an occupied plot or failed save never spends gold. All 24 plots are accessible buttons. Watering consumes one can per thirsty plant; bulk watering stops at
+the number of cans available. Fertilizer adds half a growth stage and consumes one
+unit, at most once per plant per garden day. The saved “Fertilized today” flag
+blocks repeated uses after reload and clears on Next day, just like watering.
+Older saves without the flag remain compatible. Fully grown plants cannot be fertilized. Counts update and persist atomically
+with each action, including rapid taps and storage errors.
+
+Progress uses AsyncStorage on iOS/Android and its localStorage backend on web, under
+`healthgarden:game:v1`. Money, inventory, and garden demo progress are saved together
+on this device; they do not sync through Supabase or across devices. Startup restores
+the saved snapshot before showing the app. Only a missing save uses the initial 1,000
+coins, an empty garden, and empty inventory. Existing saves are preserved. Unreadable saves show retry/reset options rather than being
+silently replaced. Failed writes leave the previous balance and inventory intact.
+
+For testing, open Market → **Reset saved garden** → **Confirm reset**. This restores
+1,000 coins, empties the garden and inventory, and resets garden demo progress, while leaving health and
+account data untouched. The demo controls have the same confirmed reset.
+
+Run `npm run check` for purchase, persistence, concurrent mutation, failed storage, and
+reset tests. Web hosting must serve `index.html` for client routes such as `/market`;
+`serve -s dist` provides this fallback locally.
+
+## Approved improvements (October 2026)
+
+The personal garden follows local calendar dates and keeps the existing saved gold,
+plants and inventory. The sample garden has separate local storage and is the only mode
+with an **Advance sample day** button. Every app launch opens the personal garden;
+sample mode is only selected for the current session. Open the date/settings badge to switch modes or replay
+**How to play**. New gardens start with 1,000 gold and no plants or supplies.
+
+Personal goals are calculated locally from recorded totals from the preceding seven days:
+steps, active minutes, feed minutes and daylight. Targets remain fixed through the week.
+At least one preceding day with a metric is required. Missing values do not count as zero.
+Movement rewards settle when reached; feed-time limits settle after the local date ends.
+Reward keys and gold are saved together, so refreshes and retries do not duplicate rewards.
+No AI request is needed for these local goal calculations. Sample coach content stays in
+the sample garden; personal mode never presents that persona's report as your own.
+
+**Report → Your data and privacy** explains storage, disconnects syncing and offers
+confirmed deletion. Local health updates use a durable AsyncStorage queue (localStorage
+on web); the latest 35 days and pending uploads are retained. Failed uploads are retried
+on startup, foregrounding and **Retry upload**. Local save failures preserve your input.
+Health data deletion preserves gold, inventory, plants and minimal reward-deduplication
+keys; it clears local totals/targets and cloud health-derived records for the current
+anonymous account. Cloud deletion/reconnect require the migrations in
+`docs/SUPABASE_SETUP.md`. Apple Health originals are not removed.
+
+### Verification
+
+Run `npm run typecheck`, `npm run check`, and `npm run export:web` in `mobile/`.
+Checks cover input validation, concurrent/offline health updates, daily care rollover,
+DST/backward clocks, automatic local-midnight timers without health data, resume/timezone changes, separate sample progress and once-only rewards (including failed saves).
+SQL isolation/deletion tests live in `supabase/tests/`; they require a Supabase database.
+
+For a visual check at 320×568 and 390×844, complete or skip the guide, plant a plot,
+open Market, switch tabs, view Report/privacy, and switch to/from the sample garden.
+The full 24-plant sample garden was measured in the web development build with a temporary
+render counter: four tab switches (Goals, Coach, Report, Garden) caused **4 GardenScene
+renders before and 0 after** memoization/stable callbacks. The counter was removed after
+measurement. Plant artwork is memoized, and plot lookups are indexed by coordinate.
+This is a render-count result, not a native-device frame-rate benchmark.

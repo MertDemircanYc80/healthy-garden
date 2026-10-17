@@ -7,10 +7,11 @@ import { C, T } from "@/theme";
 import { goalProgress, goalValue, onTrack } from "@/lib/format";
 
 export function GoalsSection() {
-  const { goals } = useApp();
+  const { goals, isDemo } = useApp();
   return (
     <View>
-      <SectionTitle title="Your goals this week" hint="Set by your coach from your own data. They adjust every Monday." />
+      <SectionTitle title="Your goals this week" hint={isDemo ? "Sample goals for the demo week." : "Targets use your recorded totals from the previous week. Gold is awarded once per goal per day; feed-time limits settle the next day."} />
+      {goals.length === 0 && <Card><Text style={u.body}>Your goals need at least one previous day of recorded steps, active minutes, daylight, or feed time. Connect Apple Health or save feed minutes in Report. Missing readings never count as a completed goal.</Text></Card>}
       {goals.map((g) => {
         const ok = onTrack(g);
         return (
@@ -27,7 +28,7 @@ export function GoalsSection() {
             </View>
             <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 6 }}>
               <Text style={u.muted}>
-                Today {goalValue(g, g.current)}, {g.direction === "at_least" ? "goal" : "limit"} {goalValue(g, g.target)}
+                Today {g.currentAvailable === false ? "no reading yet" : goalValue(g, g.current)}, {g.direction === "at_least" ? "goal" : "limit"} {goalValue(g, g.target)}
               </Text>
               <View style={{ flexDirection: "row", gap: 3, alignItems: "center" }} accessibilityLabel={`${g.daysHit} of ${g.daysTotal} days this week`}>
                 {Array.from({ length: g.daysTotal }, (_, i) => (

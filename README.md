@@ -1,65 +1,90 @@
 # 🌱 Healthy Garden
 
-> Forest rewards you for putting your phone down. Healthy Garden rewards you for living well.
->
-> **Grow Yourself. Grow Your Garden. Grow a Better World.** 🌱
+> **Grow Yourself. Grow Your Garden. Grow a Better World.**
 
-Healthy Garden turns healthy habits — walking, sleeping well, scrolling less — into a living
-virtual garden, with milestones that link to real-world tree planting.
-Hackathon project · plan in [`docs/PLAN.md`](docs/PLAN.md) · task board in [`docs/TASKS.md`](docs/TASKS.md).
+Healthy Garden reads your phone and watch data — steps, sleep, runs, time outside, meals and
+time spent in feed apps — and an AI coach turns it into **personal** weekly goals and
+suggestions. Every goal you hit brings sunlight and coins to a calm little garden that grows
+with you. Plants never die; they rest until you come back.
 
-## Quick start (the app)
+<p align="center"><img src="docs/screens/app-screens.png" alt="Healthy Garden: garden, goals, coach, report and alerts" width="100%"></p>
 
+## Try it in 3 steps (no accounts needed)
+
+You need an iPhone (or Android phone) with **Expo Go** from the App Store / Play Store, and a
+computer with **Node.js LTS** and **Git**. Phone and computer on the same Wi-Fi.
+
+**Mac (Terminal)**
 ```bash
-git clone https://github.com/MertDemircanYc80/healthy-garden
-cd healthy-garden/mobile
-npm install
-npx expo start      # scan the QR code with your iPhone (Expo Go app)
+git clone https://github.com/MertDemircanYc80/healthy-garden.git
+cd healthy-garden/mobile && npm ci
+npx expo start            # scan the QR code with the iPhone camera
 ```
 
-The phone app lives in [`mobile/`](mobile/README.md). Database setup: [`docs/SUPABASE_SETUP.md`](docs/SUPABASE_SETUP.md).
+**Windows (Command Prompt)**
+```bat
+winget install OpenJS.NodeJS.LTS
+winget install Git.Git
+:: close and reopen Command Prompt, then:
+cd %USERPROFILE%
+git clone https://github.com/MertDemircanYc80/healthy-garden.git
+cd healthy-garden\mobile
+npm ci
+npx expo start
+```
 
-## Web prototype (earlier, frozen)
+Different networks, or the QR won't connect? Use `npx expo start --tunnel`.
 
-The root Next.js app is the first browser prototype — run it with `npm install && npm run dev`
-at the repo root. It contains reusable pieces (game engine, Apple Health export parser).
+The app opens in **demo mode**: a sample persona's 30 days of phone and watch data. Tap the
+**Sample data** pill under the greeting and press **Next day** to watch goals get hit, coins
+arrive and the garden grow.
 
-### What the web prototype does
+## How it works
 
-The whole core loop, on a phone-sized screen, with no backend:
+```
+Apple Health (steps, sleep, workouts, daylight, meals) ─┐
+Screen time (typed in; iOS doesn't share it with apps) ─┼─► health_days (Supabase, per user, RLS)
+                                                         │
+             Edge Function "analyze" ◄───────────────────┘
+               1. computes facts in code (averages, week-over-week, late nights vs sleep,
+                  feed time vs bedtime, weekdays vs weekends, short drives, protein on run days)
+               2. Claude writes goals, coach suggestions, report summary and alerts that may
+                  only cite those facts (Structured Outputs)
+               3. a validator enforces ranges and safety (no diagnoses, no diet restriction)
+                                                         │
+             goals · insights · reports · alerts ◄───────┘──► the app's island sections
+```
 
-- **Onboarding** (name, step goal, bedtime, data source) — or "load the demo garden"
-- **Tasks** — today's steps / sleep / scroll in one place, live progress, collect coins (idempotent, 200/day cap)
-- **Shop** — seeds, saplings, watering can, fertilizer
-- **Garden** — a 3D Hay Day-style island (drag to rotate, pinch to zoom): tap the soil to plant, tap a plant to water/fertilize; 9 species (daisy, marigold, lavender, tulip, sunflower, rose, fruit tree, cherry blossom, oak) grow through 5 stages and rest (never die) when skipped
-- **Data** — import an Apple Health export (steps, walking/running, workouts, sleep, energy, daylight, food); iPhone Shortcuts sync for daily totals, feed-app time and driving (see `docs/DATA_SOURCES.md`)
-- **Real impact** — every 500 coins unlocks a (mocked) real tree + certificate
-- **🧪 Demo panel** — +1,000 steps, +1 h sleep, −30 min scroll, offline hour, skip to tomorrow, load demo garden, reset
+- **App:** Expo SDK 57 + React Native, Expo Router, react-native-svg (the garden is drawn in code)
+- **Apple Health:** `@kingstinct/react-native-healthkit` with background delivery (needs a development build; Expo Go shows sample data)
+- **Backend:** Supabase — anonymous sign-in (no login screen), Postgres with row-level security, Edge Functions
+- **AI:** Claude (`claude-sonnet-5-5`) with Structured Outputs; without a key a rule-based coach writes the same kind of output from the same facts
 
-Game state is saved in the browser (localStorage). Shortcuts sync needs Supabase in production (`npm run dev` uses an in-memory store). `npm run check` runs the game-loop and data-pipeline tests.
+## Repository map
 
-**Demo tip:** "Load demo garden" starts at 460 coins — complete one task live and the first real tree unlocks.
+| Path | What |
+|---|---|
+| `mobile/` | The iPhone app (Expo). See [`mobile/README.md`](mobile/README.md) |
+| `supabase/migrations/` | Database schema with RLS — [`docs/SUPABASE_SETUP.md`](docs/SUPABASE_SETUP.md) |
+| `supabase/functions/analyze/` | AI coach Edge Function; logic + tests in `supabase/functions/_shared/analysis/` |
+| `supabase/seed/demo_health_days.csv` | The demo persona's data, for seeding a Supabase demo user |
+| `docs/SUBMISSION.md` | Demo video script and submission checklist |
+| `src/` (root) | First web prototype (frozen, kept for reference) |
 
-## Stack
+## Tests
 
-App: Expo SDK 57 (matches the App Store Expo Go) · React Native · Expo Router · react-native-svg · Supabase (anonymous auth, Postgres, Edge Functions) · Claude API for analysis.
-Web prototype: Next.js 16 · Tailwind v4.
+```bash
+cd mobile && npm run check && npm run typecheck          # health parsing + demo week
+cd supabase/functions && deno test --allow-env _shared/analysis/   # AI coach pipeline
+```
 
-## Working with AI assistants
+## Privacy and honesty
 
-All assistants (Claude Code, Cursor, Copilot, Codex, Gemini…) should follow
-[`AGENTS.md`](AGENTS.md). `CLAUDE.md`, `GEMINI.md` and `.github/copilot-instructions.md`
-point to it.
+- Only daily totals are stored — never message content, browsing history or locations.
+- Demo mode uses a synthetic persona generated by `mobile/scripts/make-demo-data.ts`; it is labelled "Sample data" in the app.
+- Healthy Garden is not medical advice. Tree planting shown in earlier prototypes is a mock-up.
 
-## Team workflow (short)
+## Team
 
-1. `git pull` → claim a task in `docs/TASKS.md`
-2. Branch `<role>/<feature>` → small commits
-3. `npm run lint && npm run build` → PR into `main`
-
-## Credits
-
-All 3D models are procedural (generated in code). Libraries: Next.js, React, three.js,
-@react-three/fiber, @react-three/drei, fflate, Supabase JS. _Add any other API, asset or dataset here before submission._
-
-**Not medical advice.** Healthy Garden is a hackathon prototype; tree-planting is mocked.
+Built at a hackathon by Mert and teammates, with Claude as a coding assistant. Contributor and
+AI-assistant rules: [`AGENTS.md`](AGENTS.md).

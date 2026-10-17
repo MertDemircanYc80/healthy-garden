@@ -1,0 +1,197 @@
+{
+  "today": "2026-10-16",
+  "generatedWith": "rule-based coach (no AI key yet)",
+  "goals": [
+    {
+      "title": "A little more walking",
+      "metric": "steps",
+      "target": 6500,
+      "reason": "You've averaged 5,751 steps a day. About 15% more is one extra short walk.",
+      "reward_coins": 20,
+      "week_start": "2026-10-12",
+      "unit": "steps",
+      "direction": "at_least"
+    },
+    {
+      "title": "Seven hours of sleep",
+      "metric": "sleep_minutes",
+      "target": 420,
+      "reason": "You've been sleeping about 6 h 43 min.",
+      "reward_coins": 25,
+      "week_start": "2026-10-12",
+      "unit": "min",
+      "direction": "at_least"
+    },
+    {
+      "title": "Less time in feed apps",
+      "metric": "feed_minutes",
+      "target": 75,
+      "reason": "Feed apps took about 93 minutes a day this week. Cutting a fifth frees up a walk.",
+      "reward_coins": 25,
+      "week_start": "2026-10-12",
+      "unit": "min",
+      "direction": "at_most"
+    },
+    {
+      "title": "Lights out a bit earlier",
+      "metric": "bedtime",
+      "target": 23.25,
+      "reason": "Your bedtime has averaged 11:27 pm. Fifteen minutes earlier is an easy first step.",
+      "reward_coins": 15,
+      "week_start": "2026-10-12",
+      "unit": "",
+      "direction": "at_most"
+    }
+  ],
+  "insights": [
+    {
+      "kind": "pattern",
+      "title": "Late nights cost you sleep",
+      "body": "After bedtimes past 11:30 pm you slept 5 h 56 min on average, versus 7 h 21 min after earlier nights.",
+      "evidence": "15 late nights in the last 30 days",
+      "action": "Put your phone on the charger outside your bedroom by 11 pm tonight.",
+      "metric": "bedtime"
+    },
+    {
+      "kind": "pattern",
+      "title": "Heavy scrolling days end later",
+      "body": "On days with more than 95 minutes in feed apps, you went to bed around 11:50 pm, versus 11:16 pm on lighter days.",
+      "evidence": "Last 7 days: Instagram 342 min, TikTok 214 min, YouTube 96 min",
+      "action": "Set a 9 pm app limit for Instagram in Screen Time.",
+      "metric": "feed_minutes"
+    },
+    {
+      "kind": "suggestion",
+      "title": "Swap a short drive for a walk",
+      "body": "On 4 of the last 7 days you drove 15 minutes or less in total. Some of those trips could be a walk.",
+      "evidence": "4 short-drive days this week",
+      "action": "Walk your next short trip and water your garden with the steps.",
+      "metric": "driving_minutes"
+    },
+    {
+      "kind": "suggestion",
+      "title": "More protein on run days",
+      "body": "On running days you logged about 56 g of protein, versus 86 g on other days.",
+      "evidence": "From meals logged in Apple Health",
+      "action": "Add eggs, yogurt or beans to the meal after your next run.",
+      "metric": "protein_g"
+    }
+  ],
+  "report": {
+    "period_start": "2026-10-10",
+    "period_end": "2026-10-16",
+    "score": 79,
+    "score_change": -10,
+    "summary": "This week you averaged 6 h 43 min of sleep and 5,751 steps a day. Late nights are the habit pulling your sleep down the most.",
+    "metrics": [
+      {
+        "metric": "sleep_minutes",
+        "label": "Sleep",
+        "unit": "h",
+        "week": [
+          7.7,
+          6.2,
+          7.5,
+          5.9,
+          6.4,
+          7.3,
+          6
+        ],
+        "goal": 7,
+        "better": "higher",
+        "note": "About the same as last week"
+      },
+      {
+        "metric": "steps",
+        "label": "Steps",
+        "unit": "k",
+        "week": [
+          8.7,
+          2.2,
+          7.2,
+          8.8,
+          3.8,
+          6.5,
+          3.1
+        ],
+        "goal": 6.5,
+        "better": "higher",
+        "note": "Down 14% from last week"
+      },
+      {
+        "metric": "feed_minutes",
+        "label": "Feed apps",
+        "unit": "min",
+        "week": [
+          124,
+          76,
+          103,
+          76,
+          96,
+          138,
+          38
+        ],
+        "goal": 75,
+        "better": "lower",
+        "note": "Up 7% from last week"
+      },
+      {
+        "metric": "active_minutes",
+        "label": "Active",
+        "unit": "min",
+        "week": [
+          52,
+          12,
+          12,
+          38,
+          17,
+          20,
+          14
+        ],
+        "goal": 30,
+        "better": "higher",
+        "note": "Down 15% from last week"
+      },
+      {
+        "metric": "daylight_minutes",
+        "label": "Daylight",
+        "unit": "min",
+        "week": [
+          28,
+          12,
+          6,
+          37,
+          14,
+          9,
+          9
+        ],
+        "goal": 20,
+        "better": "higher",
+        "note": "Down 15% from last week"
+      },
+      {
+        "metric": "running_minutes",
+        "label": "Running",
+        "unit": "min",
+        "week": [
+          35,
+          0,
+          0,
+          25,
+          0,
+          0,
+          0
+        ],
+        "better": "higher",
+        "note": "About the same as last week"
+      }
+    ]
+  },
+  "alerts": [
+    {
+      "level": "heads_up",
+      "title": "Wind-down tonight",
+      "body": "Lights out before 11:30 pm keeps tomorrow's sleep goal in reach."
+    }
+  ]
+}

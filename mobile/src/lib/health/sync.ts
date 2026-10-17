@@ -1,102 +1,45 @@
-// Moves on-device data into Supabase (health_days) and asks the coach to refresh.
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ensureUser, requestAnalysis, supabase } from "@/lib/supabase";
 import { localDay } from "./days";
 import { readDays } from "./healthkit";
+import { createHealthStore, type PendingHealth } from "./store";
 import type { HealthDayRow } from "./types";
 
-const LAST_SYNC_KEY = "healthgarden:lastHealthSync";
-const CACHE_KEY = "healthgarden:healthDays";
-
-/** Columns HealthKit owns. Manual/Shortcut columns (screen time, driving) are never overwritten by a HealthKit sync. */
-const HEALTHKIT_COLUMNS: (keyof HealthDayRow)[] = [
-  "steps",
-  "walking_running_km",
-  "active_energy_kcal",
-  "active_minutes",
-  "running_minutes",
-  "workout_minutes",
-  "sleep_minutes",
-  "bedtime",
-  "wake_time",
-  "daylight_minutes",
-  "nutrition",
-];
-
-export async function cachedDays(): Promise<HealthDayRow[]> {
-  try {
-    return JSON.parse((await AsyncStorage.getItem(CACHE_KEY)) ?? "[]");
-  } catch {
-    return [];
-  }
-}
-
-async function cache(rows: HealthDayRow[]) {
-  const old = await cachedDays();
-  const byDate = new Map(old.map((r) => [r.date, r]));
-  for (const r of rows) byDate.set(r.date, { ...byDate.get(r.date), ...r });
-  const merged = [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date)).slice(-35);
-  await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(merged)).catch(() => {});
-}
-
-async function upload(rows: HealthDayRow[], columns: (keyof HealthDayRow)[]) {
-  if (!supabase || !rows.length) return;
+export const healthStore = createHealthStore(AsyncStorage);
+const HEALTHKIT_COLUMNS: (keyof HealthDayRow)[] = ["steps", "walking_running_km", "active_energy_kcal", "active_minutes", "running_minutes", "workout_minutes", "sleep_minutes", "bedtime", "wake_time", "daylight_minutes", "nutrition"];
+async function upload({ row, columns }: PendingHealth) {
+  if (!supabase) throw new Error("Cloud syncing is not configured. Your data is saved on this device.");
   const userId = await ensureUser();
-  if (!userId) return;
-  // Every row carries exactly the same keys: a bulk upsert updates only these columns, and
-  // the source that owns them is the truth (no data that day → null).
-  const payload = rows.map((r) => {
-    const out: Record<string, unknown> = { user_id: userId, date: r.date, source: r.source ?? "healthkit" };
-    for (const k of columns) out[k] = r[k] ?? null;
-    return out;
-  });
+  if (!userId) throw new Error("Couldn’t sign in for syncing. Your update is pending on this device.");
+  const payload: Record<string, unknown> = { user_id: userId, date: row.date, source: row.source ?? "healthkit" };
+  for (const key of columns) payload[key] = row[key] ?? null;
   const { error } = await supabase.from("health_days").upsert(payload, { onConflict: "user_id,date" });
-  if (error) throw new Error(`Couldn't save your health data: ${error.message}`);
+  if (error) throw new Error("Saved on this device. Cloud upload is pending; try syncing again.");
 }
-
-let running: Promise<SyncResult> | null = null;
-
-export interface SyncResult {
-  days: number;
-  uploaded: boolean;
-  coach: string | null;
+export async function retryUploads() {
+  if (supabase) await healthStore.flush(upload);
 }
-
-/** Read Apple Health → cache on device → upload → refresh the coach. Safe to call often. */
-export function syncHealth(opts: { days?: number; analyze?: boolean } = {}): Promise<SyncResult> {
+let running: Promise<void> | null = null;
+export function syncHealth(opts: { days?: number } = {}) {
   running ??= (async () => {
-    try {
-      const rows = await readDays(opts.days ?? 14);
-      await cache(rows);
-      let uploaded = false;
-      let coach: string | null = null;
-      if (supabase) {
-        await upload(rows, HEALTHKIT_COLUMNS);
-        uploaded = true;
-        if (opts.analyze !== false) coach = await requestAnalysis().catch(() => null);
-      }
-      await AsyncStorage.setItem(LAST_SYNC_KEY, new Date().toISOString()).catch(() => {});
-      return { days: rows.length, uploaded, coach };
-    } finally {
-      running = null;
+    const before = await healthStore.load();
+    if (!before.syncEnabled) return;
+    const rows = await readDays(opts.days ?? 14);
+    if (!(await healthStore.load()).syncEnabled) return;
+    await healthStore.save(rows, HEALTHKIT_COLUMNS);
+    await retryUploads();
+    if (supabase && (await healthStore.load()).syncEnabled) {
+      try { await requestAnalysis(); } catch { throw new Error("Health data synced. Coach refresh failed; try syncing again."); }
     }
-  })();
+  })().finally(() => { running = null; });
   return running;
 }
-
-export async function lastSync(): Promise<string | null> {
-  return AsyncStorage.getItem(LAST_SYNC_KEY).catch(() => null);
-}
-
-/**
- * Screen time can't be read by apps on iOS, so people type today's number from
- * Settings → Screen Time. Feed apps = social/video feeds (Instagram, TikTok, YouTube, X…).
- */
+export async function waitForHealthSync() { await running?.catch(() => {}); }
 export async function logScreenTime(input: { feedMinutes?: number; screenMinutes?: number }, day = localDay(new Date())) {
   const row: HealthDayRow = { date: day, source: "manual" };
-  if (input.feedMinutes !== undefined) row.feed_minutes = Math.max(0, Math.round(input.feedMinutes));
-  if (input.screenMinutes !== undefined) row.screen_minutes = Math.max(0, Math.round(input.screenMinutes));
-  await cache([row]);
-  const cols = (["feed_minutes", "screen_minutes"] as const).filter((k) => row[k] !== undefined);
-  await upload([row], [...cols]);
+  if (input.feedMinutes !== undefined) row.feed_minutes = input.feedMinutes;
+  if (input.screenMinutes !== undefined) row.screen_minutes = input.screenMinutes;
+  const columns = (["feed_minutes", "screen_minutes"] as const).filter(k => row[k] !== undefined);
+  await healthStore.save([row], columns);
+  // Local save succeeded even if upload fails; pending status communicates that separately.
 }

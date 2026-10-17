@@ -27,7 +27,14 @@ Roles and folder ownership are in `AGENTS.md`.
 | M8 | Shop + planting in the island (port from web prototype engine) | frontend | | Todo |
 | M9 | Development build on a team iPhone (EAS or Xcode) so Apple Health works | integration | | Todo |
 | M10 | Coins: pay goal rewards into `coin_events`, update garden coins/streak | backend | | Todo |
-| M11 | Configure the Expo Supabase client from local env, add a public-key connection check | integration | Codex (user requested) | ✅ Done — dashboard auth/schema setup remains M2 |
+| M11 | Consolidate Supabase client configuration and readiness checks; resolve PR #1 against current main | integration | Codex (user requested) | ✅ Done |
+| M12 | Move the coin badge below the floating settings icon without moving settings | frontend | Codex (user requested) | ✅ Done |
+| M13 | Market screen, purchases, persistent shared money/inventory, and test reset | frontend | Codex (user requested) | ✅ Done |
+| D1 | Demo mode: sample persona (37 days), coach output, Next day simulation | all | Mert + Claude | ✅ Done |
+| D2 | Real Claude output for the demo (`docs/SUBMISSION.md` → Real AI output) | backend | | Todo — needs an Anthropic API key |
+| D3 | Record the demo video (script in `docs/SUBMISSION.md`) | design | | Todo |
+| D4 | Submission text + screenshots (`docs/screens/`) | design | | Todo |
+| D5 | Fresh-clone test on Mac and Windows with the README steps | all | | Todo |
 
 ## Web prototype board (frozen — kept for reference)
 
@@ -99,3 +106,27 @@ cut every stretch item.
 
 ## Done
 (move finished rows here)
+
+| M14 | Restore money icon to original top-right header position, retaining Market navigation | frontend | Codex (user requested) | ✅ Done |
+
+| M15 | Empty 100-gold start, planting, and limited water/fertilizer inventory | frontend | Codex (user requested) | ✅ Done |
+
+| M16 | Highlight selectable empty plots, plant picker with buy-and-plant, and 1,000 starting gold | frontend | Codex (user requested) | ✅ Done |
+
+| M17 | Persist and enforce one fertilizer use per plant per day | frontend | Codex (user requested) | ✅ Done |
+
+| M18 | Always open the personal garden and advance its local date independently of health syncing | frontend | Codex (user requested) | ✅ Done |
+
+## Approved improvements — Phase 2
+
+| # | Task | Owner | Status |
+|---|---|---|---|
+| A1 | Health data access protection | Codex | Done; live authenticated uploads and two-user isolation verified |
+| A2 | Reliable health syncing | Codex | Done; local/offline checks and live uploads passed |
+| A3 | Real daily cycle | Codex | Done |
+| A4 | Personal goals from real health data | Codex | Done; repeat-reward checks passed |
+| A5 | Privacy and data controls | Codex | Done; live deletion, write protection and reconnect verified |
+| A6 | Guided first planting | Codex | Done; browser verified |
+| A7 | Garden rendering performance | Codex | Done; full garden tab-switch renders 4 → 0 |
+
+Excluded: account backup/recovery, activity history, care-status redesign, GitHub Actions.

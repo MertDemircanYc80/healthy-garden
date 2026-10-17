@@ -23,6 +23,8 @@ export interface Plant {
   stage: Stage;
   growth: number; // 0..1 toward the next stage
   wateredToday: boolean;
+  /** Optional for older saves; cleared when the garden advances to the next day. */
+  fertilizedToday?: boolean;
   resting: boolean; // skipped days → resting, never dead
   variant?: number; // colour variant for tulips/roses
 }
@@ -49,6 +51,8 @@ export interface Goal {
   unit: string;
   direction: "at_least" | "at_most";
   current: number;
+  /** Missing readings must never qualify as a measured zero. */
+  currentAvailable?: boolean;
   /** Why this goal is personal — written by the AI from the user's own data. */
   reason: string;
   reward: number; // coins

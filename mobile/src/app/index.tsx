@@ -1,11 +1,15 @@
 // Home: the garden fills the screen and never moves; the island at the bottom holds everything else.
 // Dev-only URL params for screenshots on web: ?hour=10&tab=goals&open=1
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Platform, Pressable, Text, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { GardenScene, phaseFor } from "@/components/garden/GardenScene";
+import { PlantingSheet } from "@/components/PlantingSheet";
+import type { GardenPlot } from "@/lib/gardenPlots";
+import { PlantingGuide } from "@/components/PlantingGuide";
+import { DemoSheet } from "@/components/DemoSheet";
 import { CoinIcon } from "@/components/Icons";
 import { Island, type TabKey } from "@/components/island/Island";
 import { AlertsSection } from "@/components/sections/AlertsSection";
@@ -21,13 +25,17 @@ import type { Plant } from "@/types";
 const TABS: TabKey[] = ["garden", "goals", "coach", "report", "alerts"];
 
 export default function Home() {
+  const router = useRouter();
   const params = useLocalSearchParams<{ hour?: string; tab?: string; open?: string }>();
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const { today, plants, alerts } = useApp();
+  const { today, plants, alerts, demo, isDemo } = useApp();
+  const [guideOpen, setGuideOpen] = useState(false);
+  const [demoOpen, setDemoOpen] = useState(false);
 
   const [tab, setTab] = useState<TabKey>(TABS.includes(params.tab as TabKey) ? (params.tab as TabKey) : "garden");
   const [expanded, setExpanded] = useState(params.open === "1");
+  const [selectedPlot, setSelectedPlot] = useState<GardenPlot | null>(null);
   const [selected, setSelected] = useState<Plant | null>(null);
 
   const hour = params.hour !== undefined && !Number.isNaN(Number(params.hour)) ? Number(params.hour) : new Date().getHours();
@@ -35,7 +43,7 @@ export default function Home() {
 
   const bottom = Math.max(insets.bottom, 10) + (Platform.OS === "web" ? 6 : 0);
   const collapsedHeight = 282;
-  const headerH = insets.top + 74;
+  const headerH = insets.top + 102;
   // Expanded, the island still leaves the sky and the back of the garden in view.
   const expandedHeight = Math.max(collapsedHeight + 80, Math.min(height - headerH - bottom - 8, height * 0.6));
   const unread = alerts.filter((a) => !a.read).length;
@@ -55,11 +63,14 @@ export default function Home() {
     setExpanded(true);
   };
 
-  const onPlantPress = (p: Plant) => {
+  const onPlantPress = useCallback((p: Plant) => {
     setSelected(p);
     setTab("garden");
     setExpanded(false);
-  };
+  }, []);
+  const onEmptyPlotPress = useCallback((plot: GardenPlot) => {
+    setSelected(null); setTab("garden"); setExpanded(false); setSelectedPlot(plot);
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: C.pine }}>
@@ -76,25 +87,39 @@ export default function Home() {
           hour={hour}
           selectedId={selected?.id}
           onPlantPress={onPlantPress}
+          selectedPlot={selectedPlot}
+          onEmptyPlotPress={onEmptyPlotPress}
         />
       </View>
 
       {/* header on the sky */}
       <View style={{ position: "absolute", top: insets.top + 12, left: 22, right: 18, flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between" }}>
         <View>
-          <Text style={{ fontFamily: F.display, fontSize: T.hero, color: night ? C.mist : C.pine, letterSpacing: -0.4 }}>{greeting(hour)}</Text>
+          <Text style={{ fontFamily: F.display, fontSize: width < 360 ? 26 : T.hero, maxWidth: width - 118, color: night ? C.mist : C.pine, letterSpacing: -0.4 }}>{greeting(hour)}</Text>
           <Text style={{ fontFamily: F.displayItalic, fontSize: T.body, color: night ? "rgba(231,240,226,0.8)" : "rgba(22,48,31,0.7)", marginTop: 2 }}>
             your garden is {today.health >= 0.75 ? "thriving" : today.health >= 0.5 ? "growing" : "resting"}
           </Text>
+          <Pressable
+            onPress={() => setDemoOpen(true)}
+            accessibilityRole="button"
+            accessibilityLabel={`${isDemo ? "Sample data" : "My garden"}, ${demo.dateLabel}. Open garden settings`}
+            style={({ pressed }) => ({
+              alignSelf: "flex-start",
+              marginTop: 8,
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 6,
+              backgroundColor: night ? "rgba(22,48,31,0.6)" : "rgba(255,255,255,0.6)",
+              borderRadius: R.pill,
+              paddingHorizontal: 10,
+              paddingVertical: 4,
+              opacity: pressed ? 0.7 : 1,
+            })}
+          >
+            <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: C.sun }} />
+            <Text style={{ fontSize: T.tiny, fontWeight: "700", color: night ? C.mist : C.pine }}>{isDemo ? "Sample data" : "My garden"}, {demo.dateLabel}</Text>
+          </Pressable>
         </View>
-        <Pressable
-          onPress={() => onTab("garden")}
-          accessibilityLabel={`${today.coins} coins`}
-          style={{ flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: night ? "rgba(22,48,31,0.75)" : "rgba(255,255,255,0.82)", borderRadius: R.pill, paddingHorizontal: 12, paddingVertical: 7, marginTop: 4 }}
-        >
-          <CoinIcon size={16} />
-          <Text style={{ fontFamily: F.display, fontSize: 16, color: night ? C.sun : C.pine }}>{today.coins}</Text>
-        </Pressable>
       </View>
 
       {/* tap the meadow above the island to lower it */}
@@ -105,6 +130,17 @@ export default function Home() {
           accessibilityLabel="Show the whole garden"
         />
       )}
+
+      {/* Keep the Market button at its original top-right header position. */}
+      <Pressable
+        onPress={() => router.navigate("/market")}
+        accessibilityRole="button"
+        accessibilityLabel={`${today.coins} coins. Open Market`}
+        style={{ position: "absolute", top: insets.top + 16, right: 18, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: night ? "rgba(22,48,31,0.75)" : "rgba(255,255,255,0.82)", borderRadius: R.pill, paddingHorizontal: 12, paddingVertical: 7 }}
+      >
+        <CoinIcon size={16} />
+        <Text style={{ fontFamily: F.display, fontSize: 16, color: night ? C.sun : C.pine }}>{today.coins}</Text>
+      </Pressable>
 
       <Island
         tab={tab}
@@ -119,13 +155,16 @@ export default function Home() {
           setExpanded((e) => !e);
         }}
       >
-        {tab === "garden" && <GardenSection selected={selected} onClearSelection={() => setSelected(null)} />}
+        {tab === "garden" && <GardenSection selected={selected} onClearSelection={() => setSelected(null)} onSelect={onPlantPress} onChooseSpot={() => { setSelected(null); setExpanded(false); }} />}
         {tab === "goals" && <GoalsSection />}
         {tab === "coach" && <CoachSection />}
         {tab === "report" && <ReportSection />}
         {tab === "alerts" && <AlertsSection />}
       </Island>
+
+      {selectedPlot && <PlantingSheet key={`${selectedPlot.col}-${selectedPlot.row}`} plot={selectedPlot} onClose={() => setSelectedPlot(null)} />}
+      <DemoSheet open={demoOpen} onClose={() => setDemoOpen(false)} onShowGuide={() => setGuideOpen(true)} />
+      <PlantingGuide replay={guideOpen} onClose={() => setGuideOpen(false)} />
     </View>
   );
 }
-

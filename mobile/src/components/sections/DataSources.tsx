@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { Card, Chip, styles as u } from "@/components/ui";
 import { isBackendConfigured } from "@/lib/supabase";
+import { useApp } from "@/state/AppState";
 import { useHealth } from "@/state/Health";
 import { C, F, R, T } from "@/theme";
 
@@ -17,18 +18,21 @@ function ago(iso: string | null) {
 
 export function DataSources() {
   const h = useHealth();
-  const t = h.today;
+  const { demo, isDemo } = useApp();
+  const sample = isDemo;
+  // Until Apple Health is connected, show the demo persona's day so every number has a source.
+  const t = sample ? demo.day ?? null : h.today;
 
   let status: string;
   let action: { label: string; onPress: () => void } | null = null;
-  if (h.availability === "expo_go") status = "Needs the Healthy Garden test build. Expo Go can't read Apple Health.";
+  if (h.availability === "expo_go") status = "Apple Health needs the Healthy Garden test build — Expo Go can't read it.";
   else if (h.availability === "not_ios") status = "Apple Health is only on iPhone.";
   else if (h.availability === "no_healthkit") status = "Apple Health isn't available on this device.";
   else if (!h.connected) {
     status = "Steps, sleep, workouts, daylight and meals update by themselves once connected.";
     action = { label: "Connect Apple Health", onPress: h.connect };
   } else {
-    status = h.busy ? "Syncing…" : `Updated ${ago(h.lastSync)}${isBackendConfigured() ? "" : ", kept on this phone"}`;
+    status = h.busy ? "Syncing…" : `Local data updated ${ago(h.lastSync)}.`;
     action = { label: h.busy ? "Syncing…" : "Sync now", onPress: h.syncNow };
   }
 
@@ -42,7 +46,7 @@ export function DataSources() {
 
   return (
     <Card>
-      <Text style={u.h}>Apple Health</Text>
+      <Text style={u.h}>{sample ? `Sample day, ${demo.dateLabel}` : "Your health data"}</Text>
       <Text style={[u.muted, { marginTop: 4 }]}>{status}</Text>
       {stats.length > 0 && (
         <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 12, gap: 8 }}>
@@ -59,10 +63,13 @@ export function DataSources() {
           <Chip label={action.label} tone="solid" onPress={h.busy ? undefined : action.onPress} />
         </View>
       )}
+      <Text style={[u.muted, { marginTop: 10 }]}>{h.busy ? "Saving / syncing…" : !h.syncEnabled || !isBackendConfigured() ? "Saved on this device. Cloud syncing is off." : h.pending ? `Saved on this device · ${h.pending} day(s) pending upload.` : h.lastUpload ? `Synced to Supabase ${ago(h.lastUpload)}.` : "No health data uploaded yet."}</Text>
+      {h.pending > 0 && isBackendConfigured() && !h.busy && <Chip label="Retry upload" onPress={h.syncNow} />}
+      {!h.ready && !h.busy && <Chip label="Retry loading data" onPress={h.syncNow} />}
       {h.error && <Text style={[u.muted, { color: C.berry, marginTop: 8 }]}>{h.error}</Text>}
 
       <View style={{ height: 1, backgroundColor: C.pineLine, marginVertical: 14 }} />
-      <ScreenTimeInput current={t?.feed_minutes ?? null} onSave={h.logScreenTime} />
+      {!sample && <ScreenTimeInput current={t?.feed_minutes ?? null} onSave={h.logScreenTime} />}
     </Card>
   );
 }
@@ -77,7 +84,7 @@ function ScreenTimeInput({ current, onSave }: { current: number | null; onSave: 
     <View>
       <Text style={u.h}>Feed apps today</Text>
       <Text style={[u.muted, { marginTop: 4 }]}>
-        iPhones don't share screen time with apps. Check Settings → Screen Time and add up Instagram, TikTok, YouTube and similar.
+        iPhones don&apos;t share screen time with apps. Check Settings → Screen Time and add up Instagram, TikTok, YouTube and similar.
         {current != null ? ` Saved: ${current} min.` : ""}
       </Text>
       <View style={{ flexDirection: "row", gap: 8, marginTop: 10, alignItems: "center" }}>
@@ -92,12 +99,13 @@ function ScreenTimeInput({ current, onSave }: { current: number | null; onSave: 
           accessibilityLabel="Minutes in feed apps today"
         />
         <Pressable
+          accessibilityRole="button"
           disabled={!valid || saving}
           onPress={async () => {
             setSaving(true);
-            await onSave(minutes);
-            setSaving(false);
-            setText("");
+            try { await onSave(minutes); setText(""); }
+            catch { /* Keep input for retry; the provider displays the save error. */ }
+            finally { setSaving(false); }
           }}
           style={({ pressed }) => ({ backgroundColor: valid ? C.moss : C.pineLine, borderRadius: R.pill, paddingHorizontal: 18, paddingVertical: 11, opacity: pressed ? 0.75 : 1 })}
         >

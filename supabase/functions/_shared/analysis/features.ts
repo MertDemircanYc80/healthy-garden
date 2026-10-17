@@ -192,11 +192,25 @@ function contrast(
   return { yesAvg: avg(yes)!, noAvg: avg(no)!, yesN: yes.length, noN: no.length };
 }
 
+/** The same findings as the facts, as numbers — used by the no-AI fallback coach. */
+export interface Signals {
+  lateSleep?: { lateAvg: number; earlyAvg: number; lateNights: number; factId: string };
+  lateSteps?: { lateAvg: number; earlyAvg: number; factId: string };
+  feedBedtime?: { threshold: number; heavyBed: number; lightBed: number; factId: string };
+  topApps?: { app: string; minutes: number }[];
+  daylightSleep?: { withAvg: number; withoutAvg: number; factId: string };
+  weekend?: { weekendAvg: number; weekdayAvg: number; factId: string };
+  shortDrives?: { days: number; factId: string };
+  runProtein?: { runAvg: number; otherAvg: number; factId: string };
+  bedtimeSpreadMin?: number;
+}
+
 export interface Features {
   today: string;
   daysWithAnyData: number;
   stats: Record<MetricKey, MetricStats>;
   facts: Fact[];
+  signals: Signals;
 }
 
 export function computeFeatures(days: HealthDay[], today: string): Features {
@@ -204,8 +218,12 @@ export function computeFeatures(days: HealthDay[], today: string): Features {
   const keys = Object.keys(LABEL) as MetricKey[];
   const stats = Object.fromEntries(keys.map((k) => [k, statsFor(recent, today, k)])) as Record<MetricKey, MetricStats>;
   const facts: Fact[] = [];
+  const signals: Signals = {};
   let n = 0;
-  const add = (text: string) => facts.push({ id: `F${++n}`, text });
+  const add = (text: string) => {
+    facts.push({ id: `F${++n}`, text });
+    return `F${n}`;
+  };
 
   for (const k of keys) {
     const s = stats[k];
@@ -229,6 +247,7 @@ export function computeFeatures(days: HealthDay[], today: string): Features {
   if (beds.length >= 5) {
     const m = avg(beds)!;
     const sd = Math.sqrt(avg(beds.map((b) => (b - m) ** 2))!);
+    signals.bedtimeSpreadMin = Math.round(sd * 60);
     add(`Bedtime varies by about ${Math.round(sd * 60)} minutes from night to night (average ${clock(m)}).`);
   }
 
@@ -243,11 +262,14 @@ export function computeFeatures(days: HealthDay[], today: string): Features {
   const sleepAfter = contrast(recent, late, (d) => d.sleep_minutes);
   if (sleepAfter) {
     const diff = Math.round(sleepAfter.noAvg - sleepAfter.yesAvg);
-    if (Math.abs(diff) >= 15)
-      add(`After bedtimes past 11:30 pm (${sleepAfter.yesN} nights) sleep averaged ${fmt("sleep_minutes", sleepAfter.yesAvg)}, versus ${fmt("sleep_minutes", sleepAfter.noAvg)} after earlier bedtimes (${sleepAfter.noN} nights) — a difference of ${Math.abs(diff)} minutes.`);
+    if (Math.abs(diff) >= 15) {
+      const factId = add(`After bedtimes past 11:30 pm (${sleepAfter.yesN} nights) sleep averaged ${fmt("sleep_minutes", sleepAfter.yesAvg)}, versus ${fmt("sleep_minutes", sleepAfter.noAvg)} after earlier bedtimes (${sleepAfter.noN} nights) — a difference of ${Math.abs(diff)} minutes.`);
+      signals.lateSleep = { lateAvg: sleepAfter.yesAvg, earlyAvg: sleepAfter.noAvg, lateNights: sleepAfter.yesN, factId };
+    }
   }
   const stepsAfterLate = contrast(recent, late, (d) => d.steps);
   if (stepsAfterLate && Math.abs(stepsAfterLate.noAvg - stepsAfterLate.yesAvg) >= 800) {
+    signals.lateSteps = { lateAvg: stepsAfterLate.yesAvg, earlyAvg: stepsAfterLate.noAvg, factId: `F${n + 1}` };
     add(`The day after a bedtime past 11:30 pm, steps averaged ${fmt("steps", stepsAfterLate.yesAvg)} versus ${fmt("steps", stepsAfterLate.noAvg)} after earlier nights.`);
   }
 
@@ -260,11 +282,14 @@ export function computeFeatures(days: HealthDay[], today: string): Features {
       (d) => (d.feed_minutes === null ? null : d.feed_minutes > median),
       (_d, next) => bedtimeHours(next?.bedtime ?? null), // that evening's bedtime lives on the next row
     );
-    if (heavy && Math.abs(heavy.yesAvg - heavy.noAvg) >= 0.25)
+    if (heavy && Math.abs(heavy.yesAvg - heavy.noAvg) >= 0.25) {
+      signals.feedBedtime = { threshold: median, heavyBed: heavy.yesAvg, lightBed: heavy.noAvg, factId: `F${n + 1}` };
       add(`On days with more than ${median} minutes in feed apps, bedtime averaged ${clock(heavy.yesAvg)}, versus ${clock(heavy.noAvg)} on lighter days.`);
+    }
     const apps: Record<string, number> = {};
     for (const d of recent.filter((d) => d.date > addDays(today, -7))) for (const [a, m] of Object.entries(d.app_usage ?? {})) apps[a] = (apps[a] ?? 0) + m;
     const top = Object.entries(apps).sort((a, b) => b[1] - a[1]).slice(0, 3);
+    if (top.length) signals.topApps = top.map(([app, minutes]) => ({ app, minutes: Math.round(minutes) }));
     if (top.length) add(`Feed app time in the last 7 days by app: ${top.map(([a, m]) => `${a} ${Math.round(m)} min`).join(", ")}.`);
   }
 
@@ -274,27 +299,33 @@ export function computeFeatures(days: HealthDay[], today: string): Features {
     (d) => (d.daylight_minutes === null ? null : d.daylight_minutes >= 20),
     (_d, next) => next?.sleep_minutes ?? null,
   );
-  if (outside && Math.abs(outside.yesAvg - outside.noAvg) >= 15)
+  if (outside && Math.abs(outside.yesAvg - outside.noAvg) >= 15) {
+    signals.daylightSleep = { withAvg: outside.yesAvg, withoutAvg: outside.noAvg, factId: `F${n + 1}` };
     add(`On days with 20+ minutes of daylight, the following night's sleep averaged ${fmt("sleep_minutes", outside.yesAvg)}, versus ${fmt("sleep_minutes", outside.noAvg)} on days with less.`);
+  }
 
   // Weekday vs weekend steps
   const dow = (d: HealthDay) => new Date(`${d.date}T00:00:00Z`).getUTCDay();
   const wk = contrast(recent, (d) => dow(d) === 0 || dow(d) === 6, (d) => d.steps);
-  if (wk && Math.abs(wk.yesAvg - wk.noAvg) >= 1000)
+  if (wk && Math.abs(wk.yesAvg - wk.noAvg) >= 1000) {
+    signals.weekend = { weekendAvg: wk.yesAvg, weekdayAvg: wk.noAvg, factId: `F${n + 1}` };
     add(`Weekend steps average ${fmt("steps", wk.yesAvg)} versus ${fmt("steps", wk.noAvg)} on weekdays.`);
+  }
 
   // Short drives
   const drive = stats.driving_minutes;
   if (drive.daysWithData >= 5 && drive.last7 !== null && drive.last7 > 0) {
     const shortDays = recent.filter((d) => d.date > addDays(today, -7) && (d.driving_minutes ?? 0) > 0 && (d.driving_minutes ?? 0) <= 15).length;
+    if (shortDays >= 2) signals.shortDrives = { days: shortDays, factId: `F${n + 1}` };
     if (shortDays >= 2) add(`In the last 7 days there were ${shortDays} days where total driving was 15 minutes or less.`);
   }
 
   // Run days and protein (only descriptive, never restrictive)
   const run = contrast(recent, (d) => (d.running_minutes === null ? null : d.running_minutes > 0), (d) => d.nutrition?.proteinG ?? null);
+  if (run) signals.runProtein = { runAvg: run.yesAvg, otherAvg: run.noAvg, factId: `F${n + 1}` };
   if (run) add(`On running days logged protein averaged ${Math.round(run.yesAvg)} g, versus ${Math.round(run.noAvg)} g on other days.`);
 
-  return { today, daysWithAnyData: recent.length, stats, facts };
+  return { today, daysWithAnyData: recent.length, stats, facts, signals };
 }
 
 export { LABEL, fmt, HIGHER_IS_BETTER };

@@ -1,6 +1,6 @@
 // The JSON shape Claude must return (Structured Outputs) + a strict sanitizer.
 // Structured Outputs can't express numeric ranges or list lengths, so those rules live here.
-import { bedtimeHours, type Features, type MetricKey } from "./features.ts";
+import { bedtimeHours, clock, type Features, type MetricKey } from "./features.ts";
 import { GOAL_METRICS, type AlertRow, type GoalMetric, type GoalRow, type InsightRow } from "./types.ts";
 
 const NOTE_METRICS: MetricKey[] = ["sleep_minutes", "steps", "feed_minutes", "active_minutes", "daylight_minutes", "running_minutes", "driving_minutes"];
@@ -181,7 +181,7 @@ export function starterGoals(f: Features, weekStart: string, existing: GoalRow[]
   const has = new Set(out.map((g) => g.metric));
   const s = f.stats;
   const push = (g: Omit<GoalRow, "week_start" | "unit" | "direction">) => {
-    if (out.length >= 3 || has.has(g.metric)) return;
+    if (out.length >= 4 || has.has(g.metric)) return;
     const rule = GOAL_RULES[g.metric];
     out.push({ ...g, week_start: weekStart, unit: rule.unit, direction: rule.direction, target: rule.round(Math.min(rule.max, Math.max(rule.min, g.target))) });
     has.add(g.metric);
@@ -202,12 +202,22 @@ export function starterGoals(f: Features, weekStart: string, existing: GoalRow[]
     reason: sleep ? `You've been sleeping about ${Math.floor(sleep / 60)} h ${Math.round(sleep % 60)} min.` : "Seven hours is a solid baseline for most adults.",
     reward_coins: 25,
   });
+  const feed = s.feed_minutes.last7;
+  if (feed !== null && feed > 30) {
+    push({
+      title: "Less time in feed apps",
+      metric: "feed_minutes",
+      target: Math.max(30, feed * 0.8),
+      reason: `Feed apps took about ${Math.round(feed)} minutes a day this week. Cutting a fifth frees up a walk.`,
+      reward_coins: 25,
+    });
+  }
   const bed = s.bedtime.last7;
   push({
     title: "Lights out a bit earlier",
     metric: "bedtime",
     target: bed ? bed - 0.25 : 23,
-    reason: "A consistent, slightly earlier bedtime makes the rest easier.",
+    reason: bed ? `Your bedtime has averaged ${clock(bed)}. Fifteen minutes earlier is an easy first step.` : "A consistent, slightly earlier bedtime makes the rest easier.",
     reward_coins: 15,
   });
   push({ title: "Some daylight every day", metric: "daylight_minutes", target: 20, reason: "Time outside in daylight helps sleep and mood.", reward_coins: 15 });
