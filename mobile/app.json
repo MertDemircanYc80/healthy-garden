@@ -36,6 +36,15 @@
           "NSHealthUpdateUsageDescription": "Healthy Garden does not write to Apple Health.",
           "background": true
         }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "recordAudioAndroid": false,
+          "enableBackgroundPlayback": false,
+          "enableBackgroundRecording": false
+        }
       ]
     ],
     "scheme": "healthygarden",

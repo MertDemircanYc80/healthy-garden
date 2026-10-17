@@ -74,3 +74,12 @@ export function ChevronIcon({ color, size = 18, up }: IconProps & { up?: boolean
     </Svg>
   );
 }
+
+export function SoundIcon({ color, size = 20, muted }: IconProps & { muted: boolean }) {
+  return <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Path d="M4 9h4l5-4v14l-5-4H4Z" stroke={color} strokeWidth={S} strokeLinejoin="round" />
+    {muted
+      ? <Path d="m17 9 5 6m0-6-5 6" stroke={color} strokeWidth={S} strokeLinecap="round" />
+      : <Path d="M17 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14" stroke={color} strokeWidth={S} strokeLinecap="round" />}
+  </Svg>;
+}

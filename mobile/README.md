@@ -149,3 +149,28 @@ render counter: four tab switches (Goals, Coach, Report, Garden) caused **4 Gard
 renders before and 0 after** memoization/stable callbacks. The counter was removed after
 measurement. Plant artwork is memoized, and plot lookups are indexed by coordinate.
 This is a render-count result, not a native-device frame-rate benchmark.
+
+## Garden sounds
+
+The speaker button below the top-right money badge mutes/unmutes garden effects.
+The choice is saved separately from the garden in AsyncStorage (`healthgarden:sound-muted:v1`),
+which uses localStorage on web; resetting the garden does not reset this preference.
+Sounds default to on once the saved preference has loaded. A failed preference save shows
+an inline retry message.
+
+Successful watering (including Water all), fertilizing and planting (including Buy & plant)
+play soft original clips, 0.34–0.62 seconds long, at 28% playback volume. Failed actions and
+shop-only purchases stay silent. One queue plays each effect to completion; rapid actions
+never overlap. Muting clears pending sounds and fades the current clip out over about 48ms.
+Backgrounding clears playback. iOS silent mode is respected, and no microphone permissions
+or background audio service are enabled. Audio problems never roll back a saved garden action.
+
+Assets in `assets/sounds/` are original synthesized Foley, created for this repository without
+external recordings. Regenerate them with `python3 scripts/make-garden-sounds.py`.
+Playback uses Expo SDK 57's `expo-audio`. Expo Go includes it; an existing custom development
+build needs rebuilding after adding the native module.
+
+To test: plant in an empty plot, buy a watering can/fertilizer and care for the plant.
+Try rapid successful actions on different plants, then mute and refresh. The speaker should
+stay muted and plant care should still work. Unmute to restore effects. `npm run check`
+covers serialization, mute persistence, cancellation and storage/audio failure handling.

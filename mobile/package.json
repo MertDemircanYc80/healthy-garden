@@ -9,6 +9,7 @@
     "@react-native-async-storage/async-storage": "2.2.0",
     "@supabase/supabase-js": "^2.118.0",
     "expo": "~57.0.30",
+    "expo-audio": "~57.0.5",
     "expo-blur": "~57.0.3",
     "expo-constants": "~57.0.22",
     "expo-dev-client": "~57.0.20",
@@ -26,8 +27,8 @@
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "~4.26.0",
     "react-native-svg": "15.15.4",
-    "react-native-web": "~0.21.4",
-    "react-native-url-polyfill": "^4.0.0"
+    "react-native-url-polyfill": "^4.0.0",
+    "react-native-web": "~0.21.4"
   },
   "devDependencies": {
     "@types/react": "~19.2.0",
@@ -40,7 +41,7 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "export:web": "expo export -p web",
-    "check": "npx --yes tsx scripts/check-health.ts && npx --yes tsx scripts/check-demo.ts && npx --yes tsx scripts/check-market.ts && npx --yes tsx scripts/check-validation.ts && npx --yes tsx scripts/check-sync.ts && npx --yes tsx scripts/check-calendar.ts && npx --yes tsx scripts/check-local-clock.ts && npx --yes tsx scripts/check-personal.ts && npx --yes tsx scripts/check-supabase-client.ts",
+    "check": "npx --yes tsx scripts/check-health.ts && npx --yes tsx scripts/check-demo.ts && npx --yes tsx scripts/check-market.ts && npx --yes tsx scripts/check-validation.ts && npx --yes tsx scripts/check-sync.ts && npx --yes tsx scripts/check-calendar.ts && npx --yes tsx scripts/check-local-clock.ts && npx --yes tsx scripts/check-personal.ts && npx --yes tsx scripts/check-supabase-client.ts && npx --yes tsx scripts/check-sounds.ts",
     "check:connection": "node --experimental-strip-types scripts/check-connection.mjs",
     "demo:data": "npx --yes tsx scripts/make-demo-data.ts",
     "check:supabase": "npm run check:connection"

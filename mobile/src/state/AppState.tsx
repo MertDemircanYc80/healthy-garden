@@ -13,6 +13,8 @@ import { DEMO_GARDEN_KEY, initialPersonalGarden, rollGardenDay } from "@/lib/dai
 import { watchLocalDate } from "@/lib/localDateClock";
 import { useHealth } from "@/state/Health";
 import { personalGoalsAt, reconcilePersonal } from "@/lib/personalGoals";
+import { useGardenSounds } from "@/state/Sounds";
+import type { GardenSound } from "@/lib/gardenSounds";
 import { C } from "@/theme";
 import type { Alert, Goal, Insight, Plant, Report, Today } from "@/types";
 
@@ -57,6 +59,7 @@ const REPORT = coachReport();
 
 export function AppStateProvider({ children }: { children: React.ReactNode }) {
   const health = useHealth();
+  const sounds = useGardenSounds();
   const [stores] = useState(() => ({ personal: createGardenStore(AsyncStorage, undefined, initialPersonalGarden), demo: createGardenStore(AsyncStorage, DEMO_GARDEN_KEY) }));
   // Sample mode is a preview for this session, never the persisted startup mode.
   const [mode, setMode] = useState<"personal" | "demo">("personal");
@@ -142,20 +145,21 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
 
   const goals = useMemo(() => isDemo ? goalsAt(sim.offset) : personalGoalsAt(saved?.personal, health.days, localDate), [sim.offset, isDemo, saved?.personal, localDate, health.days]);
 
-  const gardenAction = useCallback(async (change: (state: SavedGarden) => SavedGarden, message: string): Promise<ActionResult> => {
+  const gardenAction = useCallback(async (change: (state: SavedGarden) => SavedGarden, message: string, sound: GardenSound): Promise<ActionResult> => {
     try {
       await store.update(state => change(isDemo ? state : health.ready ? reconcilePersonal(state, health.days, localDay(new Date())) : rollGardenDay(state, localDay(new Date()))));
       setSaveError(false);
+      sounds.play(sound);
       return { ok: true, message };
     } catch (error) {
       return { ok: false, message: error instanceof GardenActionError ? error.message : "Couldn’t save that action. No items were used. Please try again." };
     }
-  }, [store, isDemo, health.days, health.ready]);
-  const waterPlant = useCallback((id: string) => gardenAction(s => waterPlants(s, id), "Plant watered. Used 1 watering can."), [gardenAction]);
-  const waterAll = useCallback(() => gardenAction(s => waterPlants(s), "Watered as many thirsty plants as your watering cans allowed."), [gardenAction]);
-  const plantOwnedItem = useCallback((id: ItemId) => gardenAction(s => plantItem(s, id), "Planted in your garden. Used 1 from inventory."), [gardenAction]);
-  const plantInPlot = useCallback((id: ItemId, plot: GardenPlot, buyIfNeeded: boolean) => gardenAction(s => placePlant(s, id, plot, buyIfNeeded), "Planted in your chosen plot."), [gardenAction]);
-  const fertilizePlant = useCallback((id: string) => gardenAction(s => applyFertilizer(s, id), "Growth boosted. Used 1 fertilizer."), [gardenAction]);
+  }, [store, isDemo, health.days, health.ready, sounds]);
+  const waterPlant = useCallback((id: string) => gardenAction(s => waterPlants(s, id), "Plant watered. Used 1 watering can.", "water"), [gardenAction]);
+  const waterAll = useCallback(() => gardenAction(s => waterPlants(s), "Watered as many thirsty plants as your watering cans allowed.", "water"), [gardenAction]);
+  const plantOwnedItem = useCallback((id: ItemId) => gardenAction(s => plantItem(s, id), "Planted in your garden. Used 1 from inventory.", "plant"), [gardenAction]);
+  const plantInPlot = useCallback((id: ItemId, plot: GardenPlot, buyIfNeeded: boolean) => gardenAction(s => placePlant(s, id, plot, buyIfNeeded), "Planted in your chosen plot.", "plant"), [gardenAction]);
+  const fertilizePlant = useCallback((id: string) => gardenAction(s => applyFertilizer(s, id), "Growth boosted. Used 1 fertilizer.", "fertilize"), [gardenAction]);
   const dismissInsight = useCallback((id: string) => setInsights((xs) => xs.map((x) => (x.id === id ? { ...x, dismissed: true } : x))), []);
   const markAlertsRead = useCallback(() => setSim((s) => ({ ...s, alerts: s.alerts.map((x) => ({ ...x, read: true })) })), [setSim]);
 

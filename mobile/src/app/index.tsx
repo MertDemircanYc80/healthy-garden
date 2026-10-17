@@ -10,6 +10,7 @@ import { PlantingSheet } from "@/components/PlantingSheet";
 import type { GardenPlot } from "@/lib/gardenPlots";
 import { PlantingGuide } from "@/components/PlantingGuide";
 import { DemoSheet } from "@/components/DemoSheet";
+import { SoundToggle } from "@/components/SoundToggle";
 import { CoinIcon } from "@/components/Icons";
 import { Island, type TabKey } from "@/components/island/Island";
 import { AlertsSection } from "@/components/sections/AlertsSection";
@@ -141,6 +142,8 @@ export default function Home() {
         <CoinIcon size={16} />
         <Text style={{ fontFamily: F.display, fontSize: 16, color: night ? C.sun : C.pine }}>{today.coins}</Text>
       </Pressable>
+
+      <SoundToggle top={insets.top + 58} night={night} />
 
       <Island
         tab={tab}

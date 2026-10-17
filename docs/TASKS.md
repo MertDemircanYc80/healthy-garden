@@ -130,3 +130,9 @@ cut every stretch item.
 | A7 | Garden rendering performance | Codex | Done; full garden tab-switch renders 4 → 0 |
 
 Excluded: account backup/recovery, activity history, care-status redesign, GitHub Actions.
+
+## Garden sound effects
+
+| # | Task | Role | Owner | Status |
+|---|---|---|---|---|
+| S1 | Gentle garden action sounds, serialized playback and persistent mute | frontend | Codex (user requested) | ✅ Done |
