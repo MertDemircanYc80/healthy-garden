@@ -13,7 +13,7 @@ cd ~/healthy-garden/mobile
 npm run demo:setup
 ```
 
-İstendiğinde anahtarı yapıştırıp Enter'a basın. Yazdığınız anahtar terminalde görünmez. Anahtarı komutun içine veya sohbete yazmayın. Kurulum mevcut yerel ayarların diğer alanlarını korur; anahtar yalnız gitignored `.env.coach.local` içinde kalır. Expo'ya yalnız Mac'in yerel adresi ve demo erişim kodu verilir.
+İstendiğinde anahtarı yapıştırıp Enter'a basın. Yazdığınız anahtar terminalde görünmez; yıldız da çıkmaz. ⌘V ile yapıştırdıktan sonra Enter’a basın. Ctrl+C kurulumu iptal eder; “Yerel ayarlar hazır” mesajı gelmeden sunucuyu başlatmayın. Anahtarı komutun içine veya sohbete yazmayın. Kurulum mevcut yerel ayarların diğer alanlarını korur; anahtar yalnız gitignored `.env.coach.local` içinde kalır. Expo'ya yalnız Mac'in yerel adresi ve demo erişim kodu verilir.
 
 Birden fazla ağ adaptörü varsa Wi-Fi adresi tercih edilir. Telefon bağlanamıyorsa kendi Mac Wi-Fi IP'nizle tekrar çalıştırın:
 
