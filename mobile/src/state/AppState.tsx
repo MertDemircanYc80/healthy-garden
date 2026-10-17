@@ -1,3 +1,4 @@
+import { applyTerminalCommand } from "@/demo/terminal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   createContext,
@@ -57,6 +58,7 @@ interface AppState {
     day: HealthDayRow | undefined;
     canGoForward: boolean;
     coachSource: string;
+    terminalStatus: string;
     load: () => Promise<ActionResult>;
     analyze: (offline?: boolean) => Promise<ActionResult>;
     finish: () => Promise<ActionResult>;
@@ -87,6 +89,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
   const [loadError, setLoadError] = useState(false);
   const [saveError, setSaveError] = useState(false);
   const [confirmRecovery, setConfirmRecovery] = useState(false);
+  const [terminalStatus, setTerminalStatus] = useState("");
   const [dismissed, setDismissed] = useState<string[]>([]);
   useEffect(() => {
     let active = true;
@@ -237,6 +240,111 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     return result;
   }, [store, action, analyze]);
 
+  const terminalReady = saved !== null;
+  useEffect(() => {
+    const url = process.env.EXPO_PUBLIC_COACH_URL;
+    if (!terminalReady || !url || process.env.EXPO_PUBLIC_DEMO_CONTROL !== "1")
+      return;
+    const base = url.replace(/\/analyze\/?$/, "");
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.EXPO_PUBLIC_COACH_TOKEN ?? ""}`,
+    };
+    let stopped = false;
+    let pending = false;
+    let lastAck = "";
+    const poll = async () => {
+      if (stopped || pending) return;
+      pending = true;
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+      try {
+        const response = await fetch(`${base}/demo/commands`, {
+          headers,
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error("Demo server unavailable");
+        const body = (await response.json()) as { commands?: unknown[] };
+        if (!Array.isArray(body.commands) || body.commands.length > 400)
+          throw new Error("Invalid command stream");
+        let receipt:
+          | {
+              id: string;
+              ok: boolean;
+              day: number;
+              gold: number;
+              message: string;
+            }
+          | undefined;
+        for (const command of body.commands) {
+          if (stopped) return;
+          const id = (command as { id?: unknown })?.id;
+          if (typeof id !== "string") throw new Error("Invalid command ID");
+          try {
+            const next = await store.update((s) =>
+              applyTerminalCommand(s, command),
+            );
+            receipt = {
+              id,
+              ok: true,
+              day: next.journey.index + 1,
+              gold: next.sim.coins,
+              message: "Replay saved. Rewards paid once.",
+            };
+          } catch (error) {
+            const current = await store.load();
+            receipt = {
+              id,
+              ok: false,
+              day: current.journey.index + 1,
+              gold: current.sim.coins,
+              message:
+                error instanceof Error
+                  ? error.message
+                  : "Could not save command.",
+            };
+            break;
+          }
+        }
+        if (receipt && !stopped) {
+          const signature = JSON.stringify(receipt);
+          if (signature !== lastAck) {
+            const ack = await fetch(`${base}/demo/ack`, {
+              method: "POST",
+              headers,
+              body: signature,
+              signal: controller.signal,
+            });
+            if (!ack.ok) throw new Error("Receipt not saved");
+            lastAck = signature;
+          }
+          setTerminalStatus(
+            receipt.ok
+              ? `Terminal connected · day ${receipt.day}`
+              : receipt.message,
+          );
+        } else if (!stopped)
+          setTerminalStatus("Terminal connected · waiting for data");
+      } catch {
+        if (!stopped)
+          setTerminalStatus(
+            "Terminal offline · start the coach server on your Mac",
+          );
+      } finally {
+        clearTimeout(timeout);
+        pending = false;
+      }
+    };
+    void poll();
+    const timer = setInterval(() => {
+      void poll();
+    }, 1500);
+    return () => {
+      stopped = true;
+      clearInterval(timer);
+    };
+  }, [store, terminalReady]);
+
   const value = useMemo<AppState>(() => {
     const state = saved ?? initialGarden();
     const j = state.journey;
@@ -271,8 +379,9 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
         canGoForward: sample && !!plan && j.index < 29 && j.phase !== "midday",
         coachSource:
           plan?.source === "live_ai"
-            ? "Live AI"
+            ? `${plan.provider === "gemini" ? "Gemini" : "Live AI"}${plan.cached ? " · saved result" : " · live response"}`
             : "Prepared AI · offline replay",
+        terminalStatus,
         load: () =>
           action(loadBaseline, "First 7 days loaded. Your garden stays empty."),
         analyze,
@@ -303,6 +412,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     };
   }, [
     saved,
+    terminalStatus,
     health.days,
     health.today,
     dismissed,

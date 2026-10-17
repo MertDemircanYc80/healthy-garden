@@ -13,6 +13,10 @@ export type Plan = {
   through: number;
   source: "prepared_ai" | "live_ai";
   summary: string;
+  provider?: string;
+  model?: string;
+  generatedAt?: string;
+  cached?: boolean;
   goals: Omit<Goal, "current" | "daysHit" | "daysTotal">[];
   insights: Insight[];
 };
@@ -81,7 +85,8 @@ export function valueFor(
   metric: string,
 ): number | null {
   if (!day) return null;
-  if (metric.startsWith("app:")) return day.app_usage?.[metric.slice(4)] ?? null;
+  if (metric.startsWith("app:"))
+    return day.app_usage?.[metric.slice(4)] ?? null;
   if (metric === "energy_kcal") return day.nutrition?.energyKcal ?? null;
   if (metric === "water_ml") return day.nutrition?.waterMl ?? null;
   if (metric === "protein_g") return day.nutrition?.proteinG ?? null;
@@ -134,10 +139,10 @@ export function applyPlan(state: SavedGarden, plan: Plan): SavedGarden {
     plan.through < 6
   )
     throw new Error("Finish the day before analyzing it.");
-  if (state.journey.plans.some((p) => p.through === plan.through)) return state;
+  const plans = state.journey.plans.filter((p) => p.through !== plan.through);
   return {
     ...state,
-    journey: { ...state.journey, plans: [...state.journey.plans, plan] },
+    journey: { ...state.journey, plans: [...plans, plan] },
   };
 }
 
@@ -252,6 +257,10 @@ export function validatePlan(value: unknown, through: number): Plan {
     typeof p.summary !== "string" ||
     !p.summary.trim() ||
     p.summary.length > 1800 ||
+    [p.provider, p.model, p.generatedAt].some(
+      (s) => s !== undefined && (typeof s !== "string" || s.length > 200),
+    ) ||
+    (p.cached !== undefined && typeof p.cached !== "boolean") ||
     !Array.isArray(p.goals) ||
     p.goals.length < 2 ||
     p.goals.length > 4 ||
@@ -302,7 +311,7 @@ export async function analyzeCheckpoint(j: Journey): Promise<Plan> {
   const url = process.env.EXPO_PUBLIC_COACH_URL;
   if (!url) return preparedPlan(j.index);
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 30000);
+  const timeout = setTimeout(() => controller.abort(), 65000);
   try {
     const response = await fetch(url, {
       method: "POST",

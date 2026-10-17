@@ -104,6 +104,11 @@ export function DemoSheet({
               A 30-day replay. First observe a week, then build healthier habits
               and a garden.
             </Text>
+            {!!demo.terminalStatus && (
+              <Text style={[u.muted, { marginTop: 12 }]}>
+                {demo.terminalStatus}
+              </Text>
+            )}
             <View style={{ marginVertical: 24, gap: 10 }}>
               <Text
                 style={{ color: C.sun, fontFamily: F.display, fontSize: 24 }}

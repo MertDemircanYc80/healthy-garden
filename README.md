@@ -90,3 +90,7 @@ cd supabase/functions && deno test --allow-env _shared/analysis/   # AI coach pi
 
 Built at a hackathon by Mert and teammates, with Claude as a coding assistant. Contributor and
 AI-assistant rules: [`AGENTS.md`](AGENTS.md).
+
+## Free-tier AI and terminal demo
+
+[Turkish setup + week-by-week recording guide](docs/AI_TERMINAL_TR.md): Gemini key setup, terminal imports for days 7/14/21/28/30, daily rewards and manual garden care. Keys stay local; the live provider must be verified with your own key.

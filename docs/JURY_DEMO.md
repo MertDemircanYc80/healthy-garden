@@ -69,16 +69,15 @@ Care is manual: no gold, water or flowers are added by secretly skipping days. B
 
 Record the full daily sequence, then cut/time-lapse routine day changes. Do not claim fictional screen readings were measured or cached output was a live AI call.
 
-## Optional live AI
+## Optional live AI and terminal weeks
 
-The offline replay needs no account or secret. To make real model requests, use the local gateway (Node 22+; no added npm dependencies):
+The free-tier Gemini gateway and terminal controller are ready. Follow **[AI_TERMINAL_TR.md](AI_TERMINAL_TR.md)** for the full setup and recording guide. In `mobile/`, run `npm run demo:setup` and enter your own Gemini key at the hidden prompt. Keep `npm run coach` and `npm start -- --clear` open in two terminals. A third terminal drives `npm run demo -- week 1`, then `week 2`, `week 3`, `week 4`, `week 5` (last two days). `next`/`finish` allow normal-speed daily footage. Terminal reset requires `reset --yes`.
 
-1. Copy `mobile/.env.coach.example` to `.env.coach.local`. Set `ANTHROPIC_API_KEY`, `ANALYZE_MODEL`, and a random `DEMO_COACH_TOKEN`. These stay on the computer. For phone access on a trusted local network, set `DEMO_COACH_HOST=0.0.0.0`.
-2. In `mobile/.env.local`, set `EXPO_PUBLIC_COACH_URL=http://YOUR_MAC_LAN_IP:8877/analyze` and `EXPO_PUBLIC_COACH_TOKEN` to that demo access code. Never put a provider API key in an `EXPO_PUBLIC_*` variable. The public demo token is a local access code, not an API secret.
-3. Terminal 1: `npm run coach`. Terminal 2: `npx expo start --go --clear`.
-4. Reset this branch’s replay, load the first week and analyze. The coach source must say **Live AI**. If the gateway is unreachable or rejects a response, the app reports it; choose prepared analysis explicitly to continue offline. Existing plans are kept for a stable demonstration.
+Default provider/model: Gemini / `gemini-3.8-flash`, using Google's Interactions REST API with a JSON response schema. [Pricing](https://ai.google.dev/gemini-api/docs/pricing), [structured output](https://ai.google.dev/gemini-api/docs/structured-output). Free access is quota/account dependent; no paid-provider fallback is automatic. Optional existing Anthropic support remains: set `COACH_PROVIDER=anthropic`, `ANTHROPIC_API_KEY`, and an appropriate `ANALYZE_MODEL` in the local server env.
 
-The gateway uses only bundled demo data, authenticates its caller, caps input size, serializes/throttles requests and times out. It is a local demo helper, not a deployed multi-user service. It does not modify Supabase or put a secret on GitHub. Live-provider response shapes are validated in the app; the integration is mock-tested until a real key is configured.
+The key stays in gitignored `.env.coach.local`; only the LAN URL and local demo access code go in Expo's public env. Commands, receipts and generated plan cache stay in gitignored `.demo-control.local.json`. Run on one presenter device at a time: commands are broadcast to installations using the same local access code; the latest receipt is what the terminal displays. This is a local demo helper, not deployed Supabase ingestion or a multi-user production service.
+
+A week import settles remaining days using the preceding plan before installing the new plan, atomically preserving purchases, plant care and reward receipts. Applied command IDs prevent duplicate payouts after polling/reload. The server uses only bundled days through the cutoff, validates the response and provides preceding goals/results for weekly adaptation. Cloud failure leaves the replay unchanged. Rehearsal fallback is explicit: `week N --prepared`. Cached live results are labeled **saved result**; newly received answers say **live response**. A genuine provider request still needs a valid user key; automated integration checks use mock providers.
 
 ## Real integrations and limits
 

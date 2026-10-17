@@ -4,9 +4,9 @@
 
 Bu dalın varsayılanı **Prepared AI · offline replay**: hedefler ve yorumlar, 30 günlük sabit senaryonun belirli haftaları için önceden hazırlanmış AI çıktılarıdır. Uygulama bu çıktıları yükler; analiz düğmesine her basışta canlı bir modele bağlanmaz.
 
-Canlı Claude bağlantısı için kod vardır. Etkinleştirmek için `mobile/.env.coach.local` içinde sunucu anahtarı, `mobile/.env.local` içinde coach adresi/erişim kodu ve çalışan `npm run coach` sunucusu gerekir. Ayrıntı: [JURY_DEMO.md → Optional live AI](JURY_DEMO.md#optional-live-ai). Anahtarlar yalnız yerel ayarlarda tutulur.
+Canlı **Gemini** bağlantısı ve terminalden hafta yükleme komutları hazırdır. Kurulum ve güncel çekim sırası: **[AI_TERMINAL_TR.md](AI_TERMINAL_TR.md)**. Ücretsiz kotası bulunan model kullanılır; kendi anahtarınızla ilk başarılı canlı istek gereklidir. Claude geçidi de isteğe bağlı korunur.
 
-Canlı bağlantı etkin ve çağrı başarılıysa Coach ekranında **Live AI** görülmelidir. “Prepared AI” yazarken videoda “AI şu anda isteği analiz etti” demeyin; “bu veri için hazırlanmış AI analizini gösteriyoruz” deyin.
+Canlı istek başarılıysa **Gemini · live response**, önceki canlı sonuç yeniden kullanılıyorsa **Gemini · saved result** görülür. “Prepared AI” yazarken videoda “AI şu anda isteği analiz etti” demeyin; “bu veri için hazırlanmış AI analizini gösteriyoruz” deyin.
 
 ## Çekime hazırlık
 

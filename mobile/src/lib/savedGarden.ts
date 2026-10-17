@@ -15,6 +15,7 @@ export interface SavedGarden {
   sim: DemoState & { health: number };
   inventory: Inventory;
   journey: Journey;
+  terminal?: { applied: string[] };
 }
 export const initialGarden = (): SavedGarden => ({
   version: 1,
@@ -126,6 +127,13 @@ export function decodeGarden(raw: string): SavedGarden {
       s.offset <= 29 &&
       count(s.streak) &&
       fraction(s.health) &&
+      (v.terminal === undefined ||
+        (record(v.terminal) &&
+          Array.isArray(v.terminal.applied) &&
+          v.terminal.applied.length <= 1000 &&
+          v.terminal.applied.every(
+            (id) => typeof id === "string" && id.length <= 100,
+          ))) &&
       journeyValid &&
       plantsValid &&
       alertsValid &&
@@ -189,7 +197,11 @@ export function createGardenStore(storage: Storage) {
     },
     reset() {
       return enqueue(async () => {
-        const next = initialGarden();
+        const previous = await load().catch(() => null);
+        const next = {
+          ...initialGarden(),
+          ...(previous?.terminal ? { terminal: previous.terminal } : {}),
+        };
         await storage.setItem(GARDEN_STORAGE_KEY, JSON.stringify(next));
         return publish(next);
       });
