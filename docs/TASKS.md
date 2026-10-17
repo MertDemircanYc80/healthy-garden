@@ -135,4 +135,4 @@ Excluded: account backup/recovery, activity history, care-status redesign, GitHu
 
 | # | Task | Role | Owner | Status |
 |---|---|---|---|---|
-| S1 | Gentle garden action sounds, serialized playback and persistent mute | frontend | Codex (user requested) | ✅ Done |
+| S1 | Gentle sine-based, low-pass-filtered garden sounds, serialized playback and persistent mute | frontend | Codex (user requested) | ✅ Done |

@@ -159,7 +159,8 @@ Sounds default to on once the saved preference has loaded. A failed preference s
 an inline retry message.
 
 Successful watering (including Water all), fertilizing and planting (including Buy & plant)
-play soft original clips, 0.34–0.62 seconds long, at 28% playback volume. Failed actions and
+play soft sine-based clips, 0.34–0.62 seconds long, at 28% playback volume.
+Raised-cosine fades and a fourth-order low-pass filter remove sharp edges and crackle. Failed actions and
 shop-only purchases stay silent. One queue plays each effect to completion; rapid actions
 never overlap. Muting clears pending sounds and fades the current clip out over about 48ms.
 Backgrounding clears playback. iOS silent mode is respected, and no microphone permissions
