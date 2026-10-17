@@ -121,13 +121,12 @@ export default function Home() {
         />
       )}
 
-      {/* Below Expo's top-right settings overlay (94 pt including its Tools label).
-          Render after the meadow tap target so the balance stays tappable when expanded. */}
+      {/* Keep the Market button at its original top-right header position. */}
       <Pressable
         onPress={() => router.navigate("/market")}
         accessibilityRole="button"
         accessibilityLabel={`${today.coins} coins. Open Market`}
-        style={{ position: "absolute", top: insets.top + 102, right: 18, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: night ? "rgba(22,48,31,0.75)" : "rgba(255,255,255,0.82)", borderRadius: R.pill, paddingHorizontal: 12, paddingVertical: 7 }}
+        style={{ position: "absolute", top: insets.top + 16, right: 18, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: night ? "rgba(22,48,31,0.75)" : "rgba(255,255,255,0.82)", borderRadius: R.pill, paddingHorizontal: 12, paddingVertical: 7 }}
       >
         <CoinIcon size={16} />
         <Text style={{ fontFamily: F.display, fontSize: 16, color: night ? C.sun : C.pine }}>{today.coins}</Text>

@@ -52,7 +52,7 @@ src/theme.ts                 colours, fonts, sizes
 
 ## Market and saved progress
 
-Tap the money badge below Settings to open the Market. Plants and supplies have Buy
+Tap the money badge in the top-right header to open the Market. Plants and supplies have Buy
 buttons; unaffordable purchases are disabled. Purchases update the shared balance and
 inventory immediately after a successful save. Items stay in inventory; planting and
 consuming supplies are separate future features.

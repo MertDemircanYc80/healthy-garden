@@ -105,3 +105,5 @@ cut every stretch item.
 
 ## Done
 (move finished rows here)
+
+| M14 | Restore money icon to original top-right header position, retaining Market navigation | frontend | Codex (user requested) | ✅ Done |
