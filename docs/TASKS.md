@@ -119,3 +119,5 @@ cut every stretch item.
 | M19 | Free-tier Gemini coach + authenticated terminal week imports for the jury replay | integration | Mert + Codex (user requested) | ✅ Done — `docs/AI_TERMINAL_TR.md`; typecheck/check/lint, iOS/web exports and terminal-to-mobile browser replay passed with mock providers; real Gemini call requires the user key |
 
 | M20 | Cross-platform jury setup, daily gold + stronger goal rewards, recorded demo and promo assets | frontend + integration + design | Mert + Codex (user requested) | ✅ Done — Mac/Windows EN/TR guides, 10 daily gold + doubled goal rewards with safe migration, actual app recording and 4 promo PNGs in `media/`; mobile checks/lint + web/iOS exports and full browser replay passed |
+
+| M21 | Tighten demo pacing and add original subtle UI/ambient sound design | design | Mert + Codex (user requested) | In progress — preserve real app footage and the existing visual theme |
