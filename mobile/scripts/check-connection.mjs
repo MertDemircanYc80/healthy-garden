@@ -1,12 +1,18 @@
 // Read-only readiness check. Never creates an account or writes health data.
 import { loadEnvFile } from "node:process";
-import { createClient } from "@supabase/supabase-js";
-try { loadEnvFile(".env.local"); } catch { /* CI may provide environment values directly. */ }
-const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const key = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-if (!url || !key) throw new Error("Set the public Supabase values in mobile/.env.local.");
-const client = createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
-const settings = await fetch(`${url}/auth/v1/settings`,{headers:{apikey:key}});
+import { createSupabaseClient } from "../src/lib/supabase-client.ts";
+try { loadEnvFile(new URL("../.env.local", import.meta.url)); }
+catch (error) {
+  if (error.code !== "ENOENT") throw error;
+}
+const client = createSupabaseClient({
+  auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  global: { fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(15_000) }) },
+});
+if (!client) throw new Error("Set the public Supabase values in mobile/.env.local.");
+const url = process.env.EXPO_PUBLIC_SUPABASE_URL.trim().replace(/\/$/, "");
+const key = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY.trim();
+const settings = await fetch(`${url}/auth/v1/settings`, { headers: { apikey: key }, signal: AbortSignal.timeout(15_000) });
 if (!settings.ok) throw new Error(`Supabase connection failed (${settings.status}).`);
 console.log("✓ Supabase URL and publishable key reach the Auth API");
 const config = await settings.json();

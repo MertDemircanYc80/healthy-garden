@@ -27,6 +27,7 @@ Roles and folder ownership are in `AGENTS.md`.
 | M8 | Shop + planting in the island (port from web prototype engine) | frontend | | Todo |
 | M9 | Development build on a team iPhone (EAS or Xcode) so Apple Health works | integration | | Todo |
 | M10 | Coins: pay goal rewards into `coin_events`, update garden coins/streak | backend | | Todo |
+| M11 | Consolidate Supabase client configuration and readiness checks; resolve PR #1 against current main | integration | Codex (user requested) | ✅ Done |
 | M12 | Move the coin badge below the floating settings icon without moving settings | frontend | Codex (user requested) | ✅ Done |
 | M13 | Market screen, purchases, persistent shared money/inventory, and test reset | frontend | Codex (user requested) | ✅ Done |
 | D1 | Demo mode: sample persona (37 days), coach output, Next day simulation | all | Mert + Claude | ✅ Done |

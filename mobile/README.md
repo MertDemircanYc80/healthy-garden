@@ -30,6 +30,37 @@ Supabase `health_days` when `mobile/.env.local` has the Supabase URL + publishab
 
 Tests for the pure health helpers: `npm run check`.
 
+## Supabase connection
+
+The app and readiness check share `src/lib/supabase-client.ts`. Copy `.env.example` to
+`mobile/.env.local` and fill in `EXPO_PUBLIC_SUPABASE_URL` and
+`EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Use only a publishable/anon key; never a
+secret/service-role key. Environment files are ignored; the empty example is committed.
+The factory trims whitespace and rejects partial configuration. When both values are
+absent, the personal garden and local health data remain available without cloud syncing.
+The app adds the native URL polyfill and retains its existing AsyncStorage auth sessions.
+
+From `mobile/`, using Node.js 22.18 or newer:
+
+```bash
+npm run check:connection
+npm run typecheck
+npm run check
+```
+
+`check:connection` verifies public-key access to the Auth API, anonymous sign-in settings,
+and denial of signed-out access to `health_days`. It uses bounded network requests and
+exits unsuccessfully for missing/invalid configuration or incomplete backend setup.
+It does not create accounts or write data, and does not prove authenticated uploads or
+cross-user isolation. `check:supabase` is a compatibility alias for the same check.
+`npm run check` includes offline client-configuration tests.
+
+For a new backend, follow [the Supabase setup guide](../docs/SUPABASE_SETUP.md), including
+its health access and privacy migrations. Do not rerun the initial schema over existing
+app tables or apply the archived web-prototype migrations. Personal goals and garden
+progress stay local; health totals sync when enabled. Native-device validation remains
+separate from these Node.js checks.
+
 ## Check it in a browser
 
 ```bash
