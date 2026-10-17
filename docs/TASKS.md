@@ -120,4 +120,4 @@ cut every stretch item.
 
 | M20 | Cross-platform jury setup, daily gold + stronger goal rewards, recorded demo and promo assets | frontend + integration + design | Mert + Codex (user requested) | ✅ Done — Mac/Windows EN/TR guides, 10 daily gold + doubled goal rewards with safe migration, actual app recording and 4 promo PNGs in `media/`; mobile checks/lint + web/iOS exports and full browser replay passed |
 
-| M21 | Tighten demo pacing and add original subtle UI/ambient sound design | design | Mert + Codex (user requested) | In progress — preserve real app footage and the existing visual theme |
+| M21 | Tighten demo pacing and add original subtle UI/ambient sound design | design | Mert + Codex (user requested) | ✅ Done — recut 165s to 74.92s, normal-speed foreground actions and short care montages, original quiet ambience/click/sweep/gold/water effects, 50 fps H.264 + AAC; frame, decode and playback checks documented in `media/README.md` |

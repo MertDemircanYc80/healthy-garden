@@ -55,7 +55,11 @@ Tap **30-day demo** under the garden title.
 
 Daily gold and completed goals are paid explicitly as observed days finish. Care is manual; water and flowers must be purchased. Buy enough water refills and care for plants as you advance. The first week earns 70 daily gold. In the prepared fixture, day 8 adds 50 goal gold and 10 daily gold.
 
-## A 2:45 video
+## Published demo video
+
+The finished [1:15 demo with sound](../media/healthy-garden-demo.mp4) and [media kit](../media/README.md) use actual app interactions, a concise care montage and original subtle sound design. This replaces the earlier 2:45 edit.
+
+### Optional 2:45 narrated recording
 
 | Time | Show | Say |
 | --- | --- | --- |
