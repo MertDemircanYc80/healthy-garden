@@ -37,5 +37,7 @@ export async function requestAnalysis(force = false): Promise<string> {
   if (!supabase) return "offline";
   const { data, error } = await supabase.functions.invoke("analyze", { body: { force } });
   if (error) throw new Error("Your coach couldn't update right now.");
-  return (data as { status?: string })?.status ?? "ok";
+  const status = (data as { status?: string })?.status;
+  if (status === "error") throw new Error("Your coach could not update right now.");
+  return status ?? "ok";
 }

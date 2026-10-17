@@ -90,7 +90,7 @@ export default function Market() {
 
         <View style={styles.reset}>
           <Text style={styles.itemName}>A fresh start</Text>
-          <Text style={[styles.muted, { marginTop: 6 }]}>For testing: empty the garden and inventory, clear demo progress, and restore {STARTING_COINS} coins. Your health data and account stay untouched.</Text>
+          <Text style={[styles.muted, { marginTop: 6 }]}>For testing: empty the garden and inventory, clear this garden’s progress, and restore {STARTING_COINS} coins. Your health data and account stay untouched.</Text>
           {!confirmReset ? <Pressable accessibilityRole="button" disabled={busy} onPress={() => setConfirmReset(true)} style={styles.resetButton}><Text style={{ color: C.berry, fontWeight: "600" }}>Reset saved garden</Text></Pressable> : <>
             <Text style={[styles.notice, { marginTop: 12 }]}>Clear this device’s saved garden and purchases?</Text>
             <View style={{ flexDirection: "row", gap: 16 }}>

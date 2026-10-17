@@ -78,3 +78,42 @@ account data untouched. The demo controls have the same confirmed reset.
 Run `npm run check` for purchase, persistence, concurrent mutation, failed storage, and
 reset tests. Web hosting must serve `index.html` for client routes such as `/market`;
 `serve -s dist` provides this fallback locally.
+
+## Approved improvements (October 2026)
+
+The personal garden follows local calendar dates and keeps the existing saved gold,
+plants and inventory. The sample garden has separate local storage and is the only mode
+with a manual **Next day** button. Open the date/settings badge to switch modes or replay
+**How to play**. New gardens start with 1,000 gold and no plants or supplies.
+
+Personal goals are calculated locally from recorded totals from the preceding seven days:
+steps, active minutes, feed minutes and daylight. Targets remain fixed through the week.
+At least one preceding day with a metric is required. Missing values do not count as zero.
+Movement rewards settle when reached; feed-time limits settle after the local date ends.
+Reward keys and gold are saved together, so refreshes and retries do not duplicate rewards.
+No AI request is needed for these local goal calculations. Sample coach content stays in
+the sample garden; personal mode never presents that persona's report as your own.
+
+**Report → Your data and privacy** explains storage, disconnects syncing and offers
+confirmed deletion. Local health updates use a durable AsyncStorage queue (localStorage
+on web); the latest 35 days and pending uploads are retained. Failed uploads are retried
+on startup, foregrounding and **Retry upload**. Local save failures preserve your input.
+Health data deletion preserves gold, inventory, plants and minimal reward-deduplication
+keys; it clears local totals/targets and cloud health-derived records for the current
+anonymous account. Cloud deletion/reconnect require the migrations in
+`docs/SUPABASE_SETUP.md`. Apple Health originals are not removed.
+
+### Verification
+
+Run `npm run typecheck`, `npm run check`, and `npm run export:web` in `mobile/`.
+Checks cover input validation, concurrent/offline health updates, daily care rollover,
+DST/backward clocks, separate sample progress and once-only rewards (including failed saves).
+SQL isolation/deletion tests live in `supabase/tests/`; they require a Supabase database.
+
+For a visual check at 320×568 and 390×844, complete or skip the guide, plant a plot,
+open Market, switch tabs, view Report/privacy, and switch to/from the sample garden.
+The full 24-plant sample garden was measured in the web development build with a temporary
+render counter: four tab switches (Goals, Coach, Report, Garden) caused **4 GardenScene
+renders before and 0 after** memoization/stable callbacks. The counter was removed after
+measurement. Plant artwork is memoized, and plot lookups are indexed by coordinate.
+This is a render-count result, not a native-device frame-rate benchmark.

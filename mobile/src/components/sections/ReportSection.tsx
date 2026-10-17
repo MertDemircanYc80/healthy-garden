@@ -1,6 +1,7 @@
 // Island → Report: the weekly health report.
 import { Text, View } from "react-native";
 import { Card, Ring, SectionTitle, WeekBars, styles as u } from "@/components/ui";
+import { PrivacyControls } from "@/components/PrivacyControls";
 import { DataSources } from "./DataSources";
 import { useApp } from "@/state/AppState";
 import { C, F, T } from "@/theme";
@@ -12,12 +13,13 @@ function latest(v: number, unit: string) {
 }
 
 export function ReportSection() {
-  const { report } = useApp();
+  const { report, isDemo } = useApp();
   return (
     <View>
       <SectionTitle title="Health report" hint={report.periodLabel} />
       <DataSources />
-      <Card style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
+      <PrivacyControls />
+      {isDemo ? <Card style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
         <Ring value={report.score / 100} size={84} stroke={8} color={C.moss}>
           <Text style={{ color: C.mist, fontFamily: F.display, fontSize: 26 }}>{report.score}</Text>
         </Ring>
@@ -28,7 +30,7 @@ export function ReportSection() {
           </Text>
           <Text style={[u.body, { marginTop: 4, fontSize: T.small, lineHeight: 19 }]}>{report.summary}</Text>
         </View>
-      </Card>
+      </Card> : <Card><Text style={u.body}>{report.summary}</Text></Card>}
 
       {report.metrics.map((m) => (
         <Card key={m.metric} style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
@@ -40,7 +42,7 @@ export function ReportSection() {
           <WeekBars values={m.week} goal={m.goal} better={m.better} />
         </Card>
       ))}
-      <Text style={[u.muted, { textAlign: "center", marginTop: 6 }]}>Bars show the last 7 days. Today is brightest.</Text>
+      {isDemo && <Text style={[u.muted, { textAlign: "center", marginTop: 6 }]}>Bars show the last 7 days. Today is brightest.</Text>}
     </View>
   );
 }

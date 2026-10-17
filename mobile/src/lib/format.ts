@@ -18,6 +18,7 @@ export function goalValue(g: Goal, v: number) {
 
 /** 0..1 progress toward a goal, for either direction. */
 export function goalProgress(g: Goal) {
+  if (g.currentAvailable === false) return 0;
   if (g.direction === "at_least") return Math.min(1, g.current / g.target);
   if (g.current <= g.target) return 1;
   // over the limit: shrink smoothly (bedtime: 1 h late ≈ 0)
@@ -26,7 +27,7 @@ export function goalProgress(g: Goal) {
   return Math.max(0.05, 1 - over / span);
 }
 
-export const onTrack = (g: Goal) => (g.direction === "at_least" ? g.current >= g.target : g.current <= g.target);
+export const onTrack = (g: Goal) => g.currentAvailable !== false && (g.direction === "at_least" ? g.current >= g.target : g.current <= g.target);
 
 export function greeting(hour: number) {
   if (hour < 5) return "Good night";

@@ -113,3 +113,17 @@ cut every stretch item.
 | M16 | Highlight selectable empty plots, plant picker with buy-and-plant, and 1,000 starting gold | frontend | Codex (user requested) | ✅ Done |
 
 | M17 | Persist and enforce one fertilizer use per plant per day | frontend | Codex (user requested) | ✅ Done |
+
+## Approved improvements — Phase 2
+
+| # | Task | Owner | Status |
+|---|---|---|---|
+| A1 | Health data access protection | Codex | Done; live authenticated uploads and two-user isolation verified |
+| A2 | Reliable health syncing | Codex | Done; local/offline checks and live uploads passed |
+| A3 | Real daily cycle | Codex | Done |
+| A4 | Personal goals from real health data | Codex | Done; repeat-reward checks passed |
+| A5 | Privacy and data controls | Codex | Done; live deletion, write protection and reconnect verified |
+| A6 | Guided first planting | Codex | Done; browser verified |
+| A7 | Garden rendering performance | Codex | Done; full garden tab-switch renders 4 → 0 |
+
+Excluded: account backup/recovery, activity history, care-status redesign, GitHub Actions.

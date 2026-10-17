@@ -2,12 +2,13 @@
 // Dev-only URL params for screenshots on web: ?hour=10&tab=goals&open=1
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Platform, Pressable, Text, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { GardenScene, phaseFor } from "@/components/garden/GardenScene";
 import { PlantingSheet } from "@/components/PlantingSheet";
 import type { GardenPlot } from "@/lib/gardenPlots";
+import { PlantingGuide } from "@/components/PlantingGuide";
 import { DemoSheet } from "@/components/DemoSheet";
 import { CoinIcon } from "@/components/Icons";
 import { Island, type TabKey } from "@/components/island/Island";
@@ -28,7 +29,8 @@ export default function Home() {
   const params = useLocalSearchParams<{ hour?: string; tab?: string; open?: string }>();
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const { today, plants, alerts, demo } = useApp();
+  const { today, plants, alerts, demo, isDemo } = useApp();
+  const [guideOpen, setGuideOpen] = useState(false);
   const [demoOpen, setDemoOpen] = useState(false);
 
   const [tab, setTab] = useState<TabKey>(TABS.includes(params.tab as TabKey) ? (params.tab as TabKey) : "garden");
@@ -61,11 +63,14 @@ export default function Home() {
     setExpanded(true);
   };
 
-  const onPlantPress = (p: Plant) => {
+  const onPlantPress = useCallback((p: Plant) => {
     setSelected(p);
     setTab("garden");
     setExpanded(false);
-  };
+  }, []);
+  const onEmptyPlotPress = useCallback((plot: GardenPlot) => {
+    setSelected(null); setTab("garden"); setExpanded(false); setSelectedPlot(plot);
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: C.pine }}>
@@ -83,21 +88,21 @@ export default function Home() {
           selectedId={selected?.id}
           onPlantPress={onPlantPress}
           selectedPlot={selectedPlot}
-          onEmptyPlotPress={plot => { setSelected(null); setTab("garden"); setExpanded(false); setSelectedPlot(plot); }}
+          onEmptyPlotPress={onEmptyPlotPress}
         />
       </View>
 
       {/* header on the sky */}
       <View style={{ position: "absolute", top: insets.top + 12, left: 22, right: 18, flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between" }}>
         <View>
-          <Text style={{ fontFamily: F.display, fontSize: T.hero, color: night ? C.mist : C.pine, letterSpacing: -0.4 }}>{greeting(hour)}</Text>
+          <Text style={{ fontFamily: F.display, fontSize: width < 360 ? 26 : T.hero, maxWidth: width - 118, color: night ? C.mist : C.pine, letterSpacing: -0.4 }}>{greeting(hour)}</Text>
           <Text style={{ fontFamily: F.displayItalic, fontSize: T.body, color: night ? "rgba(231,240,226,0.8)" : "rgba(22,48,31,0.7)", marginTop: 2 }}>
             your garden is {today.health >= 0.75 ? "thriving" : today.health >= 0.5 ? "growing" : "resting"}
           </Text>
           <Pressable
             onPress={() => setDemoOpen(true)}
             accessibilityRole="button"
-            accessibilityLabel={`Sample data, ${demo.dateLabel}. Open demo controls`}
+            accessibilityLabel={`${isDemo ? "Sample data" : "My garden"}, ${demo.dateLabel}. Open garden settings`}
             style={({ pressed }) => ({
               alignSelf: "flex-start",
               marginTop: 8,
@@ -112,7 +117,7 @@ export default function Home() {
             })}
           >
             <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: C.sun }} />
-            <Text style={{ fontSize: T.tiny, fontWeight: "700", color: night ? C.mist : C.pine }}>Sample data, {demo.dateLabel}</Text>
+            <Text style={{ fontSize: T.tiny, fontWeight: "700", color: night ? C.mist : C.pine }}>{isDemo ? "Sample data" : "My garden"}, {demo.dateLabel}</Text>
           </Pressable>
         </View>
       </View>
@@ -158,7 +163,8 @@ export default function Home() {
       </Island>
 
       {selectedPlot && <PlantingSheet key={`${selectedPlot.col}-${selectedPlot.row}`} plot={selectedPlot} onClose={() => setSelectedPlot(null)} />}
-      <DemoSheet open={demoOpen} onClose={() => setDemoOpen(false)} />
+      <DemoSheet open={demoOpen} onClose={() => setDemoOpen(false)} onShowGuide={() => setGuideOpen(true)} />
+      <PlantingGuide replay={guideOpen} onClose={() => setGuideOpen(false)} />
     </View>
   );
 }

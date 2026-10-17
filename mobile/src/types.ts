@@ -51,6 +51,8 @@ export interface Goal {
   unit: string;
   direction: "at_least" | "at_most";
   current: number;
+  /** Missing readings must never qualify as a measured zero. */
+  currentAvailable?: boolean;
   /** Why this goal is personal — written by the AI from the user's own data. */
   reason: string;
   reward: number; // coins
