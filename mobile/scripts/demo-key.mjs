@@ -14,11 +14,11 @@ export function normalizeDemoKey(raw) {
     throw new Error(
       "Anahtar boş. AI Studio'da tam API anahtarının kopyalama düğmesini kullanın.",
     );
-  if (/[.*•…]/.test(key))
+  if (/\*|•|…|\.{2,}/.test(key))
     throw new Error(
       "Kısaltılmış veya gizlenmiş anahtar kopyalanmış olabilir. AI Studio'da anahtarın kopyalama düğmesini kullanın; görünen kısaltmayı seçip kopyalamayın.",
     );
-  if (!/^[A-Za-z0-9_-]+$/.test(key) || key.length > 256)
+  if (!/^[A-Za-z0-9_.-]+$/.test(key) || key.length > 256)
     throw new Error(
       "Panodaki/girilen metin API anahtarı biçiminde değil. AI Studio'dan anahtarın kendisini kopyalayın; adını, bağlantısını veya terminal komutunu değil.",
     );

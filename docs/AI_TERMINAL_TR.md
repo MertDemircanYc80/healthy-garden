@@ -23,6 +23,8 @@ npm run demo:setup -- --clipboard
 
 Önce bu komutu başlatın. Komut beklerken AI Studio’ya dönüp API anahtarının kopyalama düğmesine tıklayın. Terminale dönün ve yalnız Enter’a basın. Anahtarı yapıştırmanız gerekmez; pano o anda okunur ve anahtar gösterilmeden yerel ayara kaydedilir. Anahtarın adını veya ekranda kısaltılmış/gizlenmiş görünümünü kopyalamayın. Kod, tırnak ve görünmez kopyalama işaretlerini temizler; geçersiz metni hata mesajında göstermez. “Yerel ayarlar hazır” mesajından sonra `npm run coach` çalıştırın.
 
+Yeni auth anahtarlarının `AQ.` biçimi desteklenir; tek nokta anahtarın bir parçasıdır. `…` veya yıldız içeren kısaltılmış/gizlenmiş metin yine reddedilir. Bu sürümde ilk 7 günlük demo verisiyle gerçek Gemini isteği de doğrulandı; anahtar ve sunucudaki yanıt önbelleği yalnız yerel dosyalarda tutulur.
+
 Birden fazla ağ adaptörü varsa Wi-Fi adresi tercih edilir. Telefon bağlanamıyorsa kendi Mac Wi-Fi IP'nizle tekrar çalıştırın:
 
 ```bash

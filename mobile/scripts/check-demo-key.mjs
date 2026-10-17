@@ -1,5 +1,10 @@
 import assert from "node:assert/strict";
 import { normalizeDemoKey } from "./demo-key.mjs";
+// New credential formats can contain dots; format validation is not authentication.
+assert.equal(
+  normalizeDemoKey("AQ." + "test_only_value".repeat(3)),
+  "AQ." + "test_only_value".repeat(3),
+);
 const sample = "test-only_" + "a".repeat(30);
 for (const input of [
   sample,
