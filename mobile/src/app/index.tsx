@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { GardenScene, phaseFor } from "@/components/garden/GardenScene";
 import { PlantingSheet } from "@/components/PlantingSheet";
 import type { GardenPlot } from "@/lib/gardenPlots";
+import { PlantingGuide } from "@/components/PlantingGuide";
 import { DemoSheet } from "@/components/DemoSheet";
 import { CoinIcon } from "@/components/Icons";
 import { Island, type TabKey } from "@/components/island/Island";
@@ -29,6 +30,7 @@ export default function Home() {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const { today, plants, alerts, demo, isDemo } = useApp();
+  const [guideOpen, setGuideOpen] = useState(false);
   const [demoOpen, setDemoOpen] = useState(false);
 
   const [tab, setTab] = useState<TabKey>(TABS.includes(params.tab as TabKey) ? (params.tab as TabKey) : "garden");
@@ -158,7 +160,8 @@ export default function Home() {
       </Island>
 
       {selectedPlot && <PlantingSheet key={`${selectedPlot.col}-${selectedPlot.row}`} plot={selectedPlot} onClose={() => setSelectedPlot(null)} />}
-      <DemoSheet open={demoOpen} onClose={() => setDemoOpen(false)} />
+      <DemoSheet open={demoOpen} onClose={() => setDemoOpen(false)} onShowGuide={() => setGuideOpen(true)} />
+      <PlantingGuide replay={guideOpen} onClose={() => setGuideOpen(false)} />
     </View>
   );
 }

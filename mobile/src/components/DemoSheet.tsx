@@ -6,7 +6,7 @@ import { STARTING_COINS } from "@/lib/market";
 import { useApp } from "@/state/AppState";
 import { C, F, R, T } from "@/theme";
 
-export function DemoSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function DemoSheet({ open, onClose, onShowGuide }: { open: boolean; onClose: () => void; onShowGuide: () => void }) {
   const { demo, today, isDemo, switchMode } = useApp();
   const [confirmReset, setConfirmReset] = useState(false);
   return (
@@ -50,6 +50,7 @@ export function DemoSheet({ open, onClose }: { open: boolean; onClose: () => voi
             Finishes today: pays coins for goals hit and grows the plants you watered.
           </Text></>}
 
+          <Pressable accessibilityRole="button" onPress={() => { onClose(); onShowGuide(); }} style={{ paddingVertical: 14 }}><Text style={{ color: C.moss, fontWeight: "700" }}>How to play</Text></Pressable>
           <Pressable
             onPress={() => {
               setConfirmReset(true);
