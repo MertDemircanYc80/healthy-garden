@@ -46,7 +46,11 @@ export function HealthProvider({ children }: { children: React.ReactNode }) {
     });
     return () => { mounted.current = false; unsub(); };
   }, [avail, run]);
-  const syncNow = useCallback(() => run(() => connected ? syncHealth() : retryUploads()), [connected, run]);
+  const syncNow = useCallback(() => run(async () => {
+    const s = await healthStore.load();
+    setSnapshot(s); setReady(true);
+    await (connected ? syncHealth() : retryUploads());
+  }), [connected, run]);
   useEffect(() => {
     let active = true;
     let stop: (() => void) | null = null;

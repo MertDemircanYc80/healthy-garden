@@ -32,7 +32,7 @@ export function DataSources() {
     status = "Steps, sleep, workouts, daylight and meals update by themselves once connected.";
     action = { label: "Connect Apple Health", onPress: h.connect };
   } else {
-    status = h.busy ? "Syncing…" : `Read from Apple Health ${ago(h.lastSync)}.`;
+    status = h.busy ? "Syncing…" : `Local data updated ${ago(h.lastSync)}.`;
     action = { label: h.busy ? "Syncing…" : "Sync now", onPress: h.syncNow };
   }
 
@@ -65,6 +65,7 @@ export function DataSources() {
       )}
       <Text style={[u.muted, { marginTop: 10 }]}>{h.busy ? "Saving / syncing…" : !h.syncEnabled || !isBackendConfigured() ? "Saved on this device. Cloud syncing is off." : h.pending ? `Saved on this device · ${h.pending} day(s) pending upload.` : h.lastUpload ? `Synced to Supabase ${ago(h.lastUpload)}.` : "No health data uploaded yet."}</Text>
       {h.pending > 0 && isBackendConfigured() && !h.busy && <Chip label="Retry upload" onPress={h.syncNow} />}
+      {!h.ready && !h.busy && <Chip label="Retry loading data" onPress={h.syncNow} />}
       {h.error && <Text style={[u.muted, { color: C.berry, marginTop: 8 }]}>{h.error}</Text>}
 
       <View style={{ height: 1, backgroundColor: C.pineLine, marginVertical: 14 }} />
@@ -98,6 +99,7 @@ function ScreenTimeInput({ current, onSave }: { current: number | null; onSave: 
           accessibilityLabel="Minutes in feed apps today"
         />
         <Pressable
+          accessibilityRole="button"
           disabled={!valid || saving}
           onPress={async () => {
             setSaving(true);

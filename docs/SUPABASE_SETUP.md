@@ -152,3 +152,12 @@ has disabled syncing (including coach work already in flight). Run
 anonymous denial, deletion, reconnect and upsert compatibility. These SQL tests still
 require a connected PostgreSQL/Supabase management session; they are not part of the
 mobile JavaScript checks. No service-role key is needed by the app.
+
+### Verified hosted readiness on 2026-10-17
+
+`cd mobile && npm run check:connection` confirms that the configured public URL/key
+reach Auth. The supplied project currently has Anonymous Sign-Ins disabled and returns
+`PGRST205` for `health_days` (the app schema is not available through its API). Enable
+Anonymous Sign-Ins and apply the base app schema, then the two 20261017 migrations.
+The active Expo checkout uses an ignored `mobile/.env.local`; no key is committed.
+The readiness check is read-only and does not create accounts or write health records.

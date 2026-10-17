@@ -1,7 +1,4 @@
-// App state. In demo mode (default until Supabase + Apple Health are live) every section is
-// driven by the sample persona in src/demo/simulation.ts: real coach output for that data,
-// goals evaluated on each day, and a Next day action that pays coins and grows plants.
-// Later: the same shapes load from Supabase (goals, insights, reports, alerts, gardens).
+// Persistent personal garden with a separate sample garden for demonstrations.
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, AppState as RNAppState, Pressable, Text, View } from "react-native";

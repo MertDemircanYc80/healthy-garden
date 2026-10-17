@@ -5,6 +5,10 @@ async function main() {
   const data = new Map<string,string>();
   let fail = false;
   const storage = { getItem: async (k:string) => data.get(k) ?? null, setItem: async (k:string,v:string) => { if (fail) throw Error("disk"); data.set(k,v); } };
+  data.set("healthgarden:healthDays",JSON.stringify([{date:"2026-10-16",feed_minutes:5}]));
+  const migrated = createHealthStore(storage);
+  assert.equal((await migrated.load()).pending[0].row.feed_minutes,5);
+  data.clear();
   const store = createHealthStore(storage);
   await Promise.all([store.save([{date:"2026-10-17",steps:100}], ["steps"]), store.save([{date:"2026-10-17",feed_minutes:10}], ["feed_minutes"])]);
   assert.equal((await store.load()).days[0].steps,100);

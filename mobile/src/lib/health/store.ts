@@ -36,7 +36,7 @@ export function createHealthStore(storage: Storage) {
       const days: HealthDayRow[] = legacy ? JSON.parse(legacy) : [];
       if (!Array.isArray(days)) throw new Error("Saved health data could not be read.");
       days.forEach(validateHealthRow);
-      current = { ...empty(), days };
+      current = { ...empty(), days, revision: 1, pending: days.map(row => ({ row, revision: 1, columns: Object.keys(row).filter(k => k !== "date" && k !== "source") as (keyof HealthDayRow)[] })) };
     }
     return current;
   }
@@ -62,7 +62,7 @@ export function createHealthStore(storage: Storage) {
         const pending = new Map(s.pending.map(p => [p.row.date, p]));
         const revision = s.revision + 1;
         for (const row of rows) {
-          const merged = { ...byDate.get(row.date), ...row };
+          const merged = { ...pending.get(row.date)?.row, ...byDate.get(row.date), ...row };
           // A source can explicitly clear its own missing values without touching manual fields.
           for (const key of columns) if (row[key] === undefined) delete merged[key];
           byDate.set(row.date, merged);

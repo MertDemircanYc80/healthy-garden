@@ -40,6 +40,7 @@
     "typecheck": "tsc --noEmit",
     "export:web": "expo export -p web",
     "check": "npx --yes tsx scripts/check-health.ts && npx --yes tsx scripts/check-demo.ts && npx --yes tsx scripts/check-market.ts && npx --yes tsx scripts/check-validation.ts && npx --yes tsx scripts/check-sync.ts && npx --yes tsx scripts/check-calendar.ts && npx --yes tsx scripts/check-personal.ts",
+    "check:connection": "node scripts/check-connection.mjs",
     "demo:data": "npx --yes tsx scripts/make-demo-data.ts"
   },
   "private": true

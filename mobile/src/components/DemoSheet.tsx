@@ -1,5 +1,5 @@
 // Demo controls: step through the sample week for a demo video, or start over.
-import { Modal, Pressable, Text, View } from "react-native";
+import { Modal, Pressable, ScrollView, Text, View } from "react-native";
 import { useState } from "react";
 import { styles as u } from "@/components/ui";
 import { STARTING_COINS } from "@/lib/market";
@@ -12,12 +12,13 @@ export function DemoSheet({ open, onClose, onShowGuide }: { open: boolean; onClo
   return (
     <Modal visible={open} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: "rgba(8,20,12,0.45)", justifyContent: "flex-end", padding: 12 }} onPress={onClose} accessibilityLabel="Close demo controls">
-        <Pressable onPress={() => {}} style={{ backgroundColor: C.pine, borderRadius: R.island, padding: 22, paddingBottom: 26 }}>
+        <Pressable onPress={() => {}} style={{ backgroundColor: C.pine, borderRadius: R.island, maxHeight: "90%" }}>
+          <ScrollView contentContainerStyle={{ padding: 22, paddingBottom: 26 }}>
           <Text style={{ color: C.mist, fontFamily: F.display, fontSize: T.title }}>{isDemo ? "Demo week" : "Garden settings"}</Text>
           <Text style={[u.muted, { marginTop: 6 }]}>
             {isDemo ? "This garden uses sample data. Its gold and plants are kept separate from your personal garden." : "Your garden follows your local calendar. Watering and fertilizer become available each new day, including after reopening the app."}
           </Text>
-          <Text style={[u.muted, { marginTop: 8 }]}>Goals and suggestions written by: {demo.coachSource}.</Text>
+          <Text style={[u.muted, { marginTop: 8 }]}>{isDemo ? `Goals and suggestions written by: ${demo.coachSource}.` : "Personal goals are calculated on this device from your recorded totals."}</Text>
 
           <View style={{ flexDirection: "row", alignItems: "baseline", gap: 8, marginTop: 16 }}>
             <Text style={{ color: C.sun, fontFamily: F.display, fontSize: 26 }}>{demo.dateLabel}</Text>
@@ -64,6 +65,7 @@ export function DemoSheet({ open, onClose, onShowGuide }: { open: boolean; onClo
             <Pressable accessibilityRole="button" onPress={() => { demo.reset(); setConfirmReset(false); onClose(); }} style={{ paddingVertical: 10 }}><Text style={{ color: C.berry, fontWeight: "700" }}>Confirm reset</Text></Pressable>
             <Pressable accessibilityRole="button" onPress={() => setConfirmReset(false)} style={{ paddingVertical: 10 }}><Text style={{ color: C.mist }}>Cancel</Text></Pressable>
           </View>}
+          </ScrollView>
         </Pressable>
       </Pressable>
     </Modal>

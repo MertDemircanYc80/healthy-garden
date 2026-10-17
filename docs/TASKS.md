@@ -118,12 +118,12 @@ cut every stretch item.
 
 | # | Task | Owner | Status |
 |---|---|---|---|
-| A1 | Health data access protection | Codex | In progress |
-| A2 | Reliable health syncing | Codex | Planned |
-| A3 | Real daily cycle | Codex | Planned |
-| A4 | Personal goals from real health data | Codex | Planned |
-| A5 | Privacy and data controls | Codex | Planned |
-| A6 | Guided first planting | Codex | Planned |
-| A7 | Garden rendering performance | Codex | Planned |
+| A1 | Health data access protection | Codex | Code + client checks done; SQL deployment/tests pending access |
+| A2 | Reliable health syncing | Codex | Done; local/offline checks passed, hosted setup pending |
+| A3 | Real daily cycle | Codex | Done |
+| A4 | Personal goals from real health data | Codex | Done; repeat-reward checks passed |
+| A5 | Privacy and data controls | Codex | UI/local controls done; cloud RPC deployment/tests pending access |
+| A6 | Guided first planting | Codex | Done; browser verified |
+| A7 | Garden rendering performance | Codex | Done; full garden tab-switch renders 4 → 0 |
 
 Excluded: account backup/recovery, activity history, care-status redesign, GitHub Actions.

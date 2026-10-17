@@ -8,9 +8,9 @@ export function validateHealthRow(value: unknown): HealthDayRow {
   if (!object(value) || !validDate(value.date)) throw new Error("Invalid health date.");
   for (const [key, v] of Object.entries(value)) {
     if (key === "date") continue;
-    if (!(key in limits) && !["source", "bedtime", "wake_time", "nutrition", "app_usage"].includes(key)) throw new Error("Unexpected health field.");
+    if (!(Object.hasOwn(limits, key)) && !["source", "bedtime", "wake_time", "nutrition", "app_usage"].includes(key)) throw new Error("Unexpected health field.");
     if (v === undefined || v === null) continue;
-    if (key in limits && (!number(v, limits[key]) || (key !== "walking_running_km" && !Number.isInteger(v)))) throw new Error(`Invalid ${key} value.`);
+    if (Object.hasOwn(limits, key) && (!number(v, limits[key]) || (key !== "walking_running_km" && !Number.isInteger(v)))) throw new Error(`Invalid ${key} value.`);
     if (["bedtime", "wake_time"].includes(key) && (typeof v !== "string" || !/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/.test(v))) throw new Error("Invalid health time.");
     if (key === "source" && !["healthkit", "manual", "shortcut", "demo"].includes(String(v))) throw new Error("Invalid health source.");
     if (key === "nutrition" && (!object(v) || Object.entries(v).some(([k, n]) => !nutritionKeys.includes(k) || !number(n, 100000)))) throw new Error("Invalid nutrition totals.");
