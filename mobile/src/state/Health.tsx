@@ -1,139 +1,88 @@
-// Health data state: Apple Health connection, background sync, manual screen time.
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AppState as RNAppState } from "react-native";
 import { localDay } from "@/lib/health/days";
 import { availability, connect as hkConnect, watchChanges, type Availability } from "@/lib/health/healthkit";
-import { cachedDays, lastSync as readLastSync, logScreenTime as saveScreenTime, syncHealth } from "@/lib/health/sync";
+import { healthStore, logScreenTime as saveScreenTime, retryUploads, syncHealth } from "@/lib/health/sync";
+import type { HealthSnapshot } from "@/lib/health/store";
 import type { HealthDayRow } from "@/lib/health/types";
 
-const CONNECTED_KEY = "healthgarden:healthConnected";
-
+export const CONNECTED_KEY = "healthgarden:healthConnected";
 interface HealthState {
-  availability: Availability;
-  connected: boolean;
-  busy: boolean;
-  lastSync: string | null;
-  error: string | null;
-  days: HealthDayRow[];
-  today: HealthDayRow | null;
-  connect: () => Promise<void>;
-  syncNow: () => Promise<void>;
-  logScreenTime: (feedMinutes: number) => Promise<void>;
+  availability: Availability; connected: boolean; busy: boolean; ready: boolean;
+  lastSync: string | null; lastUpload: string | null; pending: number; syncEnabled: boolean;
+  error: string | null; days: HealthDayRow[]; today: HealthDayRow | null;
+  connect: () => Promise<void>; syncNow: () => Promise<void>; logScreenTime: (minutes: number) => Promise<void>;
 }
-
 const Ctx = createContext<HealthState | null>(null);
-
 export function HealthProvider({ children }: { children: React.ReactNode }) {
   const [avail] = useState<Availability>(() => availability());
   const [connected, setConnected] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [lastSync, setLastSync] = useState<string | null>(null);
+  const [busyCount, setBusyCount] = useState(0);
+  const [ready, setReady] = useState(false);
+  const [snapshot, setSnapshot] = useState<HealthSnapshot | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [days, setDays] = useState<HealthDayRow[]>([]);
-  const stopWatching = useRef<null | (() => void)>(null);
-
-  const refreshLocal = useCallback(async () => {
-    setDays(await cachedDays());
-    setLastSync(await readLastSync());
+  const mounted = useRef(true);
+  const [todayKey, setTodayKey] = useState(() => localDay(new Date()));
+  const run = useCallback(async (operation: () => Promise<unknown>, rethrow = false) => {
+    setBusyCount(n => n + 1); setError(null);
+    try { await operation(); }
+    catch (e) {
+      if (mounted.current) setError(e instanceof Error ? e.message : "Couldn’t save or sync health data. Please try again.");
+      if (rethrow) throw e;
+    } finally { if (mounted.current) setBusyCount(n => n - 1); }
   }, []);
-
-  const sync = useCallback(async () => {
-    setBusy(true);
-    setError(null);
-    try {
-      await syncHealth();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Sync failed");
-    } finally {
-      await refreshLocal();
-      setBusy(false);
-    }
-  }, [refreshLocal]);
-
-  const startWatching = useCallback(async () => {
-    if (stopWatching.current) return;
-    let timer: ReturnType<typeof setTimeout> | null = null;
-    // HealthKit can fire several updates in a row — sync once they settle.
-    stopWatching.current = await watchChanges(() => {
-      if (timer) clearTimeout(timer);
-      timer = setTimeout(() => syncHealth({ days: 3 }).then(refreshLocal).catch(() => {}), 4000);
-    }).catch(() => null);
-  }, [refreshLocal]);
-
-  // On launch: show cached data right away, then resync if the user connected before.
   useEffect(() => {
-    let alive = true;
-    (async () => {
-      await refreshLocal();
-      const was = (await AsyncStorage.getItem(CONNECTED_KEY).catch(() => null)) === "1";
-      if (!alive || !was || avail !== "ok") return;
-      setConnected(true);
-      await sync();
-      await startWatching();
-    })();
-    return () => {
-      alive = false;
-      stopWatching.current?.();
-      stopWatching.current = null;
-    };
-  }, [avail, refreshLocal, sync, startWatching]);
-
-  // Coming back to the app → pick up anything new.
-  useEffect(() => {
-    const sub = RNAppState.addEventListener("change", (s) => {
-      if (s === "active" && connected) syncHealth({ days: 3 }).then(refreshLocal).catch(() => {});
+    mounted.current = true;
+    const unsub = healthStore.subscribe(s => { if (mounted.current) setSnapshot(s); });
+    void run(async () => {
+      const s = await healthStore.load();
+      const was = await AsyncStorage.getItem(CONNECTED_KEY);
+      if (!mounted.current) return;
+      setSnapshot(s); setReady(true); setConnected(was === "1" && s.syncEnabled && avail === "ok");
+      await retryUploads();
     });
-    return () => sub.remove();
-  }, [connected, refreshLocal]);
-
-  const connect = useCallback(async () => {
-    setError(null);
-    try {
-      await hkConnect();
-      await AsyncStorage.setItem(CONNECTED_KEY, "1").catch(() => {});
-      setConnected(true);
-      await sync();
-      await startWatching();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't connect to Apple Health");
+    return () => { mounted.current = false; unsub(); };
+  }, [avail, run]);
+  const syncNow = useCallback(() => run(() => connected ? syncHealth() : retryUploads()), [connected, run]);
+  useEffect(() => {
+    let active = true;
+    let stop: (() => void) | null = null;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    if (connected) {
+      queueMicrotask(() => { if (active) void syncNow(); });
+      void watchChanges(() => { clearTimeout(timer); timer = setTimeout(() => { if (active) void syncNow(); }, 4000); })
+        .then(unsub => { if (active) stop = unsub; else unsub(); })
+        .catch(() => { if (active) setError("Automatic updates could not start. Use Sync now to retry."); });
     }
-  }, [sync, startWatching]);
-
-  const logScreenTime = useCallback(
-    async (feedMinutes: number) => {
-      setError(null);
-      try {
-        await saveScreenTime({ feedMinutes });
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Couldn't save screen time");
-      }
-      await refreshLocal();
-    },
-    [refreshLocal],
-  );
-
-  const value = useMemo<HealthState>(() => {
-    const todayKey = localDay(new Date());
-    return {
-      availability: avail,
-      connected,
-      busy,
-      lastSync,
-      error,
-      days,
-      today: days.find((d) => d.date === todayKey) ?? null,
-      connect,
-      syncNow: sync,
-      logScreenTime,
-    };
-  }, [avail, connected, busy, lastSync, error, days, connect, sync, logScreenTime]);
-
+    return () => { active = false; clearTimeout(timer); stop?.(); };
+  }, [connected, syncNow]);
+  useEffect(() => {
+    const tick = () => setTodayKey(localDay(new Date()));
+    const timer = setInterval(tick, 30000);
+    const sub = RNAppState.addEventListener("change", s => { if (s === "active") { tick(); void syncNow(); } });
+    return () => { clearInterval(timer); sub.remove(); };
+  }, [syncNow]);
+  const connect = useCallback(() => run(async () => {
+    await hkConnect();
+    await healthStore.setSyncEnabled(true);
+    await AsyncStorage.setItem(CONNECTED_KEY, "1");
+    setConnected(true);
+  }), [run]);
+  const logScreenTime = useCallback(async (feedMinutes: number) => {
+    await run(() => saveScreenTime({ feedMinutes }), true);
+    void run(retryUploads);
+  }, [run]);
+  const value = useMemo<HealthState>(() => ({ availability: avail, connected, busy: busyCount > 0, ready,
+    lastSync: snapshot?.lastRead ?? null, lastUpload: snapshot?.lastUpload ?? null,
+    pending: snapshot?.pending.length ?? 0, syncEnabled: snapshot?.syncEnabled ?? true, error,
+    days: snapshot?.days ?? [], today: snapshot?.days.find(d => d.date === todayKey) ?? null,
+    connect, syncNow, logScreenTime,
+  }), [avail, connected, busyCount, ready, snapshot, error, todayKey, connect, syncNow, logScreenTime]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
-
 export function useHealth() {
-  const v = useContext(Ctx);
-  if (!v) throw new Error("useHealth must be used inside <HealthProvider>");
-  return v;
+  const value = useContext(Ctx);
+  if (!value) throw new Error("useHealth must be used inside <HealthProvider>");
+  return value;
 }
