@@ -39,7 +39,7 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "export:web": "expo export -p web",
-    "check": "npx --yes tsx scripts/check-health.ts && npx --yes tsx scripts/check-demo.ts",
+    "check": "npx --yes tsx scripts/check-health.ts && npx --yes tsx scripts/check-demo.ts && npx --yes tsx scripts/check-market.ts",
     "demo:data": "npx --yes tsx scripts/make-demo-data.ts"
   },
   "private": true
