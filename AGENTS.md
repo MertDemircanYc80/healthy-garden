@@ -9,10 +9,22 @@ plan) and `docs/TASKS.md` (who is doing what).
 
 ## What Healthy Garden is
 
-A phone-first web app: health data (steps, sleep) + doomscrolling time → daily tasks
-→ coins → buy seeds/tools → a virtual garden grows. Plants never die (they go dormant).
-Milestones link to a real tree planting (mocked payment). Tone: calm, encouraging,
-never guilt-based.
+An iPhone app: health data (Apple Health — steps, sleep, running, meals; screen time;
+driving) is analysed by AI, which sets **personal** goals and suggestions for each user.
+Hitting them brings sunlight and coins, and a calm illustrated garden grows. Plants never
+die (they rest). Tone: calm, encouraging, never guilt-based. Not medical advice.
+
+## Where things are (read this first)
+
+| Path | What | Status |
+|---|---|---|
+| `mobile/` | **The product.** Expo app: fixed garden + bottom island (Garden, Goals, Coach, Report, Alerts). Has its own `mobile/AGENTS.md` — read it before touching mobile code. | UI done on demo data |
+| `supabase/migrations/` | Database for the app (anonymous auth + RLS). Setup: `docs/SUPABASE_SETUP.md` | Ready to apply |
+| `src/` (root Next.js) | First **web prototype** (game engine, Apple Health export parser, Shortcuts ingest). Reference code; port pieces into `mobile/` when needed. | Frozen — don't add features |
+| `supabase/web-prototype/` | Old prototype SQL. Never apply. | Archived |
+
+Phase order: (1) app look ✅ → (2) Supabase + anonymous sign-in → (3) HealthKit sync
+(development build) → (4) AI analysis Edge Function → (5) notifications.
 
 ## Golden rules
 
@@ -29,7 +41,8 @@ never guilt-based.
    Do not add real payments, native apps, medical advice, or new wearables.
 4. **Never commit secrets.** Keys go in `.env.local` (gitignored). Only `.env.example`
    is committed, with empty values.
-5. **Before every push:** `npm run lint && npm run check && npm run build` must pass. Never push a red build to `main`.
+5. **Before every push:** in `mobile/`: `npm run typecheck`. At the root (only if you touched
+   the web prototype): `npm run lint && npm run check && npm run build`. Never push a red build to `main`.
 6. **Small, frequent commits** on a feature branch; open a PR to `main` (see Git workflow).
 7. **Don't add dependencies casually.** Ask your human first; prefer what's already here.
    Approved if needed: `@supabase/supabase-js`, `recharts`.

@@ -8,19 +8,23 @@ Healthy Garden turns healthy habits — walking, sleeping well, scrolling less �
 virtual garden, with milestones that link to real-world tree planting.
 Hackathon project · plan in [`docs/PLAN.md`](docs/PLAN.md) · task board in [`docs/TASKS.md`](docs/TASKS.md).
 
-## Quick start
+## Quick start (the app)
 
 ```bash
-git clone <this-repo-url>
-cd healthy-garden
+git clone https://github.com/MertDemircanYc80/healthy-garden
+cd healthy-garden/mobile
 npm install
-cp .env.example .env.local   # fill in Supabase keys when available (app runs on mock data without them)
-npm run dev                  # http://localhost:3000
+npx expo start      # scan the QR code with your iPhone (Expo Go app)
 ```
 
-Open it in your browser's phone view (DevTools → device toolbar) — the app is phone-first.
+The phone app lives in [`mobile/`](mobile/README.md). Database setup: [`docs/SUPABASE_SETUP.md`](docs/SUPABASE_SETUP.md).
 
-## What works right now
+## Web prototype (earlier, frozen)
+
+The root Next.js app is the first browser prototype — run it with `npm install && npm run dev`
+at the repo root. It contains reusable pieces (game engine, Apple Health export parser).
+
+### What the web prototype does
 
 The whole core loop, on a phone-sized screen, with no backend:
 
@@ -38,7 +42,8 @@ Game state is saved in the browser (localStorage). Shortcuts sync needs Supabase
 
 ## Stack
 
-Next.js 16 · React 19 · TypeScript · Tailwind v4 · Supabase · Vercel
+App: Expo SDK 58 · React Native · Expo Router · react-native-svg · Supabase (anonymous auth, Postgres, Edge Functions) · Claude API for analysis.
+Web prototype: Next.js 16 · Tailwind v4.
 
 ## Working with AI assistants
 
