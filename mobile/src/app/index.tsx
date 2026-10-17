@@ -1,6 +1,6 @@
 // Home: the garden fills the screen and never moves; the island at the bottom holds everything else.
 // Dev-only URL params for screenshots on web: ?hour=10&tab=goals&open=1
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import { Platform, Pressable, Text, View, useWindowDimensions } from "react-native";
@@ -22,6 +22,7 @@ import type { Plant } from "@/types";
 const TABS: TabKey[] = ["garden", "goals", "coach", "report", "alerts"];
 
 export default function Home() {
+  const router = useRouter();
   const params = useLocalSearchParams<{ hour?: string; tab?: string; open?: string }>();
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -123,9 +124,9 @@ export default function Home() {
       {/* Below Expo's top-right settings overlay (94 pt including its Tools label).
           Render after the meadow tap target so the balance stays tappable when expanded. */}
       <Pressable
-        onPress={() => onTab("garden")}
+        onPress={() => router.navigate("/market")}
         accessibilityRole="button"
-        accessibilityLabel={`${today.coins} coins`}
+        accessibilityLabel={`${today.coins} coins. Open Market`}
         style={{ position: "absolute", top: insets.top + 102, right: 18, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: night ? "rgba(22,48,31,0.75)" : "rgba(255,255,255,0.82)", borderRadius: R.pill, paddingHorizontal: 12, paddingVertical: 7 }}
       >
         <CoinIcon size={16} />

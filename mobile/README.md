@@ -33,13 +33,14 @@ Tests for the pure health helpers: `npm run check`.
 ## Check it in a browser
 
 ```bash
-npm run export:web && npx serve dist   # open at phone size; ?hour=21 shows night
+npm run export:web && npx serve -s dist   # open at phone size; ?hour=21 shows night
 ```
 
 ## Structure
 
 ```
-src/app/index.tsx            the one screen: garden + island
+src/app/index.tsx            main garden + island
+src/app/market.tsx           Market and inventory
 src/components/garden/       fixed SVG garden (scene + plants)
 src/components/island/       the bottom island + tab bar
 src/components/sections/     Garden, Goals, Coach, Report, Alerts
@@ -48,3 +49,25 @@ src/data/demo.ts             demo content in the same shape the AI will write
 src/types.ts                 shared shapes (mirror the Supabase tables)
 src/theme.ts                 colours, fonts, sizes
 ```
+
+## Market and saved progress
+
+Tap the money badge below Settings to open the Market. Plants and supplies have Buy
+buttons; unaffordable purchases are disabled. Purchases update the shared balance and
+inventory immediately after a successful save. Items stay in inventory; planting and
+consuming supplies are separate future features.
+
+Progress uses AsyncStorage on iOS/Android and its localStorage backend on web, under
+`healthgarden:game:v1`. Money, inventory, and garden demo progress are saved together
+on this device; they do not sync through Supabase or across devices. Startup restores
+the saved snapshot before showing the app. Only a missing save uses the initial 460
+coins and empty inventory. Unreadable saves show retry/reset options rather than being
+silently replaced. Failed writes leave the previous balance and inventory intact.
+
+For testing, open Market → **Reset saved garden** → **Confirm reset**. This restores
+460 coins, clears inventory, and resets garden demo progress, while leaving health and
+account data untouched. The demo controls have the same confirmed reset.
+
+Run `npm run check` for purchase, persistence, concurrent mutation, failed storage, and
+reset tests. Web hosting must serve `index.html` for client routes such as `/market`;
+`serve -s dist` provides this fallback locally.
