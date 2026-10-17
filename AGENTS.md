@@ -20,11 +20,13 @@ die (they rest). Tone: calm, encouraging, never guilt-based. Not medical advice.
 |---|---|---|
 | `mobile/` | **The product.** Expo app: fixed garden + bottom island (Garden, Goals, Coach, Report, Alerts). Has its own `mobile/AGENTS.md` — read it before touching mobile code. | UI done on demo data |
 | `supabase/migrations/` | Database for the app (anonymous auth + RLS). Setup: `docs/SUPABASE_SETUP.md` | Ready to apply |
+| `supabase/functions/analyze` | AI coach Edge Function (Deno + Claude). Pure logic in `supabase/functions/_shared/analysis/`, tests: `deno test --allow-env _shared/analysis/` | Code + tests done |
 | `src/` (root Next.js) | First **web prototype** (game engine, Apple Health export parser, Shortcuts ingest). Reference code; port pieces into `mobile/` when needed. | Frozen — don't add features |
 | `supabase/web-prototype/` | Old prototype SQL. Never apply. | Archived |
 
-Phase order: (1) app look ✅ → (2) Supabase + anonymous sign-in → (3) HealthKit sync
-(development build) → (4) AI analysis Edge Function → (5) notifications.
+Phase order: (1) app look ✅ → (2) Supabase + anonymous sign-in → (3) HealthKit sync ✅ code
+(needs a development build) → (4) AI analysis Edge Function ✅ code → (5) sections read Supabase
+→ (6) coins + notifications.
 
 ## Golden rules
 

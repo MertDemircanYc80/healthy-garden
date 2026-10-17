@@ -21,7 +21,10 @@ team agrees — Expo Go on everyone's phone would stop opening the app.
   Fraunces for display text, system font for body). Don't hard-code new colours.
 - Copy: sentence case, plain words, encouraging, never shaming. Health content always says
   it is not medical advice.
-- Before pushing: `npm run typecheck`. To check visuals without a phone: `npm run export:web`,
+- Apple Health code lives in `src/lib/health/`. `healthkit.ts` must keep lazy-loading the native
+  module (never import `@kingstinct/react-native-healthkit` at the top of a file) so Expo Go keeps working.
+  Put logic in `days.ts` (pure, tested by `npm run check`).
+- Before pushing: `npm run typecheck` and `npm run check`. To check visuals without a phone: `npm run export:web`,
   serve `dist/`, open at 390×844 (`?hour=10&tab=goals&open=1` sets time/tab for screenshots).
 
 This is an Expo/React Native mobile application. Prioritize mobile-first patterns, performance, and cross-platform compatibility.

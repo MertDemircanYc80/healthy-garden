@@ -28,7 +28,15 @@
       "expo-router",
       "expo-font",
       "expo-splash-screen",
-      "expo-status-bar"
+      "expo-status-bar",
+      [
+        "@kingstinct/react-native-healthkit",
+        {
+          "NSHealthShareUsageDescription": "Healthy Garden reads your steps, sleep, workouts, time in daylight and meals to grow your garden and suggest personal goals.",
+          "NSHealthUpdateUsageDescription": "Healthy Garden does not write to Apple Health.",
+          "background": true
+        }
+      ]
     ],
     "scheme": "healthygarden",
     "splash": {

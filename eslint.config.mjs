@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // The Expo app has its own toolchain.
     "mobile/**",
+    // Supabase Edge Functions are Deno code.
+    "supabase/**",
   ]),
 ]);
 

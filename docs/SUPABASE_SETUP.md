@@ -77,12 +77,59 @@ The schema is `supabase/migrations/20261016120000_app_schema.sql`. Ignore `supab
 
 ---
 
-## Next phase (not now)
+## Part C — AI coach (Edge Function `analyze`) — after Part B is done
 
-- Edge Function `analyze`: loads a user's last 30 `health_days`, asks Claude for personal
-  goals/insights/report/alerts as strict JSON, validates it, writes the rows, pays coins via
-  `coin_events` (unique `ref` = no double pay). Secret: `ANTHROPIC_API_KEY` (set with
-  `supabase secrets set`, never in the repo).
-- Schedule it nightly per user with pg_cron + pg_net, and also call it when the app opens if
-  the last run is older than 12 hours.
+Code: `supabase/functions/analyze/index.ts` + `supabase/functions/_shared/analysis/`.
+Tests: `cd supabase/functions && deno test --allow-env _shared/analysis/` (no keys needed).
+
+How it works: loads the user's last ~30 `health_days` → computes numbered facts in code (averages,
+week-over-week change, late-night vs sleep, feed time vs bedtime, weekday vs weekend…) → asks Claude
+(`claude-sonnet-5-5`, Structured Outputs) to write goals / insights / report summary / alerts that may
+only cite those facts → validates everything (ranges, rounding, no medical or diet-restriction
+language, patterns must cite a real fact) → writes `goals`, `insights`, `reports`, `alerts`, `ai_runs`.
+Goals change once a week (Monday) unless none exist. Without `ANTHROPIC_API_KEY` it still writes a
+sensible starter plan (no AI).
+
+For the person:
+1. Create an Anthropic API key (console.anthropic.com → API keys). Put a monthly spend limit on it.
+2. Make up a long random `CRON_SECRET` (e.g. a password-manager password).
+3. Give both to your AI **only through the CLI prompt below / the dashboard** — never in chat with
+   teammates or in the repo.
+
+For the AI assistant:
+> 1. Set secrets (the user types the values, don't echo them):
+>    `supabase secrets set ANTHROPIC_API_KEY=... CRON_SECRET=...`
+> 2. Deploy: `supabase functions deploy analyze --no-verify-jwt`
+>    (the function verifies user tokens itself so the scheduler can call it with `x-cron-secret`).
+> 3. Smoke test as a user: sign in anonymously with the publishable key, insert 5 `health_days`
+>    rows for that user, call `POST /functions/v1/analyze` with the user's access token, check that
+>    `goals`, `insights`, `reports` and an `ai_runs` row (`status = ok`) appeared. Delete the test user.
+> 4. Schedule it (SQL editor; store the secret in Vault, not in the SQL):
+>    ```sql
+>    create extension if not exists pg_cron;
+>    create extension if not exists pg_net;
+>    select vault.create_secret('<CRON_SECRET>', 'cron_secret');
+>    select vault.create_secret('https://<project-ref>.supabase.co', 'project_url');
+>    -- nightly at 04:00 UTC (9 pm in California) and Monday 13:00 UTC with new weekly goals
+>    select cron.schedule('analyze-nightly', '0 4 * * *', $$
+>      select net.http_post(
+>        url := (select decrypted_secret from vault.decrypted_secrets where name = 'project_url') || '/functions/v1/analyze',
+>        headers := jsonb_build_object('content-type', 'application/json',
+>          'x-cron-secret', (select decrypted_secret from vault.decrypted_secrets where name = 'cron_secret')),
+>        body := '{"weekly": false}'::jsonb);
+>    $$);
+>    select cron.schedule('analyze-weekly', '0 13 * * 1', $$
+>      select net.http_post(
+>        url := (select decrypted_secret from vault.decrypted_secrets where name = 'project_url') || '/functions/v1/analyze',
+>        headers := jsonb_build_object('content-type', 'application/json',
+>          'x-cron-secret', (select decrypted_secret from vault.decrypted_secrets where name = 'cron_secret')),
+>        body := '{"weekly": true}'::jsonb);
+>    $$);
+>    ```
+> 5. Report back which steps succeeded. Never print the secret values.
+
+## Later
+
+- Coins: a `settle` step that pays `reward_coins` into `coin_events` (unique `ref` = no double pay)
+  when a day's goal is met, and updates `gardens.coins` / `streak`.
 - Before a public launch: CAPTCHA on anonymous sign-ins, Sign in with Apple via manual linking.

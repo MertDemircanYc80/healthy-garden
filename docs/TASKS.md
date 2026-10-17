@@ -20,11 +20,13 @@ Roles and folder ownership are in `AGENTS.md`.
 | M1 | Expo app: fixed garden + island with Garden/Goals/Coach/Report/Alerts (demo data) | frontend | Mert + Claude | ✅ Done |
 | M2 | Supabase: apply `20261016120000_app_schema.sql`, anonymous sign-ins, types (docs/SUPABASE_SETUP.md) | backend | | Todo |
 | M3 | App ↔ Supabase: anonymous sign-in on launch, load sections from tables, save plants | backend + frontend | | Todo |
-| M4 | HealthKit sync (development build, `@kingstinct/react-native-healthkit`, background delivery) → `health_days` | integration | | Todo |
-| M5 | Edge Function `analyze` with Claude → goals, insights, report, alerts, coins | backend | | Todo |
-| M6 | Screen time: iOS thresholds (Family Controls) or Shortcuts fallback → `feed_minutes` | integration | | Todo |
+| M4 | HealthKit sync (development build, `@kingstinct/react-native-healthkit`, background delivery) → `health_days` | integration | Mert + Claude | ✅ Code done — needs a development build on an iPhone to test |
+| M5 | Edge Function `analyze` with Claude → goals, insights, report, alerts | backend | Mert + Claude | ✅ Code + tests done — deploy per docs/SUPABASE_SETUP.md Part C |
+| M6 | Screen time: manual entry ✅ (Report → Feed apps today). Later: Family Controls thresholds | integration | | Partly done |
 | M7 | Push notifications for alerts | frontend | | Todo |
 | M8 | Shop + planting in the island (port from web prototype engine) | frontend | | Todo |
+| M9 | Development build on a team iPhone (EAS or Xcode) so Apple Health works | integration | | Todo |
+| M10 | Coins: pay goal rewards into `coin_events`, update garden coins/streak | backend | | Todo |
 
 ## Web prototype board (frozen — kept for reference)
 
