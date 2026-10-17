@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { purchase, emptyInventory } from "../src/lib/market";
 import { createGardenStore, decodeGarden, GARDEN_STORAGE_KEY, initialGarden, type SavedGarden } from "../src/lib/savedGarden";
-import { plantItem, waterPlants, fertilizePlant } from "../src/lib/gardenActions";
+import { plantItem, placePlant, waterPlants, fertilizePlant } from "../src/lib/gardenActions";
 import { nextDay } from "../src/demo/simulation";
 
 function memoryStorage(raw: string | null = null) {
@@ -28,16 +28,16 @@ async function main() {
 
   const storage = memoryStorage();
   const store = createGardenStore(storage);
-  assert.equal((await store.load()).sim.coins, 100);
+  assert.equal((await store.load()).sim.coins, 1000);
   assert.equal(storage.raw(), null, "startup must not overwrite storage");
   const seen: number[] = [];
   const unsubscribe = store.subscribe(s => seen.push(s.sim.coins));
   await store.update(buy);
   await store.update(buy);
-  assert.deepEqual(seen, [80, 60]);
+  assert.deepEqual(seen, [980, 960]);
   unsubscribe();
   const reopened = await createGardenStore(storage).load();
-  assert.equal(reopened.sim.coins, 60);
+  assert.equal(reopened.sim.coins, 960);
   assert.equal(reopened.inventory.flower, 2);
   console.log("✓ purchases update subscribers and survive a new store instance");
 
@@ -52,12 +52,12 @@ async function main() {
 
   storage.failWrites(true);
   await assert.rejects(store.update(buy), /Disk full/);
-  assert.equal((await store.load()).sim.coins, 60);
+  assert.equal((await store.load()).sim.coins, 960);
   assert.equal((await store.load()).inventory.flower, 2);
   await assert.rejects(store.reset(), /Disk full/);
   storage.failWrites(false);
   await store.update(buy);
-  assert.equal((await store.load()).sim.coins, 40);
+  assert.equal((await store.load()).sim.coins, 940);
   console.log("✓ failed saves and resets leave money/inventory intact; later transactions recover");
 
   await store.update(s => ({ ...s, sim: { ...nextDay(s.sim), health: s.sim.health } }));
@@ -141,6 +141,37 @@ async function main() {
   assert.equal(attempts.filter(r => r.status === "fulfilled").length, 1);
   assert.equal((await createGardenStore(plantingStorage).load()).inventory.tree, 0);
   console.log("✓ concurrent use cannot overspend; failed writes preserve supplies and reload restores used counts");
+  const chosen = { col: 4, row: 2 };
+  const placed = placePlant(initialGarden(), "tree", chosen, true);
+  assert.equal(placed.sim.coins, 900);
+  assert.equal(placed.inventory.tree, 0);
+  assert.equal(placed.sim.plants[0].col, 4);
+  assert.equal(placed.sim.plants[0].row, 2);
+  assert.throws(() => placePlant(placed, "flower", chosen, true), /already planted/);
+  assert.equal(placed.sim.coins, 900, "occupied plots never spend gold");
+  const ownedPlant = initialGarden(); ownedPlant.inventory.flower = 1;
+  assert.equal(placePlant(ownedPlant, "flower", chosen, true).sim.coins, 1000, "prefer owned stock over purchasing");
+  assert.throws(() => placePlant(initialGarden(), "flower", chosen, false), /None left/);
+  for (const invalidPlot of [{ col: -1, row: 0 }, { col: 6, row: 0 }, { col: 0, row: 4 }, { col: 0.5, row: 1 }]) {
+    assert.throws(() => placePlant(initialGarden(), "flower", invalidPlot, true), /valid garden plot/);
+  }
+  const poor = initialGarden(); poor.sim.coins = 19;
+  assert.throws(() => placePlant(poor, "flower", chosen, true), /Not enough money/);
+  const placementStorage = memoryStorage();
+  const placementStore = createGardenStore(placementStorage);
+  placementStorage.failWrites(true);
+  await assert.rejects(placementStore.update(s => placePlant(s, "tree", chosen, true)), /Disk full/);
+  assert.equal((await placementStore.load()).sim.coins, 1000);
+  assert.deepEqual((await placementStore.load()).sim.plants, []);
+  placementStorage.failWrites(false);
+  const doubleTap = await Promise.allSettled(Array.from({ length: 5 }, () => placementStore.update(s => placePlant(s, "tree", chosen, true))));
+  assert.equal(doubleTap.filter(r => r.status === "fulfilled").length, 1);
+  const restoredPlacement = await createGardenStore(placementStorage).load();
+  assert.equal(restoredPlacement.sim.coins, 900);
+  assert.equal(restoredPlacement.sim.plants.length, 1);
+  assert.equal(restoredPlacement.sim.plants[0].col, chosen.col);
+  assert.equal(restoredPlacement.sim.plants[0].row, chosen.row);
+  console.log("✓ selected plots, buy-and-plant, owned stock, invalid/occupied plots, failed writes, and repeated taps are atomic");
   console.log("All market checks passed");
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });

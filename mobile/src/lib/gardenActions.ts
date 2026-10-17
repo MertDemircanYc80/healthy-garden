@@ -1,5 +1,6 @@
 import type { Plant, Species, Stage } from "@/types";
-import type { ItemId } from "./market";
+import { purchase, type ItemId } from "./market";
+import { GARDEN_PLOTS, GARDEN_SIZE, type GardenPlot } from "./gardenPlots";
 import type { SavedGarden } from "./savedGarden";
 
 export class GardenActionError extends Error {}
@@ -8,15 +9,33 @@ export const PLANT_SPECIES: Partial<Record<ItemId, Species>> = {
 };
 const STAGES: Stage[] = ["seed", "sprout", "young", "mature", "blooming"];
 
-export function plantItem(state: SavedGarden, item: ItemId): SavedGarden {
+export function plantItem(state: SavedGarden, item: ItemId, requestedPlot?: GardenPlot): SavedGarden {
   const species = PLANT_SPECIES[item];
   if (!species) throw new GardenActionError("Choose a flower or tree to plant.");
   if (state.inventory[item] < 1) throw new GardenActionError("None left to plant. Visit the Market.");
-  const spot = Array.from({ length: 24 }, (_, i) => ({ col: i % 6, row: Math.floor(i / 6) }))
-    .find(s => !state.sim.plants.some(p => p.col === s.col && p.row === s.row));
+  if (requestedPlot && (!Number.isInteger(requestedPlot.col) || !Number.isInteger(requestedPlot.row) ||
+    requestedPlot.col < 0 || requestedPlot.col >= GARDEN_SIZE.cols || requestedPlot.row < 0 || requestedPlot.row >= GARDEN_SIZE.rows)) {
+    throw new GardenActionError("Choose a valid garden plot.");
+  }
+  const spot = requestedPlot ?? GARDEN_PLOTS.find(s => !state.sim.plants.some(p => p.col === s.col && p.row === s.row));
   if (!spot) throw new GardenActionError("Your garden is full.");
+  if (state.sim.plants.some(p => p.col === spot.col && p.row === spot.row)) throw new GardenActionError("That plot is already planted. Choose an empty plot.");
   const plant: Plant = { id: `plot-${spot.col}-${spot.row}`, ...spot, species, stage: "seed", growth: 0, wateredToday: false, resting: false };
   return { ...state, inventory: { ...state.inventory, [item]: state.inventory[item] - 1 }, sim: { ...state.sim, plants: [...state.sim.plants, plant] } };
+}
+
+/** A single saved transaction: buy only if requested and unowned, then plant in the chosen plot. */
+export function placePlant(state: SavedGarden, item: ItemId, plot: GardenPlot, buyIfNeeded: boolean): SavedGarden {
+  let prepared = state;
+  if (buyIfNeeded && state.inventory[item] === 0) {
+    try {
+      const bought = purchase(state.sim.coins, state.inventory, item);
+      prepared = { ...state, sim: { ...state.sim, coins: bought.coins }, inventory: bought.inventory };
+    } catch (error) {
+      throw new GardenActionError(error instanceof Error ? error.message : "Couldn’t buy this plant.");
+    }
+  }
+  return plantItem(prepared, item, plot);
 }
 
 /** One can per thirsty plant. Bulk watering stops when the available cans run out. */

@@ -6,7 +6,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { COACH_SOURCE, coachInsights, coachReport, dateLabel, dayAt, goalsAt, MAX_OFFSET, nextDay, type DemoDay } from "@/demo/simulation";
-import { GardenActionError, plantItem, waterPlants, fertilizePlant as applyFertilizer } from "@/lib/gardenActions";
+import { GardenActionError, plantItem, placePlant, waterPlants, fertilizePlant as applyFertilizer } from "@/lib/gardenActions";
+import type { GardenPlot } from "@/lib/gardenPlots";
 import { goalProgress } from "@/lib/format";
 import { STARTING_COINS, purchase, type Inventory, type ItemId } from "@/lib/market";
 import { createGardenStore, initialGarden, type SavedGarden } from "@/lib/savedGarden";
@@ -39,6 +40,7 @@ interface AppState {
   waterAll: () => Promise<ActionResult>;
   plantOwnedItem: (id: ItemId) => Promise<ActionResult>;
   fertilizePlant: (id: string) => Promise<ActionResult>;
+  plantInPlot: (id: ItemId, plot: GardenPlot, buyIfNeeded: boolean) => Promise<ActionResult>;
   dismissInsight: (id: string) => void;
   markAlertsRead: () => void;
 }
@@ -112,6 +114,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
   const waterPlant = useCallback((id: string) => gardenAction(s => waterPlants(s, id), "Plant watered. Used 1 watering can."), [gardenAction]);
   const waterAll = useCallback(() => gardenAction(s => waterPlants(s), "Watered as many thirsty plants as your watering cans allowed."), [gardenAction]);
   const plantOwnedItem = useCallback((id: ItemId) => gardenAction(s => plantItem(s, id), "Planted in your garden. Used 1 from inventory."), [gardenAction]);
+  const plantInPlot = useCallback((id: ItemId, plot: GardenPlot, buyIfNeeded: boolean) => gardenAction(s => placePlant(s, id, plot, buyIfNeeded), "Planted in your chosen plot."), [gardenAction]);
   const fertilizePlant = useCallback((id: string) => gardenAction(s => applyFertilizer(s, id), "Growth boosted. Used 1 fertilizer."), [gardenAction]);
   const dismissInsight = useCallback((id: string) => setInsights((xs) => xs.map((x) => (x.id === id ? { ...x, dismissed: true } : x))), []);
   const markAlertsRead = useCallback(() => setSim((s) => ({ ...s, alerts: s.alerts.map((x) => ({ ...x, read: true })) })), [setSim]);
@@ -152,11 +155,12 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       waterPlant,
       waterAll,
       plantOwnedItem,
+      plantInPlot,
       fertilizePlant,
       dismissInsight,
       markAlertsRead,
     };
-  }, [sim, inventory, buyItem, resetData, goals, insights, goNext, reset, waterPlant, waterAll, plantOwnedItem, fertilizePlant, dismissInsight, markAlertsRead]);
+  }, [sim, inventory, buyItem, resetData, goals, insights, goNext, reset, waterPlant, waterAll, plantOwnedItem, plantInPlot, fertilizePlant, dismissInsight, markAlertsRead]);
 
   if (!saved) return (
     <View style={{ flex: 1, backgroundColor: C.pine, padding: 28, justifyContent: "center", gap: 18 }}>

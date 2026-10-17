@@ -109,3 +109,5 @@ cut every stretch item.
 | M14 | Restore money icon to original top-right header position, retaining Market navigation | frontend | Codex (user requested) | ✅ Done |
 
 | M15 | Empty 100-gold start, planting, and limited water/fertilizer inventory | frontend | Codex (user requested) | ✅ Done |
+
+| M16 | Highlight selectable empty plots, plant picker with buy-and-plant, and 1,000 starting gold | frontend | Codex (user requested) | ✅ Done |

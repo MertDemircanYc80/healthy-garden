@@ -9,7 +9,7 @@ export const MARKET_ITEMS = [
 
 export type ItemId = (typeof MARKET_ITEMS)[number]["id"];
 export type Inventory = Record<ItemId, number>;
-export const STARTING_COINS = 100;
+export const STARTING_COINS = 1000;
 export const emptyInventory = (): Inventory => ({ flower: 0, lavender: 0, sunflower: 0, tree: 0, fertilizer: 0, watering_can: 0 });
 
 export function purchase(coins: number, inventory: Inventory, id: ItemId) {

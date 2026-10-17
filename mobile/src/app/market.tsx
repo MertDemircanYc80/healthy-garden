@@ -85,7 +85,7 @@ export default function Market() {
             <Text style={{ color: C.mist, fontSize: T.body }}>{item.name}</Text>
             <Text accessibilityLabel={`${item.name}: ${inventory[item.id]} owned`} style={{ color: C.moss, fontWeight: "700" }}>× {inventory[item.id]}</Text>
           </View>)}
-          <Text style={[styles.muted, { marginTop: 14 }]}>Plant flowers and trees from the Garden panel. Each plant uses one owned item. Watering uses one can per plant; fertilizing uses one fertilizer per boost.</Text>
+          <Text style={[styles.muted, { marginTop: 14 }]}>Tap a highlighted + plot in the garden to choose where to plant. Each plant uses one owned item. Watering uses one can per plant; fertilizing uses one fertilizer per boost.</Text>
         </View>
 
         <View style={styles.reset}>

@@ -6,6 +6,8 @@ import { useState } from "react";
 import { Platform, Pressable, Text, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { GardenScene, phaseFor } from "@/components/garden/GardenScene";
+import { PlantingSheet } from "@/components/PlantingSheet";
+import type { GardenPlot } from "@/lib/gardenPlots";
 import { DemoSheet } from "@/components/DemoSheet";
 import { CoinIcon } from "@/components/Icons";
 import { Island, type TabKey } from "@/components/island/Island";
@@ -31,6 +33,7 @@ export default function Home() {
 
   const [tab, setTab] = useState<TabKey>(TABS.includes(params.tab as TabKey) ? (params.tab as TabKey) : "garden");
   const [expanded, setExpanded] = useState(params.open === "1");
+  const [selectedPlot, setSelectedPlot] = useState<GardenPlot | null>(null);
   const [selected, setSelected] = useState<Plant | null>(null);
 
   const hour = params.hour !== undefined && !Number.isNaN(Number(params.hour)) ? Number(params.hour) : new Date().getHours();
@@ -79,6 +82,8 @@ export default function Home() {
           hour={hour}
           selectedId={selected?.id}
           onPlantPress={onPlantPress}
+          selectedPlot={selectedPlot}
+          onEmptyPlotPress={plot => { setSelected(null); setTab("garden"); setExpanded(false); setSelectedPlot(plot); }}
         />
       </View>
 
@@ -145,13 +150,14 @@ export default function Home() {
           setExpanded((e) => !e);
         }}
       >
-        {tab === "garden" && <GardenSection selected={selected} onClearSelection={() => setSelected(null)} onSelect={onPlantPress} />}
+        {tab === "garden" && <GardenSection selected={selected} onClearSelection={() => setSelected(null)} onSelect={onPlantPress} onChooseSpot={() => { setSelected(null); setExpanded(false); }} />}
         {tab === "goals" && <GoalsSection />}
         {tab === "coach" && <CoachSection />}
         {tab === "report" && <ReportSection />}
         {tab === "alerts" && <AlertsSection />}
       </Island>
 
+      {selectedPlot && <PlantingSheet key={`${selectedPlot.col}-${selectedPlot.row}`} plot={selectedPlot} onClose={() => setSelectedPlot(null)} />}
       <DemoSheet open={demoOpen} onClose={() => setDemoOpen(false)} />
     </View>
   );

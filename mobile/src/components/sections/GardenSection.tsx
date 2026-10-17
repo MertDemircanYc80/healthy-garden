@@ -24,8 +24,8 @@ const NAMES: Record<Species, string> = {
 
 const STAGE: Record<Stage, string> = { seed: "Seed", sprout: "Sprout", young: "Growing", mature: "Budding", blooming: "In bloom" };
 
-export function GardenSection({ selected, onClearSelection, onSelect }: { selected: Plant | null; onClearSelection: () => void; onSelect: (plant: Plant) => void }) {
-  const { today, goals, plants, inventory, waterAll, waterPlant, plantOwnedItem, fertilizePlant } = useApp();
+export function GardenSection({ selected, onClearSelection, onSelect, onChooseSpot }: { selected: Plant | null; onClearSelection: () => void; onSelect: (plant: Plant) => void; onChooseSpot: () => void }) {
+  const { today, goals, plants, inventory, waterAll, waterPlant, fertilizePlant } = useApp();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -91,6 +91,11 @@ export function GardenSection({ selected, onClearSelection, onSelect }: { select
 
   return (
     <View>
+      <Text style={u.sectionTitle}>{plants.length === 0 ? "Your garden is ready" : "Make room to grow"}</Text>
+      <Text style={u.muted}>Tap a highlighted + plot above to choose a plant. You can use an owned plant or buy and plant directly.</Text>
+      <Pressable accessibilityRole="button" disabled={plants.length >= 24} onPress={() => { setMessage("Tap any highlighted + plot in the garden above."); onChooseSpot(); }} style={{ backgroundColor: plants.length >= 24 ? C.pineLine : C.moss, borderRadius: R.pill, padding: 12, alignItems: "center", marginVertical: 12 }}>
+        <Text style={{ color: C.pine, fontWeight: "700" }}>{plants.length >= 24 ? "Garden full" : "Choose a planting spot"}</Text>
+      </Pressable>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
         <Ring value={today.sunlight} size={62}>
           <Text style={{ color: C.mist, fontFamily: F.display, fontSize: 18 }}>{Math.round(today.sunlight * 100)}</Text>
@@ -132,13 +137,10 @@ export function GardenSection({ selected, onClearSelection, onSelect }: { select
       </Pressable>
       {supplies}
       {feedback}
-      {!plants.length && <Text style={[u.muted, { marginTop: 14 }]}>Your garden is empty. Buy a flower or tree in the Market, then plant it below.</Text>}
+      {!plants.length && <Text style={[u.muted, { marginTop: 14 }]}>Empty inventory? Tap a + plot to buy and plant in one step.</Text>}
       <Text style={[u.h, { marginTop: 18 }]}>Ready to plant</Text>
       {MARKET_ITEMS.filter(item => item.category === "Plants").map(item => <View key={item.id} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: 10 }}>
         <Text style={[u.muted, { flex: 1 }]}>{item.icon} {item.name}: {inventory[item.id]} left</Text>
-        <Pressable accessibilityRole="button" accessibilityLabel={`Plant ${item.name}`} disabled={busy || !inventory[item.id] || plants.length >= 24} onPress={() => { void act(() => plantOwnedItem(item.id)); }} style={{ padding: 12, borderRadius: R.pill, backgroundColor: inventory[item.id] && plants.length < 24 ? C.moss : C.pineLine }}>
-          <Text style={{ color: inventory[item.id] && plants.length < 24 ? C.pine : C.fern }}>{plants.length >= 24 ? "Full" : "Plant"}</Text>
-        </Pressable>
       </View>)}
       {plants.length > 0 && <Text style={[u.h, { marginTop: 18 }]}>In your garden</Text>}
       {plants.map(plant => <Pressable key={plant.id} accessibilityRole="button" accessibilityLabel={`Care for ${NAMES[plant.species]}, plot ${plant.row * 6 + plant.col + 1}`} onPress={() => { setMessage(""); onSelect(plant); }} style={{ paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.pineLine }}>
