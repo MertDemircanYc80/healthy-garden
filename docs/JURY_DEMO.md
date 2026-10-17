@@ -1,5 +1,7 @@
 # Healthy Garden · jury preview
 
+[Türkçe çekim rehberi ve AI durumu](DEMO_TR.md) · [Türkçe veri açıklaması](../datasets/README_TR.md)
+
 Branch: **`demo/jury-month`**. The original version stays on `main`. Do not merge this preview just to try it.
 
 ## Try without changing an existing checkout

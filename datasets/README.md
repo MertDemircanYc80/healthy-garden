@@ -1,5 +1,7 @@
 # Jury replay: 30 days, with provenance
 
+[Turkish jury overview / Türkçe veri açıklaması](README_TR.md) · [Türkçe demo çekim rehberi](../docs/DEMO_TR.md)
+
 This is a **hybrid demonstration**, not a measured Healthy Garden intervention.
 The app starts empty. The first 7 days load only when the presenter chooses **Load first 7 days**.
 The next 23 days become visible one at a time. No future observations are passed to a coach analysis.
