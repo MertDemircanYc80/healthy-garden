@@ -4,13 +4,15 @@
 // Later: the same shapes load from Supabase (goals, insights, reports, alerts, gardens).
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, AppState as RNAppState, Pressable, Text, View } from "react-native";
 import { COACH_SOURCE, coachInsights, coachReport, dateLabel, dayAt, goalsAt, MAX_OFFSET, nextDay, type DemoDay } from "@/demo/simulation";
 import { GardenActionError, plantItem, placePlant, waterPlants, fertilizePlant as applyFertilizer } from "@/lib/gardenActions";
 import type { GardenPlot } from "@/lib/gardenPlots";
 import { goalProgress } from "@/lib/format";
 import { STARTING_COINS, purchase, type Inventory, type ItemId } from "@/lib/market";
 import { createGardenStore, initialGarden, type SavedGarden } from "@/lib/savedGarden";
+import { localDay } from "@/lib/health/days";
+import { DEMO_GARDEN_KEY, MODE_KEY, initialPersonalGarden, rollGardenDay } from "@/lib/dailyCycle";
 import { C } from "@/theme";
 import type { Alert, Goal, Insight, Plant, Report, Today } from "@/types";
 
@@ -26,6 +28,8 @@ interface DemoControls {
 type ActionResult = { ok: boolean; message: string };
 
 interface AppState {
+  isDemo: boolean;
+  switchMode: () => Promise<void>;
   today: Today;
   plants: Plant[];
   goals: Goal[];
@@ -51,7 +55,10 @@ const START = initialGarden();
 const REPORT = coachReport();
 
 export function AppStateProvider({ children }: { children: React.ReactNode }) {
-  const [store] = useState(() => createGardenStore(AsyncStorage));
+  const [stores] = useState(() => ({ personal: createGardenStore(AsyncStorage, undefined, initialPersonalGarden), demo: createGardenStore(AsyncStorage, DEMO_GARDEN_KEY) }));
+  const [mode, setMode] = useState<"personal" | "demo" | null>(null);
+  const store = stores[mode ?? "personal"];
+  const isDemo = mode === "demo";
   const [saved, setSaved] = useState<SavedGarden | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [saveError, setSaveError] = useState(false);
@@ -62,10 +69,31 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let active = true;
+    if (!mode) {
+      AsyncStorage.getItem(MODE_KEY).then(value => { if (active) setMode(value === "demo" ? "demo" : "personal"); }).catch(() => { if (active) setLoadError(true); });
+      return () => { active = false; };
+    }
     const unsubscribe = store.subscribe(state => { if (active) setSaved(state); });
     store.load().then(state => { if (active) setSaved(state); }).catch(() => { if (active) setLoadError(true); });
     return () => { active = false; unsubscribe(); };
-  }, [store]);
+  }, [store, mode]);
+
+  const switchMode = useCallback(async () => {
+    try {
+      const next = isDemo ? "personal" : "demo";
+      await stores[next].load();
+      await AsyncStorage.setItem(MODE_KEY, next);
+      setSaved(null); setMode(next); setLoadError(false);
+    } catch { setSaveError(true); }
+  }, [isDemo, stores]);
+  useEffect(() => {
+    if (mode !== "personal") return;
+    const tick = () => { void store.update(s => rollGardenDay(s, localDay(new Date()))).catch(() => setSaveError(true)); };
+    tick();
+    const timer = setInterval(tick, 15000);
+    const sub = RNAppState.addEventListener("change", s => { if (s === "active") tick(); });
+    return () => { clearInterval(timer); sub.remove(); };
+  }, [store, mode]);
 
   const setSim = useCallback((change: (s: SavedGarden["sim"]) => SavedGarden["sim"]) => {
     void store.update(state => ({ ...state, sim: change(state.sim) }))
@@ -100,17 +128,17 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     }
   }, [store]);
 
-  const goals = useMemo(() => goalsAt(sim.offset), [sim.offset]);
+  const goals = useMemo(() => isDemo ? goalsAt(sim.offset) : [], [sim.offset, isDemo]);
 
   const gardenAction = useCallback(async (change: (state: SavedGarden) => SavedGarden, message: string): Promise<ActionResult> => {
     try {
-      await store.update(change);
+      await store.update(state => change(isDemo ? state : rollGardenDay(state, localDay(new Date()))));
       setSaveError(false);
       return { ok: true, message };
     } catch (error) {
       return { ok: false, message: error instanceof GardenActionError ? error.message : "Couldn’t save that action. No items were used. Please try again." };
     }
-  }, [store]);
+  }, [store, isDemo]);
   const waterPlant = useCallback((id: string) => gardenAction(s => waterPlants(s, id), "Plant watered. Used 1 watering can."), [gardenAction]);
   const waterAll = useCallback(() => gardenAction(s => waterPlants(s), "Watered as many thirsty plants as your watering cans allowed."), [gardenAction]);
   const plantOwnedItem = useCallback((id: ItemId) => gardenAction(s => plantItem(s, id), "Planted in your garden. Used 1 from inventory."), [gardenAction]);
@@ -121,12 +149,12 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
 
   const goNext = useCallback(
     () =>
-      setSim((s) => {
+      isDemo && setSim((s) => {
         const g = goalsAt(s.offset);
         const sunlight = g.length ? g.reduce((sum, x) => sum + goalProgress(x), 0) / g.length : 0;
         return { ...nextDay(s), health: Math.min(1, s.health * 0.7 + sunlight * 0.3) };
       }),
-    [setSim],
+    [setSim, isDemo],
   );
   const reset = useCallback(() => {
     void resetData();
@@ -135,20 +163,21 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<AppState>(() => {
     const sunlight = goals.length ? goals.reduce((s, g) => s + goalProgress(g), 0) / goals.length : 0;
     return {
+      isDemo, switchMode,
       today: { sunlight, health: sim.health, coins: sim.coins, streak: sim.streak },
       inventory,
       buyItem,
       resetData,
       plants: sim.plants,
       goals,
-      insights,
-      report: REPORT,
+      insights: isDemo ? insights : [],
+      report: isDemo ? REPORT : { periodLabel: "Your data", score: 0, scoreChange: 0, summary: "Your report will use the health data saved on this device. Not medical advice.", metrics: [] },
       alerts: sim.alerts,
       demo: {
-        dateLabel: dateLabel(sim.offset),
-        day: dayAt(sim.offset),
-        canGoForward: sim.offset < MAX_OFFSET,
-        coachSource: COACH_SOURCE,
+        dateLabel: isDemo ? dateLabel(sim.offset) : saved?.calendarDate ?? localDay(new Date()),
+        day: isDemo ? dayAt(sim.offset) : undefined,
+        canGoForward: isDemo && sim.offset < MAX_OFFSET,
+        coachSource: isDemo ? COACH_SOURCE : "your saved health data",
         nextDay: goNext,
         reset,
       },
@@ -160,7 +189,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       dismissInsight,
       markAlertsRead,
     };
-  }, [sim, inventory, buyItem, resetData, goals, insights, goNext, reset, waterPlant, waterAll, plantOwnedItem, plantInPlot, fertilizePlant, dismissInsight, markAlertsRead]);
+  }, [isDemo, switchMode, saved?.calendarDate, sim, inventory, buyItem, resetData, goals, insights, goNext, reset, waterPlant, waterAll, plantOwnedItem, plantInPlot, fertilizePlant, dismissInsight, markAlertsRead]);
 
   if (!saved) return (
     <View style={{ flex: 1, backgroundColor: C.pine, padding: 28, justifyContent: "center", gap: 18 }}>

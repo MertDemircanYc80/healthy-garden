@@ -4,6 +4,7 @@ import { emptyInventory, MARKET_ITEMS, STARTING_COINS, type Inventory } from "./
 export const GARDEN_STORAGE_KEY = "healthgarden:game:v1";
 export interface SavedGarden {
   version: 1;
+  calendarDate?: string;
   sim: DemoState & { health: number };
   inventory: Inventory;
 }
@@ -32,7 +33,7 @@ export function decodeGarden(raw: string): SavedGarden {
     const alertsValid = Array.isArray(s.alerts) && s.alerts.every(a => record(a) &&
       ["id", "title", "body", "time"].every(k => typeof a[k] === "string") &&
       ["nudge", "heads_up", "celebrate"].includes(String(a.level)) && typeof a.read === "boolean");
-    if (count(s.coins) && count(s.offset) && s.offset <= MAX_OFFSET && count(s.streak) && fraction(s.health) &&
+    if ((v.calendarDate === undefined || (typeof v.calendarDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v.calendarDate))) && count(s.coins) && count(s.offset) && s.offset <= MAX_OFFSET && count(s.streak) && fraction(s.health) &&
         plantsValid && alertsValid && MARKET_ITEMS.every(item => count(inventory[item.id]))) {
       return v as unknown as SavedGarden;
     }
@@ -43,7 +44,7 @@ export function decodeGarden(raw: string): SavedGarden {
 interface Storage { getItem(key: string): Promise<string | null>; setItem(key: string, value: string): Promise<void> }
 
 /** Serialize all mutations and publish only after saving the complete snapshot succeeds. */
-export function createGardenStore(storage: Storage) {
+export function createGardenStore(storage: Storage, key = GARDEN_STORAGE_KEY, initialize = initialGarden) {
   let current: SavedGarden | null = null;
   let loading: Promise<SavedGarden> | null = null;
   let queue: Promise<unknown> = Promise.resolve();
@@ -55,7 +56,7 @@ export function createGardenStore(storage: Storage) {
   };
   const load = (): Promise<SavedGarden> => {
     if (current) return Promise.resolve(current);
-    loading ??= storage.getItem(GARDEN_STORAGE_KEY).then(raw => publish(raw === null ? initialGarden() : decodeGarden(raw))).finally(() => { loading = null; });
+    loading ??= storage.getItem(key).then(raw => publish(raw === null ? initialize() : decodeGarden(raw))).finally(() => { loading = null; });
     return loading;
   };
   const enqueue = (operation: () => Promise<SavedGarden>) => {
@@ -71,14 +72,14 @@ export function createGardenStore(storage: Storage) {
         const previous = await load();
         const next = change(previous);
         if (next === previous) return previous;
-        await storage.setItem(GARDEN_STORAGE_KEY, JSON.stringify(next));
+        await storage.setItem(key, JSON.stringify(next));
         return publish(next);
       });
     },
     reset() {
       return enqueue(async () => {
-        const next = initialGarden();
-        await storage.setItem(GARDEN_STORAGE_KEY, JSON.stringify(next));
+        const next = initialize();
+        await storage.setItem(key, JSON.stringify(next));
         return publish(next);
       });
     },

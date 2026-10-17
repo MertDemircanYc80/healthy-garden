@@ -28,7 +28,7 @@ export default function Home() {
   const params = useLocalSearchParams<{ hour?: string; tab?: string; open?: string }>();
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const { today, plants, alerts, demo } = useApp();
+  const { today, plants, alerts, demo, isDemo } = useApp();
   const [demoOpen, setDemoOpen] = useState(false);
 
   const [tab, setTab] = useState<TabKey>(TABS.includes(params.tab as TabKey) ? (params.tab as TabKey) : "garden");
@@ -97,7 +97,7 @@ export default function Home() {
           <Pressable
             onPress={() => setDemoOpen(true)}
             accessibilityRole="button"
-            accessibilityLabel={`Sample data, ${demo.dateLabel}. Open demo controls`}
+            accessibilityLabel={`${isDemo ? "Sample data" : "My garden"}, ${demo.dateLabel}. Open garden settings`}
             style={({ pressed }) => ({
               alignSelf: "flex-start",
               marginTop: 8,
@@ -112,7 +112,7 @@ export default function Home() {
             })}
           >
             <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: C.sun }} />
-            <Text style={{ fontSize: T.tiny, fontWeight: "700", color: night ? C.mist : C.pine }}>Sample data, {demo.dateLabel}</Text>
+            <Text style={{ fontSize: T.tiny, fontWeight: "700", color: night ? C.mist : C.pine }}>{isDemo ? "Sample data" : "My garden"}, {demo.dateLabel}</Text>
           </Pressable>
         </View>
       </View>

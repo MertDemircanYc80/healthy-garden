@@ -7,15 +7,15 @@ import { useApp } from "@/state/AppState";
 import { C, F, R, T } from "@/theme";
 
 export function DemoSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { demo, today } = useApp();
+  const { demo, today, isDemo, switchMode } = useApp();
   const [confirmReset, setConfirmReset] = useState(false);
   return (
     <Modal visible={open} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: "rgba(8,20,12,0.45)", justifyContent: "flex-end", padding: 12 }} onPress={onClose} accessibilityLabel="Close demo controls">
         <Pressable onPress={() => {}} style={{ backgroundColor: C.pine, borderRadius: R.island, padding: 22, paddingBottom: 26 }}>
-          <Text style={{ color: C.mist, fontFamily: F.display, fontSize: T.title }}>Demo week</Text>
+          <Text style={{ color: C.mist, fontFamily: F.display, fontSize: T.title }}>{isDemo ? "Demo week" : "Garden settings"}</Text>
           <Text style={[u.muted, { marginTop: 6 }]}>
-            This is sample data for a demo persona — 30 days of phone and watch data. On a real iPhone it comes from Apple Health.
+            {isDemo ? "This garden uses sample data. Its gold and plants are kept separate from your personal garden." : "Your garden follows your local calendar. Watering and fertilizer become available each new day, including after reopening the app."}
           </Text>
           <Text style={[u.muted, { marginTop: 8 }]}>Goals and suggestions written by: {demo.coachSource}.</Text>
 
@@ -24,7 +24,10 @@ export function DemoSheet({ open, onClose }: { open: boolean; onClose: () => voi
             <Text style={u.muted}>{today.coins} coins</Text>
           </View>
 
-          <Pressable
+          <Pressable accessibilityRole="button" onPress={() => { void switchMode().then(onClose); }} style={{ paddingVertical: 14 }}>
+            <Text style={{ color: C.moss, fontWeight: "700" }}>{isDemo ? "Return to my garden" : "Try the sample garden"}</Text>
+          </Pressable>
+          {isDemo && <><Pressable
             disabled={!demo.canGoForward}
             onPress={() => {
               demo.nextDay();
@@ -45,7 +48,7 @@ export function DemoSheet({ open, onClose }: { open: boolean; onClose: () => voi
           </Pressable>
           <Text style={[u.muted, { marginTop: 8, textAlign: "center" }]}>
             Finishes today: pays coins for goals hit and grows the plants you watered.
-          </Text>
+          </Text></>}
 
           <Pressable
             onPress={() => {
