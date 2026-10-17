@@ -144,3 +144,11 @@ it creates two synthetic users inside a transaction and rolls all fixtures back.
 It checks cross-user reads/inserts/updates/deletes, anonymous access, ownership changes,
 and malformed totals. The migration and SQL checks have not yet been run on the hosted
 project; mobile validation tests do not substitute for these database tests.
+
+Apply `supabase/migrations/20261017020000_health_privacy.sql` next. It adds
+owner-only deletion/reconnect RPCs and blocks new health-derived writes while deletion
+has disabled syncing (including coach work already in flight). Run
+`supabase/tests/health_privacy.sql` in a development project to check isolation,
+anonymous denial, deletion, reconnect and upsert compatibility. These SQL tests still
+require a connected PostgreSQL/Supabase management session; they are not part of the
+mobile JavaScript checks. No service-role key is needed by the app.

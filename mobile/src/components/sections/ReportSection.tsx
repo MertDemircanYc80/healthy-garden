@@ -1,6 +1,7 @@
 // Island → Report: the weekly health report.
 import { Text, View } from "react-native";
 import { Card, Ring, SectionTitle, WeekBars, styles as u } from "@/components/ui";
+import { PrivacyControls } from "@/components/PrivacyControls";
 import { DataSources } from "./DataSources";
 import { useApp } from "@/state/AppState";
 import { C, F, T } from "@/theme";
@@ -17,6 +18,7 @@ export function ReportSection() {
     <View>
       <SectionTitle title="Health report" hint={report.periodLabel} />
       <DataSources />
+      <PrivacyControls />
       {isDemo ? <Card style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
         <Ring value={report.score / 100} size={84} stroke={8} color={C.moss}>
           <Text style={{ color: C.mist, fontFamily: F.display, fontSize: 26 }}>{report.score}</Text>

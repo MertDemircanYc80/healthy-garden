@@ -32,6 +32,7 @@ type ActionResult = { ok: boolean; message: string };
 interface AppState {
   isDemo: boolean;
   switchMode: () => Promise<void>;
+  clearPersonalGoals: () => Promise<void>;
   today: Today;
   plants: Plant[];
   goals: Goal[];
@@ -97,6 +98,10 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     const sub = RNAppState.addEventListener("change", s => { if (s === "active") tick(); });
     return () => { clearInterval(timer); sub.remove(); };
   }, [store, mode, health.days, health.ready]);
+
+  const clearPersonalGoals = useCallback(async () => {
+    await stores.personal.update(s => ({ ...s, personal: { startedOn: localDay(new Date()), weeks: {}, rewarded: s.personal?.rewarded ?? [] }, sim: { ...s.sim, health: 0, streak: 0, alerts: [] } }));
+  }, [stores]);
 
   const setSim = useCallback((change: (s: SavedGarden["sim"]) => SavedGarden["sim"]) => {
     void store.update(state => ({ ...state, sim: change(state.sim) }))
@@ -166,7 +171,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<AppState>(() => {
     const sunlight = goals.length ? goals.reduce((s, g) => s + goalProgress(g), 0) / goals.length : 0;
     return {
-      isDemo, switchMode,
+      isDemo, switchMode, clearPersonalGoals,
       today: { sunlight, health: sim.health, coins: sim.coins, streak: sim.streak },
       inventory,
       buyItem,
@@ -192,7 +197,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       dismissInsight,
       markAlertsRead,
     };
-  }, [health.days.length, isDemo, switchMode, saved?.calendarDate, sim, inventory, buyItem, resetData, goals, insights, goNext, reset, waterPlant, waterAll, plantOwnedItem, plantInPlot, fertilizePlant, dismissInsight, markAlertsRead]);
+  }, [clearPersonalGoals, health.days.length, isDemo, switchMode, saved?.calendarDate, sim, inventory, buyItem, resetData, goals, insights, goNext, reset, waterPlant, waterAll, plantOwnedItem, plantInPlot, fertilizePlant, dismissInsight, markAlertsRead]);
 
   if (!saved) return (
     <View style={{ flex: 1, backgroundColor: C.pine, padding: 28, justifyContent: "center", gap: 18 }}>
