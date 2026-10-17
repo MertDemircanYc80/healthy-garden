@@ -3,7 +3,7 @@
 // The garden behind it never moves.
 import * as Haptics from "expo-haptics";
 import { useEffect, useRef } from "react";
-import { Animated, Platform, Pressable, ScrollView, StyleSheet, Text, View, type ScrollViewInstance } from "react-native";
+import { Animated, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { BellIcon, ChartIcon, ChevronIcon, LeafIcon, SparkIcon, TargetIcon } from "@/components/Icons";
 import { C, R } from "@/theme";
 
@@ -37,7 +37,7 @@ function tap() {
 
 export function Island({ tab, expanded, collapsedHeight, expandedHeight, bottom, badges, onTab, onToggle, children }: Props) {
   const h = useRef(new Animated.Value(expanded ? expandedHeight : collapsedHeight)).current;
-  const scroll = useRef<ScrollViewInstance>(null);
+  const scroll = useRef<ScrollView>(null);
 
   useEffect(() => {
     Animated.spring(h, { toValue: expanded ? expandedHeight : collapsedHeight, useNativeDriver: false, damping: 22, stiffness: 220, mass: 0.9 }).start();

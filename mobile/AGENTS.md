@@ -3,6 +3,11 @@
 Read the repo-root `AGENTS.md` first (team rules, ownership, git workflow). This file adds
 the mobile-specific rules. The Expo guidance below came with the template and still applies.
 
+## SDK version
+We stay on **Expo SDK 57** because the App Store version of Expo Go doesn't support SDK 58
+yet. Do not upgrade the SDK (or run `expo install --fix` against a newer `expo`) until the
+team agrees — Expo Go on everyone's phone would stop opening the app.
+
 ## Product rules for this app
 - The garden (`src/components/garden/`) is a FIXED illustration: same angle, same place, no
   pan/zoom/rotate, no 3D. Keep it calm and simple. Plants are drawn in SVG per species + stage.

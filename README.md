@@ -42,7 +42,7 @@ Game state is saved in the browser (localStorage). Shortcuts sync needs Supabase
 
 ## Stack
 
-App: Expo SDK 58 · React Native · Expo Router · react-native-svg · Supabase (anonymous auth, Postgres, Edge Functions) · Claude API for analysis.
+App: Expo SDK 57 (matches the App Store Expo Go) · React Native · Expo Router · react-native-svg · Supabase (anonymous auth, Postgres, Edge Functions) · Claude API for analysis.
 Web prototype: Next.js 16 · Tailwind v4.
 
 ## Working with AI assistants
