@@ -52,20 +52,27 @@ src/theme.ts                 colours, fonts, sizes
 
 ## Market and saved progress
 
-Tap the money badge below Settings to open the Market. Plants and supplies have Buy
+Tap the money badge in the top-right header to open the Market. Plants and supplies have Buy
 buttons; unaffordable purchases are disabled. Purchases update the shared balance and
-inventory immediately after a successful save. Items stay in inventory; planting and
-consuming supplies are separate future features.
+inventory immediately after a successful save. Tap any highlighted + plot in the garden
+to choose a flower or tree for that exact spot. The picker uses one owned item, or
+offers Buy & plant when none are owned. Buying and planting is one saved transaction;
+an occupied plot or failed save never spends gold. All 24 plots are accessible buttons. Watering consumes one can per thirsty plant; bulk watering stops at
+the number of cans available. Fertilizer adds half a growth stage and consumes one
+unit, at most once per plant per garden day. The saved “Fertilized today” flag
+blocks repeated uses after reload and clears on Next day, just like watering.
+Older saves without the flag remain compatible. Fully grown plants cannot be fertilized. Counts update and persist atomically
+with each action, including rapid taps and storage errors.
 
 Progress uses AsyncStorage on iOS/Android and its localStorage backend on web, under
 `healthgarden:game:v1`. Money, inventory, and garden demo progress are saved together
 on this device; they do not sync through Supabase or across devices. Startup restores
-the saved snapshot before showing the app. Only a missing save uses the initial 460
-coins and empty inventory. Unreadable saves show retry/reset options rather than being
+the saved snapshot before showing the app. Only a missing save uses the initial 1,000
+coins, an empty garden, and empty inventory. Existing saves are preserved. Unreadable saves show retry/reset options rather than being
 silently replaced. Failed writes leave the previous balance and inventory intact.
 
 For testing, open Market → **Reset saved garden** → **Confirm reset**. This restores
-460 coins, clears inventory, and resets garden demo progress, while leaving health and
+1,000 coins, empties the garden and inventory, and resets garden demo progress, while leaving health and
 account data untouched. The demo controls have the same confirmed reset.
 
 Run `npm run check` for purchase, persistence, concurrent mutation, failed storage, and

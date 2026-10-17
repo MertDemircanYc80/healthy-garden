@@ -1,13 +1,15 @@
 // The garden — a fixed, calm, isometric illustration. It never pans, zooms or rotates.
 // The sky follows the time of day; the meadow follows 7-day garden health.
 import { useMemo } from "react";
+import { Pressable, View } from "react-native";
+import { GARDEN_PLOTS, GARDEN_SIZE, plotNumber, type GardenPlot } from "@/lib/gardenPlots";
 import Svg, { Circle, Defs, Ellipse, G, LinearGradient, Path, Polygon, RadialGradient, Rect, Stop } from "react-native-svg";
 import { C } from "@/theme";
 import type { Plant } from "@/types";
 import { mix, shade } from "./color";
 import { PlantArt } from "./Plants";
 
-export const BED = { cols: 6, rows: 4 } as const;
+export const BED = GARDEN_SIZE;
 const VB_W = 400;
 const TILE_W = 64;
 const TILE_H = 32;
@@ -39,9 +41,11 @@ interface Props {
   hour: number;
   selectedId?: string | null;
   onPlantPress?: (p: Plant) => void;
+  onEmptyPlotPress?: (plot: GardenPlot) => void;
+  selectedPlot?: GardenPlot | null;
 }
 
-export function GardenScene({ plants, width, height, bottomCover, topCover, health, hour, selectedId, onPlantPress }: Props) {
+export function GardenScene({ plants, width, height, bottomCover, topCover, health, hour, selectedId, onPlantPress, onEmptyPlotPress, selectedPlot }: Props) {
   const phase = phaseFor(hour);
   const sky = SKY[phase];
   const k = VB_W / width; // screen px → viewBox units
@@ -84,7 +88,10 @@ export function GardenScene({ plants, width, height, bottomCover, topCover, heal
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cx, top, scale]);
 
+  const emptyPlots = GARDEN_PLOTS.filter(plot => !plants.some(p => p.col === plot.col && p.row === plot.row));
+
   return (
+    <View style={{ width, height }}>
     <Svg width={width} height={height} viewBox={`0 0 ${VB_W} ${VB_H}`}>
       <Defs>
         <LinearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
@@ -167,11 +174,21 @@ export function GardenScene({ plants, width, height, bottomCover, topCover, heal
         return <Path key={r} d={`M ${x1} ${y1} L ${x2} ${y2}`} stroke={C.soilDark} strokeWidth={2 * scale} strokeLinecap="round" opacity={0.55} />;
       })}
 
+      {/* Highlight every empty plot; matching accessible press targets sit above the SVG. */}
+      {emptyPlots.map(plot => {
+        const active = selectedPlot?.col === plot.col && selectedPlot.row === plot.row;
+        const [x, y] = iso(plot.col + 0.5, plot.row + 0.5);
+        return <G key={`empty-${plot.col}-${plot.row}`}>
+          <Polygon points={pts(iso(plot.col + 0.08, plot.row + 0.08), iso(plot.col + 0.92, plot.row + 0.08), iso(plot.col + 0.92, plot.row + 0.92), iso(plot.col + 0.08, plot.row + 0.92))} fill={active ? C.sun : C.moss} fillOpacity={active ? 0.4 : 0.18} stroke={active ? C.sun : C.moss} strokeWidth={1.2 * scale} strokeDasharray={active ? undefined : `${3 * scale},${2 * scale}`} />
+          <Path d={`M ${x - 4 * scale} ${y} H ${x + 4 * scale} M ${x} ${y - 4 * scale} V ${y + 4 * scale}`} stroke={active ? C.sun : C.mist} strokeWidth={1.5 * scale} strokeLinecap="round" />
+        </G>;
+      })}
+
       {/* plants, back to front */}
       {sorted.map((p) => {
         const [x, y] = iso(p.col + 0.5, p.row + 0.5);
         return (
-          <G key={p.id} transform={`translate(${x} ${y}) scale(${scale})`} onPress={onPlantPress ? () => onPlantPress(p) : undefined}>
+          <G key={p.id} transform={`translate(${x} ${y}) scale(${scale})`}>
             <PlantArt plant={p} selected={p.id === selectedId} />
           </G>
         );
@@ -219,6 +236,20 @@ export function GardenScene({ plants, width, height, bottomCover, topCover, heal
       })}
 
     </Svg>
+    <View pointerEvents="box-none" style={{ position: "absolute", top: 0, left: 0, width, height }}>
+      {GARDEN_PLOTS.map(plot => {
+        const plant = plants.find(p => p.col === plot.col && p.row === plot.row);
+        const [x, y] = iso(plot.col + 0.5, plot.row + 0.5);
+        const targetW = TILE_W * scale / k * 0.5;
+        const targetH = TILE_H * scale / k * 0.9;
+        return <Pressable key={`plot-${plot.col}-${plot.row}`} accessibilityRole="button"
+          accessibilityLabel={plant ? `Care for plant in plot ${plotNumber(plot)}` : `Plant in empty plot ${plotNumber(plot)}`}
+          accessibilityState={{ selected: selectedPlot?.col === plot.col && selectedPlot.row === plot.row }}
+          onPress={() => plant ? onPlantPress?.(plant) : onEmptyPlotPress?.(plot)}
+          style={{ position: "absolute", left: x / k - targetW / 2, top: y / k - targetH / 2, width: targetW, height: targetH }} />;
+      })}
+    </View>
+    </View>
   );
 }
 

@@ -2,6 +2,7 @@
 import { Modal, Pressable, Text, View } from "react-native";
 import { useState } from "react";
 import { styles as u } from "@/components/ui";
+import { STARTING_COINS } from "@/lib/market";
 import { useApp } from "@/state/AppState";
 import { C, F, R, T } from "@/theme";
 
@@ -55,7 +56,7 @@ export function DemoSheet({ open, onClose }: { open: boolean; onClose: () => voi
             <Text style={{ color: C.fern, fontWeight: "600" }}>Reset saved garden</Text>
           </Pressable>
           {confirmReset && <View style={{ marginTop: 12, gap: 12 }}>
-            <Text style={u.muted}>Clear garden progress and inventory and restore 460 coins?</Text>
+            <Text style={u.muted}>Clear garden progress and inventory and restore {STARTING_COINS} gold with an empty garden?</Text>
             <Pressable accessibilityRole="button" onPress={() => { demo.reset(); setConfirmReset(false); onClose(); }} style={{ paddingVertical: 10 }}><Text style={{ color: C.berry, fontWeight: "700" }}>Confirm reset</Text></Pressable>
             <Pressable accessibilityRole="button" onPress={() => setConfirmReset(false)} style={{ paddingVertical: 10 }}><Text style={{ color: C.mist }}>Cancel</Text></Pressable>
           </View>}
