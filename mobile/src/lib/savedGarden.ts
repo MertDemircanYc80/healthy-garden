@@ -1,4 +1,3 @@
-import { demoPlants } from "@/data/demo";
 import { coachAlerts, MAX_OFFSET, type DemoState } from "@/demo/simulation";
 import { emptyInventory, MARKET_ITEMS, STARTING_COINS, type Inventory } from "./market";
 
@@ -10,7 +9,7 @@ export interface SavedGarden {
 }
 export const initialGarden = (): SavedGarden => ({
   version: 1,
-  sim: { offset: 0, coins: STARTING_COINS, streak: 4, plants: demoPlants.map(p => ({ ...p })), alerts: coachAlerts(), health: 0.72 },
+  sim: { offset: 0, coins: STARTING_COINS, streak: 4, plants: [], alerts: coachAlerts(), health: 0.72 },
   inventory: emptyInventory(),
 });
 

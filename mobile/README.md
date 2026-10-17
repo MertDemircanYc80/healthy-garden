@@ -54,18 +54,21 @@ src/theme.ts                 colours, fonts, sizes
 
 Tap the money badge in the top-right header to open the Market. Plants and supplies have Buy
 buttons; unaffordable purchases are disabled. Purchases update the shared balance and
-inventory immediately after a successful save. Items stay in inventory; planting and
-consuming supplies are separate future features.
+inventory immediately after a successful save. Plant flowers and trees from the Garden panel. Planting uses one owned item and fills
+one of 24 plots. Watering consumes one can per thirsty plant; bulk watering stops at
+the number of cans available. Fertilizer adds half a growth stage and consumes one
+unit. Fully grown plants cannot be fertilized. Counts update and persist atomically
+with each action, including rapid taps and storage errors.
 
 Progress uses AsyncStorage on iOS/Android and its localStorage backend on web, under
 `healthgarden:game:v1`. Money, inventory, and garden demo progress are saved together
 on this device; they do not sync through Supabase or across devices. Startup restores
-the saved snapshot before showing the app. Only a missing save uses the initial 460
-coins and empty inventory. Unreadable saves show retry/reset options rather than being
+the saved snapshot before showing the app. Only a missing save uses the initial 100
+coins, an empty garden, and empty inventory. Existing saves are preserved. Unreadable saves show retry/reset options rather than being
 silently replaced. Failed writes leave the previous balance and inventory intact.
 
 For testing, open Market → **Reset saved garden** → **Confirm reset**. This restores
-460 coins, clears inventory, and resets garden demo progress, while leaving health and
+100 coins, empties the garden and inventory, and resets garden demo progress, while leaving health and
 account data untouched. The demo controls have the same confirmed reset.
 
 Run `npm run check` for purchase, persistence, concurrent mutation, failed storage, and

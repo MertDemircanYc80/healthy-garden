@@ -30,7 +30,6 @@ export default function Market() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [confirmReset, setConfirmReset] = useState(false);
-  const owned = MARKET_ITEMS.filter(item => inventory[item.id] > 0);
 
   async function buy(id: ItemId, name: string) {
     setBusy(true);
@@ -82,16 +81,16 @@ export default function Market() {
 
         <View style={styles.inventory}>
           <Text accessibilityRole="header" style={styles.sectionTitle}>Your inventory</Text>
-          {owned.length === 0 ? <Text style={styles.muted}>Your shed is empty. Purchased plants and supplies will appear here.</Text> : owned.map(item => <View key={item.id} style={styles.inventoryRow}>
+          {MARKET_ITEMS.map(item => <View key={item.id} style={styles.inventoryRow}>
             <Text style={{ color: C.mist, fontSize: T.body }}>{item.name}</Text>
             <Text accessibilityLabel={`${item.name}: ${inventory[item.id]} owned`} style={{ color: C.moss, fontWeight: "700" }}>× {inventory[item.id]}</Text>
           </View>)}
-          <Text style={[styles.muted, { marginTop: 14 }]}>Kept in your inventory until you’re ready. Buying doesn’t plant or use an item.</Text>
+          <Text style={[styles.muted, { marginTop: 14 }]}>Plant flowers and trees from the Garden panel. Each plant uses one owned item. Watering uses one can per plant; fertilizing uses one fertilizer per boost.</Text>
         </View>
 
         <View style={styles.reset}>
           <Text style={styles.itemName}>A fresh start</Text>
-          <Text style={[styles.muted, { marginTop: 6 }]}>For testing: clear inventory and garden demo progress, and restore {STARTING_COINS} coins. Your health data and account stay untouched.</Text>
+          <Text style={[styles.muted, { marginTop: 6 }]}>For testing: empty the garden and inventory, clear demo progress, and restore {STARTING_COINS} coins. Your health data and account stay untouched.</Text>
           {!confirmReset ? <Pressable accessibilityRole="button" disabled={busy} onPress={() => setConfirmReset(true)} style={styles.resetButton}><Text style={{ color: C.berry, fontWeight: "600" }}>Reset saved garden</Text></Pressable> : <>
             <Text style={[styles.notice, { marginTop: 12 }]}>Clear this device’s saved garden and purchases?</Text>
             <View style={{ flexDirection: "row", gap: 16 }}>

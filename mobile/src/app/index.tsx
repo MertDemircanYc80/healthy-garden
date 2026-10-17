@@ -145,7 +145,7 @@ export default function Home() {
           setExpanded((e) => !e);
         }}
       >
-        {tab === "garden" && <GardenSection selected={selected} onClearSelection={() => setSelected(null)} />}
+        {tab === "garden" && <GardenSection selected={selected} onClearSelection={() => setSelected(null)} onSelect={onPlantPress} />}
         {tab === "goals" && <GoalsSection />}
         {tab === "coach" && <CoachSection />}
         {tab === "report" && <ReportSection />}

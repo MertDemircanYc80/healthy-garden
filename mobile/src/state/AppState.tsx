@@ -6,8 +6,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { COACH_SOURCE, coachInsights, coachReport, dateLabel, dayAt, goalsAt, MAX_OFFSET, nextDay, type DemoDay } from "@/demo/simulation";
+import { GardenActionError, plantItem, waterPlants, fertilizePlant as applyFertilizer } from "@/lib/gardenActions";
 import { goalProgress } from "@/lib/format";
-import { purchase, type Inventory, type ItemId } from "@/lib/market";
+import { STARTING_COINS, purchase, type Inventory, type ItemId } from "@/lib/market";
 import { createGardenStore, initialGarden, type SavedGarden } from "@/lib/savedGarden";
 import { C } from "@/theme";
 import type { Alert, Goal, Insight, Plant, Report, Today } from "@/types";
@@ -21,6 +22,8 @@ interface DemoControls {
   reset: () => void;
 }
 
+type ActionResult = { ok: boolean; message: string };
+
 interface AppState {
   today: Today;
   plants: Plant[];
@@ -32,8 +35,10 @@ interface AppState {
   inventory: Inventory;
   buyItem: (id: ItemId) => Promise<{ ok: boolean; message: string }>;
   resetData: () => Promise<boolean>;
-  waterPlant: (id: string) => void;
-  waterAll: () => void;
+  waterPlant: (id: string) => Promise<ActionResult>;
+  waterAll: () => Promise<ActionResult>;
+  plantOwnedItem: (id: ItemId) => Promise<ActionResult>;
+  fertilizePlant: (id: string) => Promise<ActionResult>;
   dismissInsight: (id: string) => void;
   markAlertsRead: () => void;
 }
@@ -95,12 +100,19 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
 
   const goals = useMemo(() => goalsAt(sim.offset), [sim.offset]);
 
-  // Watering wakes a resting plant right away — coming back is always rewarded.
-  const waterPlant = useCallback(
-    (id: string) => setSim((s) => ({ ...s, plants: s.plants.map((p) => (p.id === id ? { ...p, wateredToday: true, resting: false } : p)) })),
-    [setSim],
-  );
-  const waterAll = useCallback(() => setSim((s) => ({ ...s, plants: s.plants.map((p) => ({ ...p, wateredToday: true, resting: false })) })), [setSim]);
+  const gardenAction = useCallback(async (change: (state: SavedGarden) => SavedGarden, message: string): Promise<ActionResult> => {
+    try {
+      await store.update(change);
+      setSaveError(false);
+      return { ok: true, message };
+    } catch (error) {
+      return { ok: false, message: error instanceof GardenActionError ? error.message : "Couldn’t save that action. No items were used. Please try again." };
+    }
+  }, [store]);
+  const waterPlant = useCallback((id: string) => gardenAction(s => waterPlants(s, id), "Plant watered. Used 1 watering can."), [gardenAction]);
+  const waterAll = useCallback(() => gardenAction(s => waterPlants(s), "Watered as many thirsty plants as your watering cans allowed."), [gardenAction]);
+  const plantOwnedItem = useCallback((id: ItemId) => gardenAction(s => plantItem(s, id), "Planted in your garden. Used 1 from inventory."), [gardenAction]);
+  const fertilizePlant = useCallback((id: string) => gardenAction(s => applyFertilizer(s, id), "Growth boosted. Used 1 fertilizer."), [gardenAction]);
   const dismissInsight = useCallback((id: string) => setInsights((xs) => xs.map((x) => (x.id === id ? { ...x, dismissed: true } : x))), []);
   const markAlertsRead = useCallback(() => setSim((s) => ({ ...s, alerts: s.alerts.map((x) => ({ ...x, read: true })) })), [setSim]);
 
@@ -139,10 +151,12 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       },
       waterPlant,
       waterAll,
+      plantOwnedItem,
+      fertilizePlant,
       dismissInsight,
       markAlertsRead,
     };
-  }, [sim, inventory, buyItem, resetData, goals, insights, goNext, reset, waterPlant, waterAll, dismissInsight, markAlertsRead]);
+  }, [sim, inventory, buyItem, resetData, goals, insights, goNext, reset, waterPlant, waterAll, plantOwnedItem, fertilizePlant, dismissInsight, markAlertsRead]);
 
   if (!saved) return (
     <View style={{ flex: 1, backgroundColor: C.pine, padding: 28, justifyContent: "center", gap: 18 }}>
@@ -150,7 +164,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       {!loadError ? <ActivityIndicator color={C.moss} /> : <>
         <Pressable accessibilityRole="button" onPress={() => { setLoadError(false); void store.load().then(setSaved).catch(() => setLoadError(true)); }} style={{ padding: 14, backgroundColor: C.moss, borderRadius: 20 }}><Text>Try again</Text></Pressable>
         <Pressable accessibilityRole="button" onPress={() => setConfirmRecovery(true)}><Text style={{ color: C.berry }}>Reset saved garden</Text></Pressable>
-        {confirmRecovery && <><Text style={{ color: C.mist }}>Clear your garden progress and inventory and start with 460 coins?</Text>
+        {confirmRecovery && <><Text style={{ color: C.mist }}>Clear your garden progress and inventory and start with {STARTING_COINS} gold and an empty garden?</Text>
           <Pressable accessibilityRole="button" onPress={() => { void resetData(); }}><Text style={{ color: C.berry }}>Confirm reset</Text></Pressable>
           <Pressable accessibilityRole="button" onPress={() => setConfirmRecovery(false)}><Text style={{ color: C.mist }}>Cancel</Text></Pressable></>}
         {saveError && <Text style={{ color: C.berry }}>Reset could not be saved. Please try again.</Text>}

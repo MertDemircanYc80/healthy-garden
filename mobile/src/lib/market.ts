@@ -3,13 +3,13 @@ export const MARKET_ITEMS = [
   { id: "lavender", name: "Lavender", icon: "🪻", price: 35, category: "Plants", description: "Soft purple blooms and a moment of calm." },
   { id: "sunflower", name: "Sunflower", icon: "🌻", price: 50, category: "Plants", description: "A bright bloom that follows the sun." },
   { id: "tree", name: "Apple tree", icon: "🌳", price: 100, category: "Plants", description: "A small tree with room to grow." },
-  { id: "fertilizer", name: "Fertilizer", icon: "🌱", price: 20, category: "Tools & supplies", description: "A little nourishment to keep in your shed." },
-  { id: "watering_can", name: "Watering can", icon: "🚿", price: 50, category: "Tools & supplies", description: "Keep a watering can ready for your plants." },
+  { id: "fertilizer", name: "Fertilizer", icon: "🌱", price: 20, category: "Tools & supplies", description: "One use: boost one plant’s growth." },
+  { id: "watering_can", name: "Watering can", icon: "🚿", price: 50, category: "Tools & supplies", description: "One use: water one plant." },
 ] as const;
 
 export type ItemId = (typeof MARKET_ITEMS)[number]["id"];
 export type Inventory = Record<ItemId, number>;
-export const STARTING_COINS = 460;
+export const STARTING_COINS = 100;
 export const emptyInventory = (): Inventory => ({ flower: 0, lavender: 0, sunflower: 0, tree: 0, fertilizer: 0, watering_can: 0 });
 
 export function purchase(coins: number, inventory: Inventory, id: ItemId) {
