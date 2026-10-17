@@ -21,6 +21,7 @@ import {
   preparedPlan,
   shortDate,
   snapshot,
+  startObservation,
   type Journey,
 } from "@/demo/journey";
 import {
@@ -60,6 +61,7 @@ interface AppState {
     coachSource: string;
     terminalStatus: string;
     load: () => Promise<ActionResult>;
+    start: () => Promise<ActionResult>;
     analyze: (offline?: boolean) => Promise<ActionResult>;
     finish: () => Promise<ActionResult>;
     nextDay: () => Promise<ActionResult>;
@@ -376,14 +378,23 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
           ? `Day ${j.index + 1} · ${shortDate(snapshot(j)!.date)}`
           : "30-day demo",
         day: currentDay,
-        canGoForward: sample && !!plan && j.index < 29 && j.phase !== "midday",
+        canGoForward:
+          sample &&
+          (!!plan || j.index < 6) &&
+          j.index < 29 &&
+          j.phase !== "midday",
         coachSource:
           plan?.source === "live_ai"
             ? `${plan.provider === "gemini" ? "Gemini" : "Live AI"}${plan.cached ? " · saved result" : " · live response"}`
             : "Prepared AI · offline replay",
         terminalStatus,
+        start: () =>
+          action(
+            startObservation,
+            "Day 1 opened. Complete the day to earn 10 gold.",
+          ),
         load: () =>
-          action(loadBaseline, "First 7 days loaded. Your garden stays empty."),
+          action(loadBaseline, "First 7 days loaded. 70 daily gold earned."),
         analyze,
         finish,
         nextDay: advance,

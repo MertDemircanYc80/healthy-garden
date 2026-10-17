@@ -4,7 +4,7 @@ Bu dalda Gemini bağlantısı ve terminal kontrolü hazırdır. **Kendi API anah
 
 ## 1. Bir kez kurulum
 
-Node 22.9+ gerekir (Mac'te Node 24 kullanıldı). Mac ve iPhone aynı Wi-Fi'da olmalı.
+Node 24 LTS (minimum 22.13) gerekir (Mac'te Node 24 kullanıldı). Mac ve iPhone aynı Wi-Fi'da olmalı.
 
 [Google AI Studio → API keys](https://aistudio.google.com/apikey) üzerinden ücretsiz bir projede anahtar oluşturun. Model `gemini-3.8-flash`: [resmî fiyatlandırmada](https://ai.google.dev/gemini-api/docs/pricing) ücretsiz giriş/çıkış kotası bulunur; kullanım sınırları hesabınıza bağlıdır. Ücretli plana geçmek gerekmez. Kota aşılırsa uygulama hata gösterir, kendiliğinden ücretli modele geçmez.
 
@@ -72,7 +72,7 @@ Komutları aynı anda çalıştırmayın. Her adımda telefondan “Uygulandı �
 
 | Komut | Telefonda görülen |
 | --- | --- |
-| `npm run demo -- week 1` | İlk 7 gün, sıfır başlangıç ödülü, AI'ın ilk hedefleri ve açıklaması |
+| `npm run demo -- week 1` | İlk 7 gün, 70 gold günlük ödül, AI'ın ilk hedefleri ve açıklaması |
 | `npm run demo -- next` | 8. günün 14:00 verisi; hedeflerde ara ilerleme |
 | `npm run demo -- finish` | 8. günün son verisi; tutan hedeflere gold |
 | `npm run demo -- next` | 9. gün; önceki gün sulanan bitki büyür |
@@ -89,7 +89,7 @@ Bunlar Supabase'e canlı hasta kaydı ekleyen komutlar değildir: bu dalın GitH
 
 **Sulama ve alışveriş otomatize edilmez.** Telefonda bitki ve su alın, Water moduyla bitkiye dokunun, sonra `next` çalıştırın. Haftayı tek komutla atlamak, sulamadığınız günler boyunca bitkiye ücretsiz bakım sağlamaz. Çok büyüme göstermek için ilk haftalık geçişten sonra birkaç `next → finish → su al → sula` döngüsü kaydedin. Bu döngüleri montajda hızlandırabilirsiniz.
 
-Canlı AI'ın hedefleri ve ödül tutarları her üretimde değişebilir; ilk gün mutlaka 25 gold varsaymayın. Bakiye yetmiyorsa sonraki günleri tamamlayıp alışverişi sonra gösterin. Hazırlanmış prova analizinde ilk ödül 25 gold'dur: Daisy 20 + Water refill 5.
+Canlı AI'ın hedefleri ve ödül tutarları her üretimde değişebilir; ilk gün mutlaka 25 gold varsaymayın. Bakiye yetmiyorsa sonraki günleri tamamlayıp alışverişi sonra gösterin. Hazırlanmış prova analizinde 8. gün 50 hedef gold’u + 10 günlük gold gelir; ilk haftanın 70 gold’u buna eklenir.
 
 ## 4. 2 dakika 45 saniyelik çekim
 

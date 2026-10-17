@@ -3,6 +3,7 @@ import dataset from "@/data/month-health.json";
 import prepared from "@/data/month-coach.json";
 import type { Goal, Insight, Plant, Stage } from "@/types";
 import type { HealthDayRow } from "@/lib/health/types";
+import { DAILY_GOLD, goalGold } from "@/lib/demoEconomy";
 import type { SavedGarden } from "@/lib/savedGarden";
 
 export type MonthDay = HealthDayRow & {
@@ -25,6 +26,7 @@ export type Journey = {
   phase: "empty" | "baseline" | "midday" | "complete";
   plans: Plan[];
   settled: string[];
+  dailyRewards?: { date: string; amount: number }[];
   ledger: {
     id: string;
     date: string;
@@ -41,6 +43,7 @@ export const emptyJourney = (): Journey => ({
   plans: [],
   settled: [],
   ledger: [],
+  dailyRewards: [],
 });
 export const latestPlan = (j: Journey) => j.plans[j.plans.length - 1];
 export const shortDate = (date: string) =>
@@ -102,6 +105,7 @@ export function journeyGoals(j: Journey): Goal[] {
   const started = j.index > plan.through;
   return plan.goals.map((g) => ({
     ...g,
+    reward: goalGold(g.reward),
     current: started ? (valueFor(snapshot(j), g.metric) ?? 0) : 0,
     daysTotal: Math.min(7, 29 - plan.through),
     daysHit: MONTH.slice(
@@ -117,13 +121,41 @@ export function journeyGoals(j: Journey): Goal[] {
   }));
 }
 
-export function loadBaseline(state: SavedGarden): SavedGarden {
+/** Credit each completed observed day once, including the first observation week.
+ * Also upgrades existing saves without changing past goal receipts or purchases. */
+export function syncDailyGold(state: SavedGarden): SavedGarden {
+  const j = state.journey;
+  const through =
+    j.phase === "empty" ? -1 : j.index - (j.phase === "midday" ? 1 : 0);
+  const previous = j.dailyRewards ?? [];
+  const credited = new Set(previous.map((e) => e.date));
+  const added = MONTH.slice(0, through + 1)
+    .filter((d) => !credited.has(d.date))
+    .map((d) => ({ date: d.date, amount: DAILY_GOLD }));
+  if (!added.length) return state;
+  return {
+    ...state,
+    sim: { ...state.sim, coins: state.sim.coins + added.length * DAILY_GOLD },
+    journey: { ...j, dailyRewards: [...previous, ...added] },
+  };
+}
+
+export function startObservation(state: SavedGarden): SavedGarden {
   if (state.journey.phase !== "empty") return state;
   return {
     ...state,
+    sim: { ...state.sim, offset: 0 },
+    journey: { ...emptyJourney(), index: 0, phase: "midday" },
+  };
+}
+
+export function loadBaseline(state: SavedGarden): SavedGarden {
+  if (state.journey.phase !== "empty") return syncDailyGold(state);
+  return syncDailyGold({
+    ...state,
     sim: { ...state.sim, offset: 6 },
     journey: { ...emptyJourney(), index: 6, phase: "baseline" },
-  };
+  });
 }
 
 export function preparedPlan(through: number): Plan {
@@ -159,7 +191,10 @@ export function finishDay(state: SavedGarden): SavedGarden {
   );
   const earned = hit.reduce((sum, g) => sum + g.reward, 0);
   const health = goals.length ? hit.length / goals.length : 0;
-  return {
+  const daily = (j.dailyRewards ?? []).some((e) => e.date === date)
+    ? 0
+    : DAILY_GOLD;
+  return syncDailyGold({
     ...state,
     sim: {
       ...state.sim,
@@ -170,8 +205,10 @@ export function finishDay(state: SavedGarden): SavedGarden {
         {
           id: `reward-${date}`,
           level: "celebrate" as const,
-          title: `${earned} gold earned`,
-          body: `${hit.length} of ${goals.length} goals completed.`,
+          title: `${earned + daily} gold earned`,
+          body: goals.length
+            ? `${daily} daily gold + ${earned} from ${hit.length}/${goals.length} goals.`
+            : `${daily} daily gold. Your first week is for observing.`,
           time: shortDate(date),
           read: false,
         },
@@ -181,18 +218,20 @@ export function finishDay(state: SavedGarden): SavedGarden {
     journey: {
       ...complete,
       settled: [...j.settled, date],
-      ledger: [
-        ...j.ledger,
-        {
-          id: `reward-${date}`,
-          date,
-          amount: earned,
-          goalsHit: hit.length,
-          goalsTotal: goals.length,
-        },
-      ],
+      ledger: goals.length
+        ? [
+            ...j.ledger,
+            {
+              id: `reward-${date}`,
+              date,
+              amount: earned,
+              goalsHit: hit.length,
+              goalsTotal: goals.length,
+            },
+          ]
+        : j.ledger,
     },
-  };
+  });
 }
 
 const STAGES: Stage[] = ["seed", "sprout", "young", "mature", "blooming"];
@@ -221,7 +260,7 @@ export function openNextDay(state: SavedGarden): SavedGarden {
     j.index >= 29 ||
     j.phase === "empty" ||
     j.phase === "midday" ||
-    !latestPlan(j)
+    (!latestPlan(j) && j.index >= 6)
   )
     return state;
   const entry = j.ledger.find((x) => x.date === MONTH[j.index].date);

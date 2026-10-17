@@ -44,16 +44,16 @@ On a physical iPhone, sign in to the same Expo account in Expo Go and the CLI (`
 
 Tap **30-day demo** under the garden title.
 
-1. **Load first 7 days**. Report fills with one week. Goals, coach and garden stay empty.
+1. **Load first 7 days**. Report fills with one week and 70 daily gold. Goals, coach and garden stay empty.
 2. **Analyze the first week**. Four personal targets and concise coach insights appear. The source says whether this is prepared AI or a live request.
 3. **Open day 8**. Report shows an illustrative 14:00 snapshot. Sleep is complete; cumulative metrics are partial. Goals update, but no reward is paid yet.
-4. **Finish day 8**. Final totals arrive. Each met goal pays 25 gold in the prepared scenario, once per date. A feed limit can be on track at 14:00 and fail by day’s end.
+4. **Finish day 8**. Final totals arrive. Each met goal pays twice its plan reward, once per date, plus 10 daily gold. A feed limit can be on track at 14:00 and fail by day’s end.
 5. Close controls. Tap a + plot and buy/plant a daisy (20 gold). In Market buy a water refill (5 gold). Return to the garden, choose **Water**, and tap the plant. The soil darkens and water droplets appear.
 6. Open controls and **Open day 9**. A watered plant grows overnight according to the day’s completed goals. Unwatered plants rest; they never die.
 7. Continue **Finish day / Open next day**. Days 14, 21, 28 and 30 refresh the prepared analysis automatically. Weekly goals apply from the following day. With a live gateway, failed requests leave earned gold and the previous plan safe; retry or select the prepared checkpoint.
 8. Finish **day 30**. The final day pays too; the replay cannot advance beyond it. Inspect 30-day charts, total gold earned, missed goals and the grown garden.
 
-Care is manual: no gold, water or flowers are added by secretly skipping days. Buy enough water refills and care for plants as you advance. The first observed day in the new plan earns 25 gold in this fixture, enough for one daisy and one water refill.
+Daily gold and completed goals are paid explicitly as observed days finish. Care is manual; water and flowers must be purchased. Buy enough water refills and care for plants as you advance. The first week earns 70 daily gold. In the prepared fixture, day 8 adds 50 goal gold and 10 daily gold.
 
 ## A 2:45 video
 

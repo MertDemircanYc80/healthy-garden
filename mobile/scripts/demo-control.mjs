@@ -1,6 +1,7 @@
 const args = process.argv.slice(2);
 const [type, rawWeek] = args;
 const help = `Kullanım (mobile klasöründe):
+  npm run demo -- start     # optional: first observation day
   npm run demo -- status
   npm run demo -- week 1    # 1–7. gün + AI hedefleri
   npm run demo -- next      # bir sonraki gün, 14:00
@@ -11,7 +12,7 @@ const help = `Kullanım (mobile klasöründe):
   npm run demo -- week 5    # 30. güne kadar, kapanış analizi
   npm run demo -- reset --yes  # bu dalın demo/garden kaydını boşaltır
 Prova: week N --prepared (canlı AI çağırmaz). --no-wait: telefondaki onayı beklemeden çıkar.`;
-if (!["status", "week", "next", "finish", "reset"].includes(type)) {
+if (!["status", "week", "next", "finish", "reset", "start"].includes(type)) {
   console.log(help);
   process.exitCode = type ? 1 : 0;
 } else {

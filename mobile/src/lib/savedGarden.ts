@@ -1,5 +1,10 @@
 import type { DemoState } from "@/demo/simulation";
-import { emptyJourney, validatePlan, type Journey } from "@/demo/journey";
+import {
+  emptyJourney,
+  syncDailyGold,
+  validatePlan,
+  type Journey,
+} from "@/demo/journey";
 import { GARDEN_SIZE } from "./gardenPlots";
 import {
   emptyInventory,
@@ -93,6 +98,17 @@ export function decodeGarden(raw: string): SavedGarden {
       Number(j.index) >= -1 &&
       Number(j.index) <= 29 &&
       ["empty", "baseline", "midday", "complete"].includes(String(j.phase)) &&
+      (j.dailyRewards === undefined ||
+        (Array.isArray(j.dailyRewards) &&
+          j.dailyRewards.every(
+            (e) =>
+              record(e) &&
+              typeof e.date === "string" &&
+              /^\d{4}-\d{2}-\d{2}$/.test(e.date) &&
+              count(e.amount),
+          ) &&
+          new Set(j.dailyRewards.map((e) => (e as { date: string }).date))
+            .size === j.dailyRewards.length)) &&
       Array.isArray(j.plans) &&
       j.plans.every((p) => {
         try {
@@ -165,9 +181,13 @@ export function createGardenStore(storage: Storage) {
     if (current) return Promise.resolve(current);
     loading ??= storage
       .getItem(GARDEN_STORAGE_KEY)
-      .then((raw) =>
-        publish(raw === null ? initialGarden() : decodeGarden(raw)),
-      )
+      .then(async (raw) => {
+        const previous = raw === null ? initialGarden() : decodeGarden(raw);
+        const next = syncDailyGold(previous);
+        if (next !== previous)
+          await storage.setItem(GARDEN_STORAGE_KEY, JSON.stringify(next));
+        return publish(next);
+      })
       .finally(() => {
         loading = null;
       });

@@ -117,3 +117,5 @@ cut every stretch item.
 | M18 | Jury demo: empty default, larger interactive garden, full-screen daily reports, sourced 30-day replay, adaptive coach and goal rewards | frontend + integration | Mert + Codex (user requested) | ✅ Done — preview on `demo/jury-month`; validation and teammate setup in `docs/JURY_DEMO.md` |
 
 | M19 | Free-tier Gemini coach + authenticated terminal week imports for the jury replay | integration | Mert + Codex (user requested) | ✅ Done — `docs/AI_TERMINAL_TR.md`; typecheck/check/lint, iOS/web exports and terminal-to-mobile browser replay passed with mock providers; real Gemini call requires the user key |
+
+| M20 | Cross-platform jury setup, daily gold + stronger goal rewards, recorded demo and promo assets | frontend + integration + design | Mert + Codex (user requested) | In progress on `demo/jury-month` |

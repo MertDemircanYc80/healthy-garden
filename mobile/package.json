@@ -39,7 +39,7 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "export:web": "expo export -p web",
-    "check": "npx --yes tsx scripts/check-health.ts && npx --yes tsx scripts/check-demo.ts && npx --yes tsx scripts/check-market.ts && npx --yes tsx scripts/check-journey.ts && npx --yes tsx scripts/check-terminal.ts && node scripts/check-demo-key.mjs && node scripts/check-coach.mjs",
+    "check": "npx --yes tsx scripts/check-health.ts && npx --yes tsx scripts/check-demo.ts && npx --yes tsx scripts/check-market.ts && npx --yes tsx scripts/check-journey.ts && npx --yes tsx scripts/check-economy.ts && npx --yes tsx scripts/check-terminal.ts && node scripts/check-demo-key.mjs && node scripts/check-coach.mjs",
     "demo:data": "npx --yes tsx scripts/make-demo-data.ts",
     "coach": "node --env-file-if-exists=.env.coach.local scripts/coach-server.mjs",
     "demo:setup": "node scripts/demo-setup.mjs",

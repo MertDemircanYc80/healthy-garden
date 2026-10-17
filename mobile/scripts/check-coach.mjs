@@ -39,6 +39,7 @@ const geminiFetch = async (url, request) => {
   assert.equal(request.headers["x-goog-api-key"], "test-key");
   const body = JSON.parse(request.body);
   assert.equal(body.store, false);
+  assert.equal(body.generation_config.thinking_level, "low");
   assert.equal(body.response_format.mime_type, "application/json");
   assert.equal(body.model, "gemini-3.8-flash");
   const input = JSON.parse(body.input.split("\n\n").at(-1));

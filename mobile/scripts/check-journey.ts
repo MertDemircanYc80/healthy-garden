@@ -57,7 +57,7 @@ async function main() {
   assert.equal(observedDays(state.journey).length, 7);
   assert.equal(state.journey.index, 6);
   assert.equal(journeyGoals(state.journey).length, 0);
-  assert.equal(state.sim.coins, 0);
+  assert.equal(state.sim.coins, 70);
   state = applyPlan(state, preparedPlan(6));
   assert.equal(journeyGoals(state.journey).length, 4);
   assert.throws(() => applyPlan(state, preparedPlan(13)), /Finish the day/);
@@ -72,7 +72,7 @@ async function main() {
   );
   assert.equal(observedDays(state.journey).length, 8);
   assert.equal(openNextDay(state), state);
-  assert.equal(state.sim.coins, 0);
+  assert.equal(state.sim.coins, 70);
   assert.equal(state.journey.ledger.length, 0);
   assert.equal(JSON.stringify(state.journey.plans), planBefore);
   console.log(
@@ -81,7 +81,9 @@ async function main() {
   const midday = state;
   state = finishDay(state);
   const reward = state.sim.coins;
-  assert.ok(reward >= 25);
+  assert.equal(reward, 130);
+  assert.equal(state.journey.dailyRewards!.length, 8);
+  assert.equal(state.journey.ledger[0].amount, 50);
   assert.equal(finishDay(state), state);
   assert.equal(state.journey.ledger.length, 1);
   assert.equal(state.journey.ledger[0].date, MONTH[7].date);
@@ -117,7 +119,7 @@ async function main() {
   };
   const store = createGardenStore(storage);
   await assert.rejects(store.update(finishDay), /Disk full/);
-  assert.equal((await store.load()).sim.coins, 0);
+  assert.equal((await store.load()).sim.coins, 70);
   fail = false;
   await Promise.all(Array.from({ length: 8 }, () => store.update(finishDay)));
   const restored = await createGardenStore(storage).load();

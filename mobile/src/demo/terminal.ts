@@ -1,5 +1,6 @@
 import {
   applyPlan,
+  startObservation,
   finishDay,
   latestPlan,
   loadBaseline,
@@ -9,7 +10,7 @@ import {
 import { initialGarden, type SavedGarden } from "@/lib/savedGarden";
 export type TerminalCommand = {
   id: string;
-  type: "week" | "next" | "finish" | "reset";
+  type: "week" | "next" | "finish" | "reset" | "start";
   week?: number;
   plan?: unknown;
 };
@@ -23,12 +24,13 @@ export function applyTerminalCommand(
     !c ||
     typeof c.id !== "string" ||
     c.id.length > 100 ||
-    !["week", "next", "finish", "reset"].includes(c.type)
+    !["week", "next", "finish", "reset", "start"].includes(c.type)
   )
     throw new Error("Invalid terminal command.");
   const applied = state.terminal?.applied ?? [];
   if (applied.includes(c.id)) return state;
   let next = state;
+  if (c.type === "start") next = startObservation(state);
   if (c.type === "reset") next = initialGarden();
   if (c.type === "next") {
     next = openNextDay(state);

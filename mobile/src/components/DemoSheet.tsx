@@ -20,7 +20,7 @@ export function DemoSheet({
   const plan = latestPlan(journey);
   const empty = journey.phase === "empty";
   const end = journey.index === 29 && journey.phase === "complete";
-  const analyze = !empty && !plan;
+  const analyze = !empty && !plan && journey.index >= 6;
   const label = empty
     ? "Load first 7 days"
     : analyze
@@ -48,7 +48,18 @@ export function DemoSheet({
       setBusy(false);
     }
   };
-  const total = journey.ledger.reduce((sum, e) => sum + e.amount, 0);
+  const total =
+    journey.ledger.reduce((sum, e) => sum + e.amount, 0) +
+    (journey.dailyRewards ?? []).reduce((sum, e) => sum + e.amount, 0);
+  const receipts = (journey.dailyRewards ?? []).map((d) => {
+    const goal = journey.ledger.find((e) => e.date === d.date);
+    return {
+      ...d,
+      amount: d.amount + (goal?.amount ?? 0),
+      goalsHit: goal?.goalsHit ?? 0,
+      goalsTotal: goal?.goalsTotal ?? 0,
+    };
+  });
   return (
     <Modal
       visible={open}
@@ -164,13 +175,31 @@ export function DemoSheet({
                 {busy ? "Updating…" : label}
               </Text>
             </Pressable>
+            {empty && (
+              <Pressable
+                accessibilityRole="button"
+                disabled={busy}
+                onPress={async () => {
+                  setBusy(true);
+                  try {
+                    const r = await demo.start();
+                    setMessage(r.message);
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+                style={{ paddingVertical: 16, alignItems: "center" }}
+              >
+                <Text style={{ color: C.moss }}>Start with day 1</Text>
+              </Pressable>
+            )}
             <Text style={[u.muted, { marginTop: 10 }]}>
               {empty
-                ? "Loads reports only. Goals, coach and garden stay empty until analysis."
+                ? "Loads reports and 10 gold per completed day (70 total). Goals and coach follow after analysis."
                 : analyze
-                  ? "Uses a prepared AI analysis, or a live model if configured."
+                  ? "Uses a prepared AI analysis, or a live model if configured. Goal rewards are doubled."
                   : journey.phase === "midday"
-                    ? "Adds final daily totals and pays each completed goal once."
+                    ? "Saves final totals, 10 daily gold and completed goal rewards once."
                     : "Tomorrow’s totals start at 14:00. Plants you watered grow overnight."}
             </Text>
             {!!message && (
@@ -206,15 +235,15 @@ export function DemoSheet({
                 </Text>
               </Pressable>
             )}
-            {journey.ledger.length > 0 && (
+            {receipts.length > 0 && (
               <View style={{ marginTop: 16 }}>
                 <Text style={u.h}>Recent rewards</Text>
-                {journey.ledger
+                {receipts
                   .slice(-3)
                   .reverse()
                   .map((e) => (
                     <View
-                      key={e.id}
+                      key={e.date}
                       style={{
                         flexDirection: "row",
                         justifyContent: "space-between",
@@ -222,7 +251,10 @@ export function DemoSheet({
                       }}
                     >
                       <Text style={u.muted}>
-                        {e.date} · {e.goalsHit}/{e.goalsTotal} goals
+                        {e.date} ·{" "}
+                        {e.goalsTotal
+                          ? `${e.goalsHit}/${e.goalsTotal} goals + daily gold`
+                          : "Daily gold"}
                       </Text>
                       <Text style={{ color: C.sun }}>+{e.amount}</Text>
                     </View>

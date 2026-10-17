@@ -139,6 +139,7 @@ export function createCoachServer({
               ? {
                   model,
                   store: false,
+                  generation_config: { thinking_level: "low" },
                   input: `${instruction}\n\n${input}`,
                   response_format: {
                     type: "text",
@@ -258,7 +259,7 @@ export function createCoachServer({
       if (commandBusy) throw httpError(409, "Bir önceki komut hazırlanıyor.");
       commandBusy = true;
       try {
-        if (!["week", "next", "finish", "reset"].includes(data.type))
+        if (!["week", "next", "finish", "reset", "start"].includes(data.type))
           throw httpError(400, "Unknown demo command");
         if (journal.commands.length >= 400 && data.type !== "reset")
           throw httpError(

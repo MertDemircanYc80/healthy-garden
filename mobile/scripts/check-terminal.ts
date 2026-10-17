@@ -29,7 +29,7 @@ async function main() {
   assert.throws(() => applyTerminalCommand(initialGarden(), week(2)), /first/);
   let state = await execute(week(1));
   assert.equal(state.journey.index, 6);
-  assert.equal(state.sim.coins, 0);
+  assert.equal(state.sim.coins, 70);
   assert.equal(observedDays(state.journey).length, 7);
   const live = {
     ...preparedPlan(6),
@@ -43,7 +43,7 @@ async function main() {
   assert.equal(state.journey.plans[0].source, "live_ai");
   await execute({ id: "open8", type: "next" });
   state = await execute({ id: "end8", type: "finish" });
-  assert.equal(state.sim.coins, 25);
+  assert.equal(state.sim.coins, 130);
   const paid = state.sim.coins;
   await Promise.all(
     Array.from({ length: 8 }, () => execute({ id: "end8", type: "finish" })),
