@@ -12,14 +12,14 @@ const KIND: Record<InsightKind, { label: string; color: string }> = {
 };
 
 export function CoachSection() {
-  const { insights, dismissInsight } = useApp();
+  const { insights, dismissInsight, isDemo } = useApp();
   const visible = insights.filter((i) => !i.dismissed);
   return (
     <View>
       <SectionTitle title="Coach" hint="Read from your sleep, movement, screen time and meals. Not medical advice." />
       {visible.length === 0 && (
         <Card>
-          <Text style={u.body}>You're all caught up. New suggestions arrive after tonight's sync.</Text>
+          <Text style={u.body}>{isDemo ? "You’re all caught up." : "Your personal goal targets explain the recorded totals they use. More health data will help make them personal. Not medical advice."}</Text>
         </Card>
       )}
       {visible.map((i) => (

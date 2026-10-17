@@ -13,6 +13,8 @@ import { STARTING_COINS, purchase, type Inventory, type ItemId } from "@/lib/mar
 import { createGardenStore, initialGarden, type SavedGarden } from "@/lib/savedGarden";
 import { localDay } from "@/lib/health/days";
 import { DEMO_GARDEN_KEY, MODE_KEY, initialPersonalGarden, rollGardenDay } from "@/lib/dailyCycle";
+import { useHealth } from "@/state/Health";
+import { personalGoalsAt, reconcilePersonal } from "@/lib/personalGoals";
 import { C } from "@/theme";
 import type { Alert, Goal, Insight, Plant, Report, Today } from "@/types";
 
@@ -55,6 +57,7 @@ const START = initialGarden();
 const REPORT = coachReport();
 
 export function AppStateProvider({ children }: { children: React.ReactNode }) {
+  const health = useHealth();
   const [stores] = useState(() => ({ personal: createGardenStore(AsyncStorage, undefined, initialPersonalGarden), demo: createGardenStore(AsyncStorage, DEMO_GARDEN_KEY) }));
   const [mode, setMode] = useState<"personal" | "demo" | null>(null);
   const store = stores[mode ?? "personal"];
@@ -87,13 +90,13 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     } catch { setSaveError(true); }
   }, [isDemo, stores]);
   useEffect(() => {
-    if (mode !== "personal") return;
-    const tick = () => { void store.update(s => rollGardenDay(s, localDay(new Date()))).catch(() => setSaveError(true)); };
+    if (mode !== "personal" || !health.ready) return;
+    const tick = () => { void store.update(s => health.ready ? reconcilePersonal(s, health.days, localDay(new Date())) : rollGardenDay(s, localDay(new Date()))).catch(() => setSaveError(true)); };
     tick();
     const timer = setInterval(tick, 15000);
     const sub = RNAppState.addEventListener("change", s => { if (s === "active") tick(); });
     return () => { clearInterval(timer); sub.remove(); };
-  }, [store, mode]);
+  }, [store, mode, health.days, health.ready]);
 
   const setSim = useCallback((change: (s: SavedGarden["sim"]) => SavedGarden["sim"]) => {
     void store.update(state => ({ ...state, sim: change(state.sim) }))
@@ -128,17 +131,17 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     }
   }, [store]);
 
-  const goals = useMemo(() => isDemo ? goalsAt(sim.offset) : [], [sim.offset, isDemo]);
+  const goals = useMemo(() => isDemo ? goalsAt(sim.offset) : personalGoalsAt(saved?.personal, health.days, saved?.calendarDate ?? localDay(new Date())), [sim.offset, isDemo, saved?.personal, saved?.calendarDate, health.days]);
 
   const gardenAction = useCallback(async (change: (state: SavedGarden) => SavedGarden, message: string): Promise<ActionResult> => {
     try {
-      await store.update(state => change(isDemo ? state : rollGardenDay(state, localDay(new Date()))));
+      await store.update(state => change(isDemo ? state : health.ready ? reconcilePersonal(state, health.days, localDay(new Date())) : rollGardenDay(state, localDay(new Date()))));
       setSaveError(false);
       return { ok: true, message };
     } catch (error) {
       return { ok: false, message: error instanceof GardenActionError ? error.message : "Couldn’t save that action. No items were used. Please try again." };
     }
-  }, [store, isDemo]);
+  }, [store, isDemo, health.days, health.ready]);
   const waterPlant = useCallback((id: string) => gardenAction(s => waterPlants(s, id), "Plant watered. Used 1 watering can."), [gardenAction]);
   const waterAll = useCallback(() => gardenAction(s => waterPlants(s), "Watered as many thirsty plants as your watering cans allowed."), [gardenAction]);
   const plantOwnedItem = useCallback((id: ItemId) => gardenAction(s => plantItem(s, id), "Planted in your garden. Used 1 from inventory."), [gardenAction]);
@@ -171,7 +174,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       plants: sim.plants,
       goals,
       insights: isDemo ? insights : [],
-      report: isDemo ? REPORT : { periodLabel: "Your data", score: 0, scoreChange: 0, summary: "Your report will use the health data saved on this device. Not medical advice.", metrics: [] },
+      report: isDemo ? REPORT : { periodLabel: "Your data", score: 0, scoreChange: 0, summary: health.days.length ? `${health.days.length} day(s) of totals saved on this device. Today’s sunlight is based on your personal goals. Not medical advice.` : "No personal health totals yet. Connect Apple Health or record feed time below. Not medical advice.", metrics: [] },
       alerts: sim.alerts,
       demo: {
         dateLabel: isDemo ? dateLabel(sim.offset) : saved?.calendarDate ?? localDay(new Date()),
@@ -189,7 +192,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       dismissInsight,
       markAlertsRead,
     };
-  }, [isDemo, switchMode, saved?.calendarDate, sim, inventory, buyItem, resetData, goals, insights, goNext, reset, waterPlant, waterAll, plantOwnedItem, plantInPlot, fertilizePlant, dismissInsight, markAlertsRead]);
+  }, [health.days.length, isDemo, switchMode, saved?.calendarDate, sim, inventory, buyItem, resetData, goals, insights, goNext, reset, waterPlant, waterAll, plantOwnedItem, plantInPlot, fertilizePlant, dismissInsight, markAlertsRead]);
 
   if (!saved) return (
     <View style={{ flex: 1, backgroundColor: C.pine, padding: 28, justifyContent: "center", gap: 18 }}>

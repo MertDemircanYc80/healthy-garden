@@ -1,3 +1,4 @@
+import type { PersonalProgress } from "./personalGoals";
 import { coachAlerts, MAX_OFFSET, type DemoState } from "@/demo/simulation";
 import { emptyInventory, MARKET_ITEMS, STARTING_COINS, type Inventory } from "./market";
 
@@ -5,6 +6,7 @@ export const GARDEN_STORAGE_KEY = "healthgarden:game:v1";
 export interface SavedGarden {
   version: 1;
   calendarDate?: string;
+  personal?: PersonalProgress;
   sim: DemoState & { health: number };
   inventory: Inventory;
 }
@@ -24,6 +26,13 @@ const stages = ["seed", "sprout", "young", "mature", "blooming"];
 export function decodeGarden(raw: string): SavedGarden {
   const v: unknown = JSON.parse(raw);
   if (record(v) && v.version === 1 && record(v.sim) && record(v.inventory)) {
+    if (v.personal !== undefined) {
+      const p = v.personal;
+      if (!record(p) || typeof p.startedOn !== "string" || !record(p.weeks) || !Array.isArray(p.rewarded) || !p.rewarded.every(k => typeof k === "string")) throw new Error("Saved goal progress could not be read.");
+      for (const plan of Object.values(p.weeks)) {
+        if (!record(plan) || typeof plan.startsOn !== "string" || !Array.isArray(plan.goals) || !plan.goals.every(g => record(g) && typeof g.id === "string" && ["steps","active_minutes","feed_minutes","daylight_minutes"].includes(String(g.metric)) && typeof g.target === "number" && Number.isFinite(g.target) && g.target >= 0 && count(g.reward) && g.reward <= 100 && ["at_least","at_most"].includes(String(g.direction)))) throw new Error("Saved goals could not be read.");
+      }
+    }
     const s = v.sim;
     const inventory = v.inventory;
     const plantsValid = Array.isArray(s.plants) && s.plants.every(p => record(p) &&
