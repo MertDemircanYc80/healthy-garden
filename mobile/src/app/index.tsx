@@ -2,7 +2,7 @@
 // Dev-only URL params for screenshots on web: ?hour=10&tab=goals&open=1
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Platform, Pressable, Text, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { GardenScene, phaseFor } from "@/components/garden/GardenScene";
@@ -63,11 +63,14 @@ export default function Home() {
     setExpanded(true);
   };
 
-  const onPlantPress = (p: Plant) => {
+  const onPlantPress = useCallback((p: Plant) => {
     setSelected(p);
     setTab("garden");
     setExpanded(false);
-  };
+  }, []);
+  const onEmptyPlotPress = useCallback((plot: GardenPlot) => {
+    setSelected(null); setTab("garden"); setExpanded(false); setSelectedPlot(plot);
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: C.pine }}>
@@ -85,14 +88,14 @@ export default function Home() {
           selectedId={selected?.id}
           onPlantPress={onPlantPress}
           selectedPlot={selectedPlot}
-          onEmptyPlotPress={plot => { setSelected(null); setTab("garden"); setExpanded(false); setSelectedPlot(plot); }}
+          onEmptyPlotPress={onEmptyPlotPress}
         />
       </View>
 
       {/* header on the sky */}
       <View style={{ position: "absolute", top: insets.top + 12, left: 22, right: 18, flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between" }}>
         <View>
-          <Text style={{ fontFamily: F.display, fontSize: T.hero, color: night ? C.mist : C.pine, letterSpacing: -0.4 }}>{greeting(hour)}</Text>
+          <Text style={{ fontFamily: F.display, fontSize: width < 360 ? 26 : T.hero, maxWidth: width - 118, color: night ? C.mist : C.pine, letterSpacing: -0.4 }}>{greeting(hour)}</Text>
           <Text style={{ fontFamily: F.displayItalic, fontSize: T.body, color: night ? "rgba(231,240,226,0.8)" : "rgba(22,48,31,0.7)", marginTop: 2 }}>
             your garden is {today.health >= 0.75 ? "thriving" : today.health >= 0.5 ? "growing" : "resting"}
           </Text>

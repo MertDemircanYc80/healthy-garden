@@ -1,6 +1,6 @@
 // The garden — a fixed, calm, isometric illustration. It never pans, zooms or rotates.
 // The sky follows the time of day; the meadow follows 7-day garden health.
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import { Pressable, View } from "react-native";
 import { GARDEN_PLOTS, GARDEN_SIZE, plotNumber, type GardenPlot } from "@/lib/gardenPlots";
 import Svg, { Circle, Defs, Ellipse, G, LinearGradient, Path, Polygon, RadialGradient, Rect, Stop } from "react-native-svg";
@@ -45,7 +45,7 @@ interface Props {
   selectedPlot?: GardenPlot | null;
 }
 
-export function GardenScene({ plants, width, height, bottomCover, topCover, health, hour, selectedId, onPlantPress, onEmptyPlotPress, selectedPlot }: Props) {
+export const GardenScene = memo(function GardenScene({ plants, width, height, bottomCover, topCover, health, hour, selectedId, onPlantPress, onEmptyPlotPress, selectedPlot }: Props) {
   const phase = phaseFor(hour);
   const sky = SKY[phase];
   const k = VB_W / width; // screen px → viewBox units
@@ -88,7 +88,8 @@ export function GardenScene({ plants, width, height, bottomCover, topCover, heal
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cx, top, scale]);
 
-  const emptyPlots = GARDEN_PLOTS.filter(plot => !plants.some(p => p.col === plot.col && p.row === plot.row));
+  const byPlot = useMemo(() => new Map(plants.map(p => [`${p.col}:${p.row}`, p])), [plants]);
+  const emptyPlots = useMemo(() => GARDEN_PLOTS.filter(plot => !byPlot.has(`${plot.col}:${plot.row}`)), [byPlot]);
 
   return (
     <View style={{ width, height }}>
@@ -238,7 +239,7 @@ export function GardenScene({ plants, width, height, bottomCover, topCover, heal
     </Svg>
     <View pointerEvents="box-none" style={{ position: "absolute", top: 0, left: 0, width, height }}>
       {GARDEN_PLOTS.map(plot => {
-        const plant = plants.find(p => p.col === plot.col && p.row === plot.row);
+        const plant = byPlot.get(`${plot.col}:${plot.row}`);
         const [x, y] = iso(plot.col + 0.5, plot.row + 0.5);
         const targetW = TILE_W * scale / k * 0.5;
         const targetH = TILE_H * scale / k * 0.9;
@@ -251,7 +252,7 @@ export function GardenScene({ plants, width, height, bottomCover, topCover, heal
     </View>
     </View>
   );
-}
+});
 
 function Cloud({ x, y, s }: { x: number; y: number; s: number }) {
   return (

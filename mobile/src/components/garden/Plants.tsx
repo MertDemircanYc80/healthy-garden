@@ -1,5 +1,6 @@
 // Flat, hand-drawn-style plants. Origin (0,0) = where the stem meets the soil; up is -y.
 // Every species has 5 stages: seed → sprout → young → mature (bud) → blooming.
+import { memo } from "react";
 import { Circle, Ellipse, G, Path, Rect } from "react-native-svg";
 import type { Plant, Species, Stage } from "@/types";
 import { rest, shade, tint } from "./color";
@@ -340,7 +341,7 @@ function RestHint({ y }: { y: number }) {
   );
 }
 
-export function PlantArt({ plant, selected }: { plant: Plant; selected: boolean }) {
+export const PlantArt = memo(function PlantArt({ plant, selected }: { plant: Plant; selected: boolean }) {
   const p: P = { stage: plant.stage, resting: plant.resting, variant: plant.variant ?? 0 };
   const stageScale = { seed: 0, sprout: 0.25, young: 0.5, mature: 0.8, blooming: 1 }[plant.stage];
   const hintY = -Math.max(16, PLANT_HEIGHT[plant.species] * Math.max(stageScale, 0.25)) - 12;
@@ -353,5 +354,4 @@ export function PlantArt({ plant, selected }: { plant: Plant; selected: boolean 
       {plant.resting ? <RestHint y={hintY} /> : !plant.wateredToday && <WaterHint y={hintY} />}
     </G>
   );
-}
-
+});
