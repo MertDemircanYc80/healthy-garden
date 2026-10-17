@@ -4,6 +4,8 @@ import { randomBytes } from "node:crypto";
 import { parseEnv } from "node:util";
 import { createInterface } from "node:readline/promises";
 import { Writable } from "node:stream";
+import { execFileSync } from "node:child_process";
+import { normalizeDemoKey } from "./demo-key.mjs";
 const load = (path) =>
   existsSync(path) ? parseEnv(readFileSync(path, "utf8")) : {};
 async function main() {
@@ -14,13 +16,22 @@ async function main() {
       throw new Error(
         "Kurulumu normal Terminal'de çalıştırın; anahtarı komut satırına yazmayın.",
       );
+    const clipboard = process.argv.includes("--clipboard");
+    if (clipboard && process.platform !== "darwin")
+      throw new Error(
+        "Pano seçeneği Mac içindir. Bu bilgisayarda --clipboard olmadan çalıştırın.",
+      );
     console.log(
-      "API anahtarı: https://aistudio.google.com/apikey (ücretsiz proje).\nGiriş gizlidir: yazı veya yıldız görünmez. ⌘V ile yapıştırıp Enter’a basın; Ctrl+C iptal eder.",
+      clipboard
+        ? "Şimdi AI Studio’da API anahtarının kopyalama düğmesine tıklayın. Anahtarın adı veya kısaltılmış görünümü değil, tam anahtar kopyalanmalı.\nTerminale anahtar yapıştırmanız gerekmiyor; pano yalnız Enter’a bastığınızda okunur."
+        : "API anahtarı: https://aistudio.google.com/apikey (ücretsiz proje).\nGiriş gizlidir: yazı veya yıldız görünmez. ⌘V ile yapıştırıp Enter’a basın; Ctrl+C iptal eder.",
     );
     process.stdout.write(
-      key
-        ? "Yeni Gemini anahtarı (mevcut anahtarı tutmak için Enter): "
-        : "Gemini API anahtarını yapıştırıp Enter'a bas: ",
+      clipboard
+        ? "Anahtarı kopyaladıktan sonra bu terminale dönüp yalnız Enter’a basın: "
+        : key
+          ? "Yeni Gemini anahtarı (mevcut anahtarı tutmak için Enter): "
+          : "Gemini API anahtarını yapıştırıp Enter'a bas: ",
     );
     const muted = new Writable({
       write(_chunk, _encoding, callback) {
@@ -34,7 +45,22 @@ async function main() {
     });
     try {
       const entered = (await rl.question("")).trim();
-      if (entered) key = entered;
+      if (clipboard) {
+        let copied;
+        try {
+          copied = execFileSync("/usr/bin/pbpaste", {
+            encoding: "utf8",
+            maxBuffer: 8192,
+            timeout: 3000,
+            stdio: ["ignore", "pipe", "ignore"],
+          });
+        } catch {
+          throw new Error(
+            "Mac panosu okunamadı. --clipboard olmadan tekrar çalıştırıp anahtarı yapıştırabilirsiniz.",
+          );
+        }
+        key = normalizeDemoKey(copied);
+      } else if (entered) key = normalizeDemoKey(entered);
     } finally {
       rl.close();
       process.stdout.write("\n");
@@ -44,8 +70,7 @@ async function main() {
         "Anahtar girilmedi. Prova kurulumu için npm run demo:setup -- --no-key kullanın.",
       );
   }
-  if (key && !/^[A-Za-z0-9_-]+$/.test(key))
-    throw new Error("Anahtarda beklenmeyen karakter var; tekrar kopyalayın.");
+  if (key) key = normalizeDemoKey(key);
   const addresses = Object.entries(networkInterfaces())
     .sort(([a], [b]) =>
       a === "en0" ? -1 : b === "en0" ? 1 : a.localeCompare(b),

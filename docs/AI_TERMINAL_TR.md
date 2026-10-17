@@ -15,6 +15,14 @@ npm run demo:setup
 
 İstendiğinde anahtarı yapıştırıp Enter'a basın. Yazdığınız anahtar terminalde görünmez; yıldız da çıkmaz. ⌘V ile yapıştırdıktan sonra Enter’a basın. Ctrl+C kurulumu iptal eder; “Yerel ayarlar hazır” mesajı gelmeden sunucuyu başlatmayın. Anahtarı komutun içine veya sohbete yazmayın. Kurulum mevcut yerel ayarların diğer alanlarını korur; anahtar yalnız gitignored `.env.coach.local` içinde kalır. Expo'ya yalnız Mac'in yerel adresi ve demo erişim kodu verilir.
 
+**Gizli yapıştırmada hata oluyorsa Mac panosundan kurulum:**
+
+```bash
+npm run demo:setup -- --clipboard
+```
+
+Önce bu komutu başlatın. Komut beklerken AI Studio’ya dönüp API anahtarının kopyalama düğmesine tıklayın. Terminale dönün ve yalnız Enter’a basın. Anahtarı yapıştırmanız gerekmez; pano o anda okunur ve anahtar gösterilmeden yerel ayara kaydedilir. Anahtarın adını veya ekranda kısaltılmış/gizlenmiş görünümünü kopyalamayın. Kod, tırnak ve görünmez kopyalama işaretlerini temizler; geçersiz metni hata mesajında göstermez. “Yerel ayarlar hazır” mesajından sonra `npm run coach` çalıştırın.
+
 Birden fazla ağ adaptörü varsa Wi-Fi adresi tercih edilir. Telefon bağlanamıyorsa kendi Mac Wi-Fi IP'nizle tekrar çalıştırın:
 
 ```bash
