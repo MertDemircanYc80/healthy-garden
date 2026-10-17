@@ -1,3 +1,5 @@
+> **Demo video & promotional images:** [Open the media kit](media/README.md) · [2:45 MP4](media/healthy-garden-demo.mp4)
+>
 > **Try the jury demo on your phone:** [Mac + Windows + Expo Go — English](docs/EXPO_GO_EN.md) · [Türkçe sıfırdan kurulum](docs/EXPO_GO_TR.md). Clone the separate `demo/jury-month` branch. No API key is needed for the prepared replay.
 
 > **Jury preview branch:** See [the 30-day demo guide](docs/JURY_DEMO.md) for the empty-first UI, real-data provenance, video script and safe teammate setup. `main` keeps the original version.
