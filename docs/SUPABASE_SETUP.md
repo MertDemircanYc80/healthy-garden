@@ -142,8 +142,9 @@ restricts edits of coach-generated goals, and validates new health totals.
 Run `supabase/tests/health_access.sql` using the SQL editor in a development project:
 it creates two synthetic users inside a transaction and rolls all fixtures back.
 It checks cross-user reads/inserts/updates/deletes, anonymous access, ownership changes,
-and malformed totals. The migration and SQL checks have not yet been run on the hosted
-project; mobile validation tests do not substitute for these database tests.
+and malformed totals. The standalone SQL test files have not been executed from this
+session; equivalent public-client integration checks against the hosted project passed
+(see the verified readiness results below).
 
 Apply `supabase/migrations/20261017020000_health_privacy.sql` next. It adds
 owner-only deletion/reconnect RPCs and blocks new health-derived writes while deletion
@@ -155,9 +156,17 @@ mobile JavaScript checks. No service-role key is needed by the app.
 
 ### Verified hosted readiness on 2026-10-17
 
-`cd mobile && npm run check:connection` confirms that the configured public URL/key
-reach Auth. The supplied project currently has Anonymous Sign-Ins disabled and returns
-`PGRST205` for `health_days` (the app schema is not available through its API). Enable
-Anonymous Sign-Ins and apply the base app schema, then the two 20261017 migrations.
-The active Expo checkout uses an ignored `mobile/.env.local`; no key is committed.
-The readiness check is read-only and does not create accounts or write health records.
+`cd mobile && npm run check:connection` now passes: the public URL/key reach Auth,
+Anonymous Sign-Ins are enabled, and signed-out access to `health_days` is denied.
+After the project owner applied setup, live tests with two fresh anonymous sessions
+verified authenticated inserts/reads/upserts, preservation of unrelated fields,
+cross-user read/insert/update/delete isolation, immutable ownership, invalid-total
+rejection, owner-only health deletion, write blocking after deletion, and explicit
+reconnect. All test health records were removed through the deletion RPC. Two empty
+anonymous test accounts remain because account removal requires admin access:
+`de42b9fe-0565-4fc0-8980-1fe13dd6b473` and `507ff415-9586-45f3-8ee7-38ed4c88e1e5`.
+
+Only the publishable key and the resulting anonymous sessions were used. The active
+Expo checkout uses an ignored `mobile/.env.local`; no key is committed. The
+`check:connection` script itself remains read-only. Native HealthKit and the optional
+cloud AI coach function are outside these live API checks.
