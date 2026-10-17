@@ -27,6 +27,7 @@ Roles and folder ownership are in `AGENTS.md`.
 | M8 | Shop + planting in the island (port from web prototype engine) | frontend | | Todo |
 | M9 | Development build on a team iPhone (EAS or Xcode) so Apple Health works | integration | | Todo |
 | M10 | Coins: pay goal rewards into `coin_events`, update garden coins/streak | backend | | Todo |
+| M12 | Move the coin badge below the floating settings icon without moving settings | frontend | Codex (user requested) | ✅ Done |
 | D1 | Demo mode: sample persona (37 days), coach output, Next day simulation | all | Mert + Claude | ✅ Done |
 | D2 | Real Claude output for the demo (`docs/SUBMISSION.md` → Real AI output) | backend | | Todo — needs an Anthropic API key |
 | D3 | Record the demo video (script in `docs/SUBMISSION.md`) | design | | Todo |

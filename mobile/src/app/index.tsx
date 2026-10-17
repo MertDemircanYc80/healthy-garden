@@ -109,14 +109,6 @@ export default function Home() {
             <Text style={{ fontSize: T.tiny, fontWeight: "700", color: night ? C.mist : C.pine }}>Sample data, {demo.dateLabel}</Text>
           </Pressable>
         </View>
-        <Pressable
-          onPress={() => onTab("garden")}
-          accessibilityLabel={`${today.coins} coins`}
-          style={{ flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: night ? "rgba(22,48,31,0.75)" : "rgba(255,255,255,0.82)", borderRadius: R.pill, paddingHorizontal: 12, paddingVertical: 7, marginTop: 4 }}
-        >
-          <CoinIcon size={16} />
-          <Text style={{ fontFamily: F.display, fontSize: 16, color: night ? C.sun : C.pine }}>{today.coins}</Text>
-        </Pressable>
       </View>
 
       {/* tap the meadow above the island to lower it */}
@@ -127,6 +119,18 @@ export default function Home() {
           accessibilityLabel="Show the whole garden"
         />
       )}
+
+      {/* Below Expo's top-right settings overlay (94 pt including its Tools label).
+          Render after the meadow tap target so the balance stays tappable when expanded. */}
+      <Pressable
+        onPress={() => onTab("garden")}
+        accessibilityRole="button"
+        accessibilityLabel={`${today.coins} coins`}
+        style={{ position: "absolute", top: insets.top + 102, right: 18, flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: night ? "rgba(22,48,31,0.75)" : "rgba(255,255,255,0.82)", borderRadius: R.pill, paddingHorizontal: 12, paddingVertical: 7 }}
+      >
+        <CoinIcon size={16} />
+        <Text style={{ fontFamily: F.display, fontSize: 16, color: night ? C.sun : C.pine }}>{today.coins}</Text>
+      </Pressable>
 
       <Island
         tab={tab}
@@ -152,4 +156,3 @@ export default function Home() {
     </View>
   );
 }
-
