@@ -114,6 +114,8 @@ cut every stretch item.
 
 | M17 | Persist and enforce one fertilizer use per plant per day | frontend | Codex (user requested) | ✅ Done |
 
+| M18 | Always open the personal garden and advance its local date independently of health syncing | frontend | Codex (user requested) | ✅ Done |
+
 ## Approved improvements — Phase 2
 
 | # | Task | Owner | Status |

@@ -83,7 +83,8 @@ reset tests. Web hosting must serve `index.html` for client routes such as `/mar
 
 The personal garden follows local calendar dates and keeps the existing saved gold,
 plants and inventory. The sample garden has separate local storage and is the only mode
-with a manual **Next day** button. Open the date/settings badge to switch modes or replay
+with an **Advance sample day** button. Every app launch opens the personal garden;
+sample mode is only selected for the current session. Open the date/settings badge to switch modes or replay
 **How to play**. New gardens start with 1,000 gold and no plants or supplies.
 
 Personal goals are calculated locally from recorded totals from the preceding seven days:
@@ -107,7 +108,7 @@ anonymous account. Cloud deletion/reconnect require the migrations in
 
 Run `npm run typecheck`, `npm run check`, and `npm run export:web` in `mobile/`.
 Checks cover input validation, concurrent/offline health updates, daily care rollover,
-DST/backward clocks, separate sample progress and once-only rewards (including failed saves).
+DST/backward clocks, automatic local-midnight timers without health data, resume/timezone changes, separate sample progress and once-only rewards (including failed saves).
 SQL isolation/deletion tests live in `supabase/tests/`; they require a Supabase database.
 
 For a visual check at 320×568 and 390×844, complete or skip the guide, plant a plot,

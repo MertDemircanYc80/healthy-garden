@@ -9,7 +9,8 @@ import { goalProgress } from "@/lib/format";
 import { STARTING_COINS, purchase, type Inventory, type ItemId } from "@/lib/market";
 import { createGardenStore, initialGarden, type SavedGarden } from "@/lib/savedGarden";
 import { localDay } from "@/lib/health/days";
-import { DEMO_GARDEN_KEY, MODE_KEY, initialPersonalGarden, rollGardenDay } from "@/lib/dailyCycle";
+import { DEMO_GARDEN_KEY, initialPersonalGarden, rollGardenDay } from "@/lib/dailyCycle";
+import { watchLocalDate } from "@/lib/localDateClock";
 import { useHealth } from "@/state/Health";
 import { personalGoalsAt, reconcilePersonal } from "@/lib/personalGoals";
 import { C } from "@/theme";
@@ -57,8 +58,10 @@ const REPORT = coachReport();
 export function AppStateProvider({ children }: { children: React.ReactNode }) {
   const health = useHealth();
   const [stores] = useState(() => ({ personal: createGardenStore(AsyncStorage, undefined, initialPersonalGarden), demo: createGardenStore(AsyncStorage, DEMO_GARDEN_KEY) }));
-  const [mode, setMode] = useState<"personal" | "demo" | null>(null);
-  const store = stores[mode ?? "personal"];
+  // Sample mode is a preview for this session, never the persisted startup mode.
+  const [mode, setMode] = useState<"personal" | "demo">("personal");
+  const [localDate, setLocalDate] = useState(() => localDay(new Date()));
+  const store = stores[mode];
   const isDemo = mode === "demo";
   const [saved, setSaved] = useState<SavedGarden | null>(null);
   const [loadError, setLoadError] = useState(false);
@@ -70,10 +73,6 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let active = true;
-    if (!mode) {
-      AsyncStorage.getItem(MODE_KEY).then(value => { if (active) setMode(value === "demo" ? "demo" : "personal"); }).catch(() => { if (active) setLoadError(true); });
-      return () => { active = false; };
-    }
     const unsubscribe = store.subscribe(state => { if (active) setSaved(state); });
     store.load().then(state => { if (active) setSaved(state); }).catch(() => { if (active) setLoadError(true); });
     return () => { active = false; unsubscribe(); };
@@ -83,17 +82,25 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     try {
       const next = isDemo ? "personal" : "demo";
       await stores[next].load();
-      await AsyncStorage.setItem(MODE_KEY, next);
       setSaved(null); setMode(next); setLoadError(false);
     } catch { setSaveError(true); }
   }, [isDemo, stores]);
   useEffect(() => {
-    if (mode !== "personal" || !health.ready) return;
-    const tick = () => { void store.update(s => health.ready ? reconcilePersonal(s, health.days, localDay(new Date())) : rollGardenDay(s, localDay(new Date()))).catch(() => setSaveError(true)); };
-    tick();
-    const timer = setInterval(tick, 15000);
-    const sub = RNAppState.addEventListener("change", s => { if (s === "active") tick(); });
-    return () => { clearInterval(timer); sub.remove(); };
+    if (mode !== "personal") return;
+    let active = true;
+    const clock = watchLocalDate(date => {
+      setLocalDate(date);
+      void store.update(s => health.ready ? reconcilePersonal(s, health.days, date) : rollGardenDay(s, date))
+        .then(() => { if (active) setSaveError(false); })
+        .catch(() => { if (active) setSaveError(true); });
+    });
+    const sub = RNAppState.addEventListener("change", s => { if (s === "active") clock.check(); });
+    // Browser focus also covers returning from another window after sleep.
+    if (typeof window !== "undefined") window.addEventListener?.("focus", clock.check);
+    return () => {
+      active = false; clock.stop(); sub.remove();
+      if (typeof window !== "undefined") window.removeEventListener?.("focus", clock.check);
+    };
   }, [store, mode, health.days, health.ready]);
 
   const clearPersonalGoals = useCallback(async () => {
@@ -133,7 +140,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     }
   }, [store]);
 
-  const goals = useMemo(() => isDemo ? goalsAt(sim.offset) : personalGoalsAt(saved?.personal, health.days, saved?.calendarDate ?? localDay(new Date())), [sim.offset, isDemo, saved?.personal, saved?.calendarDate, health.days]);
+  const goals = useMemo(() => isDemo ? goalsAt(sim.offset) : personalGoalsAt(saved?.personal, health.days, localDate), [sim.offset, isDemo, saved?.personal, localDate, health.days]);
 
   const gardenAction = useCallback(async (change: (state: SavedGarden) => SavedGarden, message: string): Promise<ActionResult> => {
     try {
@@ -179,7 +186,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       report: isDemo ? REPORT : { periodLabel: "Your data", score: 0, scoreChange: 0, summary: health.days.length ? `${health.days.length} day(s) of totals saved on this device. Today’s sunlight is based on your personal goals. Not medical advice.` : "No personal health totals yet. Connect Apple Health or record feed time below. Not medical advice.", metrics: [] },
       alerts: sim.alerts,
       demo: {
-        dateLabel: isDemo ? dateLabel(sim.offset) : saved?.calendarDate ?? localDay(new Date()),
+        dateLabel: isDemo ? dateLabel(sim.offset) : localDate,
         day: isDemo ? dayAt(sim.offset) : undefined,
         canGoForward: isDemo && sim.offset < MAX_OFFSET,
         coachSource: isDemo ? COACH_SOURCE : "your saved health data",
@@ -194,7 +201,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       dismissInsight,
       markAlertsRead,
     };
-  }, [clearPersonalGoals, health.days.length, isDemo, switchMode, saved?.calendarDate, sim, inventory, buyItem, resetData, goals, insights, goNext, reset, waterPlant, waterAll, plantOwnedItem, plantInPlot, fertilizePlant, dismissInsight, markAlertsRead]);
+  }, [clearPersonalGoals, health.days.length, isDemo, switchMode, localDate, sim, inventory, buyItem, resetData, goals, insights, goNext, reset, waterPlant, waterAll, plantOwnedItem, plantInPlot, fertilizePlant, dismissInsight, markAlertsRead]);
 
   if (!saved) return (
     <View style={{ flex: 1, backgroundColor: C.pine, padding: 28, justifyContent: "center", gap: 18 }}>

@@ -8,7 +8,7 @@ const KEY = "healthgarden:plantingGuide:v1";
 const STEPS = [
   { title:"Choose your first plot", body:"Your personal garden starts empty with 1,000 gold. Tap a highlighted + plot to choose a flower or tree. You can plant from inventory or buy and plant in one step." },
   { title:"Stock up and care for it", body:"Tap the gold badge at the top right to open Market. Watering uses one can and fertilizing uses one fertilizer. Each plant can receive each care action once per day. Your remaining supplies are shown in Garden and Market." },
-  { title:"Give your garden sunlight", body:"Record health totals in Report to build personal goals. Meeting goals brings sunlight and gold. Plants grow after your local day ends; they rest when you are away. The sample garden in settings has separate progress and a Next day button." },
+  { title:"Give your garden sunlight", body:"Record health totals in Report to build personal goals. Meeting goals brings sunlight and gold. Plants grow after your local day ends; they rest when you are away. The sample garden in settings has separate progress and an Advance sample day button." },
 ];
 export function PlantingGuide({ replay, onClose }: { replay:boolean; onClose:()=>void }) {
   const [firstVisit, setFirstVisit] = useState(false);

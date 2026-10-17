@@ -2,7 +2,6 @@ import { localDay } from "./health/days";
 import { initialGarden, type SavedGarden } from "./savedGarden";
 import type { Stage } from "@/types";
 
-export const MODE_KEY = "healthgarden:mode";
 export const DEMO_GARDEN_KEY = "healthgarden:demo:v1";
 const STAGES: Stage[] = ["seed", "sprout", "young", "mature", "blooming"];
 export function initialPersonalGarden(): SavedGarden {

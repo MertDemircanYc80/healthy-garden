@@ -16,7 +16,7 @@ export function DemoSheet({ open, onClose, onShowGuide }: { open: boolean; onClo
           <ScrollView contentContainerStyle={{ padding: 22, paddingBottom: 26 }}>
           <Text style={{ color: C.mist, fontFamily: F.display, fontSize: T.title }}>{isDemo ? "Demo week" : "Garden settings"}</Text>
           <Text style={[u.muted, { marginTop: 6 }]}>
-            {isDemo ? "This garden uses sample data. Its gold and plants are kept separate from your personal garden." : "Your garden follows your local calendar. Watering and fertilizer become available each new day, including after reopening the app."}
+            {isDemo ? "This garden uses sample data. Its dates are manual for demonstrations. Reopening the app returns to your personal garden." : "The date advances automatically at midnight in your device’s local timezone, even without health syncing. If the app is closed, it catches up when you reopen it. Watering and fertilizer reset once per new day."}
           </Text>
           <Text style={[u.muted, { marginTop: 8 }]}>{isDemo ? `Goals and suggestions written by: ${demo.coachSource}.` : "Personal goals are calculated on this device from your recorded totals."}</Text>
 
@@ -29,6 +29,7 @@ export function DemoSheet({ open, onClose, onShowGuide }: { open: boolean; onClo
             <Text style={{ color: C.moss, fontWeight: "700" }}>{isDemo ? "Return to my garden" : "Try the sample garden"}</Text>
           </Pressable>
           {isDemo && <><Pressable
+            accessibilityRole="button"
             disabled={!demo.canGoForward}
             onPress={() => {
               demo.nextDay();
@@ -44,7 +45,7 @@ export function DemoSheet({ open, onClose, onShowGuide }: { open: boolean; onClo
             })}
           >
             <Text style={{ color: demo.canGoForward ? C.pine : C.fern, fontWeight: "700", fontSize: T.body }}>
-              {demo.canGoForward ? "Next day" : "End of the demo week"}
+              {demo.canGoForward ? "Advance sample day" : "End of the sample week"}
             </Text>
           </Pressable>
           <Text style={[u.muted, { marginTop: 8, textAlign: "center" }]}>
