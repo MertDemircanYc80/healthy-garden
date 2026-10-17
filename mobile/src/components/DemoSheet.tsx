@@ -20,7 +20,8 @@ export function DemoSheet({
   const plan = latestPlan(journey);
   const empty = journey.phase === "empty";
   const end = journey.index === 29 && journey.phase === "complete";
-  const analyze = !empty && !plan && journey.index >= 6;
+  const analyze =
+    !empty && !plan && journey.phase === "complete" && journey.index >= 6;
   const label = empty
     ? "Load first 7 days"
     : analyze
